@@ -1,0 +1,20 @@
+{
+  "name": "symfony-toolbox-bundle",
+  "version": "1.0.0",
+  "description": "Symfony Toolbox Bundle",
+  "author": "David RENARD",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "release": "semantic-release"
+  },
+  "devDependencies": {
+    "conventional-changelog-conventionalcommits": "^8.0.0",
+    "semantic-release": "^24.2.0",
+    "@semantic-release/changelog": "^6.0.2",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.1",
+    "@semantic-release/commit-analyzer": "^13.0.0",
+    "@semantic-release/exec": "^6.0.3"
+  }
+}

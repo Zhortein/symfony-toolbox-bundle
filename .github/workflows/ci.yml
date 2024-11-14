@@ -1,0 +1,66 @@
+name: CI with Changelog and Release
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=1G
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --no-configuration ./tests --do-not-cache-result
+
+      - name: Run PHP-CS-Fixer on Source
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff ./src --rules=@Symfony
+
+      - name: Run PHP-CS-Fixer on Tests
+        run: vendor/bin/php-cs-fixer fix --dry-run --diff ./tests --rules=@Symfony
+
+  # Génération du Changelog, tagging et publication de la release (uniquement sur main)
+  #release:
+  #  if: github.ref == 'refs/heads/main'
+  #  runs-on: ubuntu-latest
+  #  needs: build
+  #  permissions:
+  #    contents: write # to be able to publish a GitHub release
+  #    issues: write # to be able to comment on released issues
+  #    pull-requests: write # to be able to comment on released pull requests
+  #    id-token: write # to enable use of OIDC for npm provenance
+  #  steps:
+  #    - name: Check out the code
+  #      uses: actions/checkout@v4
+  #    - name: Set up Node.js
+  #      uses: actions/setup-node@v4
+  #      with:
+  #        node-version: 'lts/*'
+  #    - name: Install dependencies
+  #      run: npm install
+  #    - name: Install jq
+  #      run: sudo apt-get install jq -y
+  #    - name: Run Semantic Release
+  #      env:
+  #        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #      run: npx semantic-release

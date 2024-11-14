@@ -1,0 +1,49 @@
+{
+  "name": "zhortein/symfony-toolbox-bundle",
+  "type": "symfony-bundle",
+  "keywords": ["symfony", "bundle", "tool", "tools", "toolbox", "utils", "misc"],
+  "description": "This bundle is dedicated to Symfony applications and provide useful tools for your app.",
+  "homepage": "https://www.david-renard.fr",
+  "license": "GPL-3.0-or-later",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "David Renard",
+      "email": "david.renard.21@free.fr",
+      "homepage": "https://www.david-renard.fr",
+      "role": "Owner, Developer"
+    }
+  ],
+  "require": {
+    "php": ">=8.3",
+    "doctrine/dbal": "^3|^4",
+    "symfony/framework-bundle": "^7.1",
+    "symfony/http-client": "^7.1",
+    "symfony/translation": "^7.1",
+    "symfony/validator": "^7.1"
+  },
+  "require-dev": {
+    "friendsofphp/php-cs-fixer": "^v3.49.0",
+    "phpstan/phpstan": "^2.0",
+    "phpstan/phpstan-doctrine": "^2.0",
+    "phpstan/phpstan-symfony": "^2.0",
+    "roave/security-advisories": "dev-latest",
+    "symfony/test-pack": "^1.0"
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "autoload": {
+    "psr-4": {
+      "Zhortein\\SymfonyToolboxBundle\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Zhortein\\SymfonyToolboxBundle\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "php-cs-fixer": "php-cs-fixer fix src --verbose --rules=@Symfony"
+  }
+}

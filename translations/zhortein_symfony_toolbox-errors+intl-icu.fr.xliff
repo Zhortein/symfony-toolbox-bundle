@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="fr" datatype="plaintext" original="file_content">
+        <body>
+            <trans-unit id="0" resname="error.invalid_url">
+                <source>URL cannot be null or invalid.</source>
+                <target>URL ne peut pas être nulle ou invalide.</target>
+            </trans-unit>
+            <trans-unit id="1" resname="error.download_failed">
+                <source>Failed to save content locally.</source>
+                <target>Échec de l'enregistrement local du contenu.</target>
+            </trans-unit>
+            <trans-unit id="2" resname="error.fetch_url">
+                <source>Failed to fetch URL: %url%.</source>
+                <target>Échec de récupération du contenu depuis l'Url : %url%.</target>
+            </trans-unit>
+            <trans-unit id="3" resname="error.exception_occurred">
+                <source>Exception occurred.</source>
+                <target>Exception survenue.</target>
+            </trans-unit>
+            <trans-unit id="4" resname="error.json_decoding">
+                <source>JSON decoding error.</source>
+                <target>Erreur de décodage du fichier JSON.</target>
+            </trans-unit>
+            <trans-unit id="5" resname="error.url_unreachable">
+                <source>URL unreachable.</source>
+                <target>L'URL est indisponible.</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

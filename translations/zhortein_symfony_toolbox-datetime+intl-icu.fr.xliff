@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+    <file source-language="en" target-language="fr" datatype="plaintext" original="file.ext">
+        <body>
+            <trans-unit id="0" resname="MONDAY">
+                <source>Monday</source>
+                <target>Lundi</target>
+            </trans-unit>
+            <trans-unit id="1" resname="TUESDAY">
+                <source>Tuesday</source>
+                <target>Mardi</target>
+            </trans-unit>
+            <trans-unit id="2" resname="WEDNESDAY">
+                <source>Wednesday</source>
+                <target>Mercredi</target>
+            </trans-unit>
+            <trans-unit id="3" resname="THURSDAY">
+                <source>Thursday</source>
+                <target>Jeudi</target>
+            </trans-unit>
+            <trans-unit id="4" resname="FRIDAY">
+                <source>Friday</source>
+                <target>Vendredi</target>
+            </trans-unit>
+            <trans-unit id="5" resname="SATURDAY">
+                <source>Saturday</source>
+                <target>Samedi</target>
+            </trans-unit>
+            <trans-unit id="6" resname="SUNDAY">
+                <source>Sunday</source>
+                <target>Dimanche</target>
+            </trans-unit>
+            <trans-unit id="7" resname="FROM_DAY">
+                <source>From</source>
+                <target>Du</target>
+            </trans-unit>
+            <trans-unit id="8" resname="TO_DAY">
+                <source>To</source>
+                <target>Au</target>
+            </trans-unit>
+            <trans-unit id="9" resname="FROM_HOUR">
+                <source>From</source>
+                <target>De</target>
+            </trans-unit>
+            <trans-unit id="10" resname="TO_HOUR">
+                <source>To</source>
+                <target>A</target>
+            </trans-unit>
+            <trans-unit id="11" resname="JANUARY">
+                <source>January</source>
+                <target>Janvier</target>
+            </trans-unit>
+            <trans-unit id="12" resname="FEBRUARY">
+                <source>February</source>
+                <target>Février</target>
+            </trans-unit>
+            <trans-unit id="13" resname="MARCH">
+                <source>March</source>
+                <target>Mars</target>
+            </trans-unit>
+            <trans-unit id="14" resname="APRIL">
+                <source>April</source>
+                <target>Avril</target>
+            </trans-unit>
+            <trans-unit id="15" resname="MAY">
+                <source>May</source>
+                <target>Mai</target>
+            </trans-unit>
+            <trans-unit id="16" resname="JUNE">
+                <source>June</source>
+                <target>Juin</target>
+            </trans-unit>
+            <trans-unit id="17" resname="JULY">
+                <source>July</source>
+                <target>Juillet</target>
+            </trans-unit>
+            <trans-unit id="18" resname="AUGUST">
+                <source>August</source>
+                <target>Août</target>
+            </trans-unit>
+            <trans-unit id="19" resname="SEPTEMBER">
+                <source>September</source>
+                <target>Septembre</target>
+            </trans-unit>
+            <trans-unit id="20" resname="OCTOBER">
+                <source>October</source>
+                <target>Octobre</target>
+            </trans-unit>
+            <trans-unit id="21" resname="NOVEMBER">
+                <source>November</source>
+                <target>Novembre</target>
+            </trans-unit>
+            <trans-unit id="22" resname="DECEMBER">
+                <source>December</source>
+                <target>Décembre</target>
+            </trans-unit>
+            <trans-unit id="23" resname="MONDAY_SHORT">
+                <source>MONDAY_SHORT</source>
+                <target>Lun</target>
+            </trans-unit>
+            <trans-unit id="24" resname="TUESDAY_SHORT">
+                <source>TUESDAY_SHORT</source>
+                <target>Mar</target>
+            </trans-unit>
+            <trans-unit id="25" resname="WEDNESDAY_SHORT">
+                <source>WEDNESDAY_SHORT</source>
+                <target>Mer</target>
+            </trans-unit>
+            <trans-unit id="26" resname="THURSDAY_SHORT">
+                <source>THURSDAY_SHORT</source>
+                <target>Jeu</target>
+            </trans-unit>
+            <trans-unit id="27" resname="FRIDAY_SHORT">
+                <source>FRIDAY_SHORT</source>
+                <target>Ven</target>
+            </trans-unit>
+            <trans-unit id="28" resname="SATURDAY_SHORT">
+                <source>SATURDAY_SHORT</source>
+                <target>Sam</target>
+            </trans-unit>
+            <trans-unit id="29" resname="SUNDAY_SHORT">
+                <source>SUNDAY_SHORT</source>
+                <target>Dim</target>
+            </trans-unit>
+            <trans-unit id="30" resname="TODAY">
+                <source>TODAY</source>
+                <target>Aujourd'hui</target>
+            </trans-unit>
+            <trans-unit id="31" resname="YESTERDAY">
+                <source>YESTERDAY</source>
+                <target>Hier</target>
+            </trans-unit>
+            <trans-unit id="32" resname="THIS_MONTH">
+                <source>THIS_MONTH</source>
+                <target>Ce mois-ci</target>
+            </trans-unit>
+            <trans-unit id="33" resname="LAST_MONTH">
+                <source>LAST_MONTH</source>
+                <target>Le mois dernier</target>
+            </trans-unit>
+            <trans-unit id="34" resname="THIS_YEAR">
+                <source>THIS_YEAR</source>
+                <target>Cette année</target>
+            </trans-unit>
+            <trans-unit id="35" resname="LAST_YEAR">
+                <source>LAST_YEAR</source>
+                <target>L'année passée</target>
+            </trans-unit>
+            <trans-unit id="36" resname="LAST7DAYS">
+                <source>LAST7DAYS</source>
+                <target>Ces 7 derniers jours</target>
+            </trans-unit>
+            <trans-unit id="37" resname="LAST30DAYS">
+                <source>LAST30DAYS</source>
+                <target>Ces 30 derniers jours</target>
+            </trans-unit>
+            <trans-unit id="38" resname="compared to">
+                <source>compared to</source>
+                <target>comparé à</target>
+            </trans-unit>
+            <trans-unit id="39" resname="InvalidFormat">
+                <source>InvalidFormat</source>
+                <target>Format invalide</target>
+            </trans-unit>
+            <trans-unit id="40" resname="YearShort">
+                <source>YearShort</source>
+                <target>a</target>
+            </trans-unit>
+            <trans-unit id="41" resname="MonthShort">
+                <source>MonthShort</source>
+                <target>m</target>
+            </trans-unit>
+            <trans-unit id="42" resname="DayShort">
+                <source>DayShort</source>
+                <target>j</target>
+            </trans-unit>
+            <trans-unit id="43" resname="HourShort">
+                <source>HourShort</source>
+                <target>h</target>
+            </trans-unit>
+            <trans-unit id="44" resname="MinuteShort">
+                <source>MinuteShort</source>
+                <target>min</target>
+            </trans-unit>
+            <trans-unit id="45" resname="SecondShort">
+                <source>SecondShort</source>
+                <target>s</target>
+            </trans-unit>
+            <trans-unit id="46" resname="Year">
+                <source>Year</source>
+                <target>{count, plural, =0 {an} =1 {an} other {ans}}</target>
+            </trans-unit>
+            <trans-unit id="47" resname="Month">
+                <source>Month</source>
+                <target>mois</target>
+            </trans-unit>
+            <trans-unit id="48" resname="Day">
+                <source>Day</source>
+                <target>{count, plural, =0 {jour} =1 {jour} other {jours}}</target>
+            </trans-unit>
+            <trans-unit id="49" resname="Hour">
+                <source>Hour</source>
+                <target>{count, plural, =0 {heure} =1 {heure} other {heures}}</target>
+            </trans-unit>
+            <trans-unit id="50" resname="Minute">
+                <source>Minute</source>
+                <target>{count, plural, =0 {minute} =1 {minute} other {minutes}}</target>
+            </trans-unit>
+            <trans-unit id="51" resname="Second">
+                <source>Second</source>
+                <target>{count, plural, =0 {seconde} =1 {seconde} other {secondes}}</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>
