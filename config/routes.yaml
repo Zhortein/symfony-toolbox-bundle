@@ -1,0 +1,4 @@
+zhortein_symfony_toolbox:
+  resource: '@ZhorteinSymfonyToolboxBundle/Controller/'
+  type: attribute
+  prefix: /zhortein/symfony-toolbox

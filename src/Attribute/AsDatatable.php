@@ -2,8 +2,6 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Attribute;
 
-use Zhortein\SymfonyToolboxBundle\Service\StringTools;
-
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsDatatable
 {
@@ -15,6 +13,8 @@ class AsDatatable
         public bool $searchable = true,
         public array $options = [], // Additional Options
     ) {
-        $this->name = StringTools::sanitizeFileName($name);
+        if (empty($name)) {
+            throw new \InvalidArgumentException('You must specify a name for a Datatable.');
+        }
     }
 }

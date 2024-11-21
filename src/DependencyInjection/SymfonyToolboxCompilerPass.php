@@ -8,12 +8,9 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsDatatable;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
-use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
-use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
-use Zhortein\SymfonyToolboxBundle\Service\StringTools;
 
 class SymfonyToolboxCompilerPass implements CompilerPassInterface
 {
@@ -65,8 +62,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         if ($attribute) {
             $instance = $attribute[0]->newInstance();
             $serviceId = $class->getName();
-            $sanitizedName = StringTools::sanitizeFileName($instance->name);
-            $this->datatables[$sanitizedName] = new Reference($serviceId);
+            $this->datatables[$instance->name] = new Reference($serviceId);
 
             return true;
         }

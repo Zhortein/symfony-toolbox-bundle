@@ -6,6 +6,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Routing\Loader\YamlFileLoader;
 
 class ZhorteinSymfonyToolboxExtension extends Extension
 {
@@ -13,6 +14,9 @@ class ZhorteinSymfonyToolboxExtension extends Extension
     {
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../../config'));
         $loader->load('services.xml');
+
+        $routingLoader = new YamlFileLoader(new FileLocator(__DIR__.'/../../config'));
+        $routingLoader->load('routes.yaml');
 
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);

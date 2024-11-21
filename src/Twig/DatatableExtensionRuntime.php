@@ -22,10 +22,10 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
         }
 
         $attributes = sprintf(
-            'data-controller="datatable" data-datatable-id="%s" %s',
+            'data-controller="datatable" data-datatable-id-value="%s" %s',
             htmlspecialchars($datatableId, ENT_QUOTES),
             implode(' ', array_map(
-                static fn ($key, $value) => sprintf('data-datatable-%s="%s"', $key, htmlspecialchars($value, ENT_QUOTES)),
+                static fn ($key, $value) => sprintf('data-datatable-%s-value="%s"', $key, htmlspecialchars($value, ENT_QUOTES)),
                 array_keys($options),
                 $options
             ))
@@ -34,7 +34,7 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
         $headers = '';
         foreach ($datatable->getColumns() as $column) {
             $sortableAttr = $column['orderable']
-                ? sprintf('data-action="click->datatable#sort" data-datatable-sort-field="%s"', htmlspecialchars($column['name'], ENT_QUOTES))
+                ? sprintf('data-action="click->datatable#sort" data-datatable-sort-value="%s"', htmlspecialchars($column['name'], ENT_QUOTES))
                 : '';
             $headers .= sprintf('<th %s>%s</th>', $sortableAttr, htmlspecialchars($column['label'], ENT_QUOTES));
         }
@@ -43,18 +43,20 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
 
         return <<<HTML
 <div {$attributes} class="datatable-wrapper">
-    <div class="datatable-spinner hidden">{$loadingText}</div>
+    <div data-datatable-target="error" class="datatable-error hidden"></div>
+    <div data-datatable-target="search" class="datatable-search hidden"></div>
+    <div data-datatable-target="spinner" class="datatable-spinner hidden">{$loadingText}</div>
     <table class="table datatable">
         <thead>
             <tr>
                 {$headers}
             </tr>
         </thead>
-        <tbody data-target="datatable.table">
+        <tbody data-datatable-target="table">
             <!-- Initial rows will be populated dynamically -->
         </tbody>
     </table>
-    <nav class="datatable-pagination" data-target="datatable.pagination">
+    <nav class="datatable-pagination" data-datatable-target="pagination">
         <!-- Pagination dynamically handled -->
     </nav>
 </div>

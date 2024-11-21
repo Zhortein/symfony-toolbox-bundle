@@ -1,10 +1,10 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['table', 'pagination', 'spinner', 'search'];
+    static targets = ['table', 'pagination', 'spinner', 'search', 'error'];
 
     static values = {
-        datatableId: String,
+        id: String,
         page: Number,
         sort: String,
         order: String,
@@ -23,7 +23,7 @@ export default class extends Controller {
     async updateTable() {
         this.showSpinner();
 
-        const url = new URL(`/datatable/${this.datatableIdValue}/data`, window.location.origin);
+        const url = new URL(`/zhortein/symfony-toolbox/datatable/${this.idValue}/data`, window.location.origin);
         url.searchParams.set('page', this.state.page);
         url.searchParams.set('sort', this.state.sort);
         url.searchParams.set('order', this.state.order);
