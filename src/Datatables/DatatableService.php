@@ -44,6 +44,7 @@ class DatatableService
                             if ($service instanceof AbstractDatatable) {
                                 return $service;
                             }
+
                             return null;
                         } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {
                             // @todo Log error ?

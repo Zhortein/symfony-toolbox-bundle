@@ -16,6 +16,11 @@ abstract class AbstractHolidayProvider
         }
     }
 
+    public function __toString(): string
+    {
+        return get_class($this);
+    }
+
     public function setHolidayCalculator(HolidayCalculator $holidayCalculator): void
     {
         $this->holidayCalculator = $holidayCalculator;

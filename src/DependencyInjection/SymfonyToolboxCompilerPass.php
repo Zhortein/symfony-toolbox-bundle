@@ -12,14 +12,13 @@ use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
-use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
 use Zhortein\SymfonyToolboxBundle\Service\StringTools;
 
 class SymfonyToolboxCompilerPass implements CompilerPassInterface
 {
     /**
-     * @var array<string, AbstractHolidayProvider>
+     * @var array<string, Reference>
      */
     private array $holidayProviders = [];
 
@@ -44,6 +43,10 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
 
         if ($haveHolidayProviders) {
             $this->registerHolidayProviders($container);
+
+            foreach ($this->holidayProviders as $countryCode => $providerRef) {
+                echo sprintf("Provider for %s: %s\n", $countryCode, $providerRef);
+            }
         }
         $this->detectActionEnum($container);
         $this->registerDBALTypes($container);
@@ -89,31 +92,30 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
     private function detectHolidayProvider(\ReflectionClass $class): bool
     {
         $attribute = $class->getAttributes(AsHolidayProvider::class);
-        $count = 0;
-        if ($attribute) {
-            $instance = $attribute[0]->newInstance();
-            try {
-                $holidayProviderInstance = $class->newInstance();
-                if (!$holidayProviderInstance instanceof AbstractHolidayProvider) {
-                    return false;
-                }
-            } catch (\ReflectionException) {
-                return false;
-            }
-            foreach ($instance->countryCodes as $countryCode) {
-                $this->holidayProviders[$countryCode] = new Reference($class);
-                ++$count;
-            }
+        if (!$attribute) {
+            return false;
         }
 
-        return $count > 0;
+        $instance = $attribute[0]->newInstance();
+        $countryCodes = $instance->countryCodes;
+
+        $serviceId = $class->getName();
+        foreach ($countryCodes as $countryCode) {
+            $this->holidayProviders[strtoupper($countryCode)] = new Reference($serviceId);
+        }
+
+        return !empty($countryCodes);
     }
 
     private function registerHolidayProviders(ContainerBuilder $container): void
     {
         if ($container->hasDefinition(HolidayProviderManager::class)) {
+            $holidayProviderRefs = array_filter($this->holidayProviders, static function ($providerRef) use ($container) {
+                return $container->has((string) $providerRef);
+            });
+
             $container->getDefinition(HolidayProviderManager::class)
-                ->setArgument(0, $this->holidayProviders);
+                ->setArgument(0, $holidayProviderRefs);
         }
     }
 

@@ -11,5 +11,9 @@
         <service id="Zhortein\SymfonyToolboxBundle\Datatables\DatatableService" autowire="true" autoconfigure="true">
             <argument key="$container">@service_container</argument>
         </service>
+
+        <service id="Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory" autowire="true" autoconfigure="true">
+            <argument key="$container">@service_container</argument>
+        </service>
     </services>
 </container>
