@@ -12,6 +12,7 @@ use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableFactory;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
 use Zhortein\SymfonyToolboxBundle\Service\StringTools;
 
@@ -44,34 +45,24 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         if ($haveHolidayProviders) {
             $this->registerHolidayProviders($container);
         }
+        $this->registerDatatables($container);
         $this->detectActionEnum($container);
         $this->registerDBALTypes($container);
     }
 
     /**
+     * Detect Datatables via attribute #[AsDatatable].
+     *
      * @param \ReflectionClass<object> $class
      */
     private function detectDatatables(ContainerBuilder $container, Definition $definition, \ReflectionClass $class): bool
     {
-        $datatableServiceDefinition = $container->findDefinition(DatatableService::class);
         $attribute = $class->getAttributes(AsDatatable::class);
         if ($attribute) {
             $instance = $attribute[0]->newInstance();
             if (!$instance instanceof AbstractDatatable) {
                 return false;
             }
-
-            $datatableServiceDefinition->addMethodCall('registerDatatable', [
-                $instance->name,
-                [
-                    'columns' => $instance->getColumns(),
-                    'defaultPageSize' => $instance->defaultPageSize,
-                    'defaultSort' => $instance->defaultSort,
-                    'searchable' => $instance->searchable,
-                    'options' => $instance->getOptions(),
-                ],
-                new Reference($class),
-            ]);
 
             $sanitizedName = StringTools::sanitizeFileName($instance->name);
             $definition->addTag('zhortein.datatable', ['id' => $sanitizedName]);
@@ -83,6 +74,8 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
     }
 
     /**
+     * Detect Holiday Providers via attribute #[AsHolidayProvider].
+     *
      * @param \ReflectionClass<object> $class
      */
     private function detectHolidayProvider(\ReflectionClass $class): bool
@@ -106,12 +99,8 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
     private function registerHolidayProviders(ContainerBuilder $container): void
     {
         if ($container->hasDefinition(HolidayProviderManager::class)) {
-            $holidayProviderRefs = array_filter($this->holidayProviders, static function ($providerRef) use ($container) {
-                return $container->has((string) $providerRef);
-            });
-
             $container->getDefinition(HolidayProviderManager::class)
-                ->setArgument(0, $holidayProviderRefs);
+                ->setArgument(0, $this->holidayProviders);
         }
     }
 
@@ -134,5 +123,19 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         $typeDefinitions = $container->getParameter('doctrine.dbal.connection_factory.types');
         $typeDefinitions[EnumActionType::NAME] = ['class' => EnumActionType::class];
         $container->setParameter('doctrine.dbal.connection_factory.types', $typeDefinitions);
+    }
+
+    private function registerDatatables(ContainerBuilder $container): void
+    {
+        if (!$container->has(DatatableFactory::class)) {
+            return;
+        }
+
+        foreach ($container->findTaggedServiceIds('zhortein.datatable') as $id => $tags) {
+            $container->register(sprintf('%s.service', $id), DatatableService::class)
+                ->setFactory([new Reference(DatatableFactory::class), 'createDatatableService'])
+                ->addArgument(new Reference($id))
+                ->setPublic(true); // Rendre le service accessible si nécessaire
+        }
     }
 }

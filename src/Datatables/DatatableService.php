@@ -21,7 +21,6 @@ class DatatableService
     private PaginatorInterface $paginator;
 
     public function __construct(
-        private readonly ContainerInterface $container,
         private readonly Environment $twig,
         private readonly PaginatorFactory $paginatorFactory,
         private readonly ParameterBagInterface $parameterBag,
