@@ -64,10 +64,6 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         $attribute = $class->getAttributes(AsDatatable::class);
         if ($attribute) {
             $instance = $attribute[0]->newInstance();
-            if (!$instance instanceof AbstractDatatable) {
-                return false;
-            }
-
             $serviceId = $class->getName();
             $sanitizedName = StringTools::sanitizeFileName($instance->name);
             $this->datatables[$sanitizedName] = new Reference($serviceId);
@@ -99,9 +95,6 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         }
 
         $instance = $attribute[0]->newInstance();
-        if (!$instance instanceof AbstractHolidayProvider) {
-            return false;
-        }
         $countryCodes = $instance->countryCodes;
 
         $serviceId = $class->getName();
