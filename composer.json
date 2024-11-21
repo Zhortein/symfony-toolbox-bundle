@@ -19,6 +19,7 @@
     "doctrine/dbal": "^3|^4",
     "doctrine/orm": "^3.3",
     "knplabs/knp-paginator-bundle": "^6.6",
+    "symfony/asset-mapper": "^7.1",
     "symfony/framework-bundle": "^7.1",
     "symfony/http-client": "^7.1",
     "symfony/translation": "^7.1",
