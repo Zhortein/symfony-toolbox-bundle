@@ -40,6 +40,7 @@ class BusinessDateTime
         if (null === $this->currentCountry) {
             $this->currentCountry = 'FR';
         }
+        $this->setHolidays($this->currentYear, $this->currentCountry);
     }
 
     public function setLogger(LoggerInterface $logger): void

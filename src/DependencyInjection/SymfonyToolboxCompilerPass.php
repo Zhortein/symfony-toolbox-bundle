@@ -43,10 +43,6 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
 
         if ($haveHolidayProviders) {
             $this->registerHolidayProviders($container);
-
-            foreach ($this->holidayProviders as $countryCode => $providerRef) {
-                echo sprintf("Provider for %s: %s\n", $countryCode, $providerRef);
-            }
         }
         $this->detectActionEnum($container);
         $this->registerDBALTypes($container);
