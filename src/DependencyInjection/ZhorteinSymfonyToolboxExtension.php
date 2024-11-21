@@ -2,13 +2,15 @@
 
 namespace Zhortein\SymfonyToolboxBundle\DependencyInjection;
 
+use Symfony\Component\AssetMapper\AssetMapperInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Routing\Loader\YamlFileLoader;
 
-class ZhorteinSymfonyToolboxExtension extends Extension
+class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtensionInterface
 {
     public function load(array $configs, ContainerBuilder $container): void
     {
@@ -26,5 +28,35 @@ class ZhorteinSymfonyToolboxExtension extends Extension
 
         $datatableConfig = $config['datatables'] ?? [];
         $container->setParameter('zhortein_symfony_toolbox.datatables', $datatableConfig);
+    }
+
+    public function prepend(ContainerBuilder $container): void
+    {
+        if (!$this->isAssetMapperAvailable($container)) {
+            return;
+        }
+
+        $container->prependExtensionConfig('framework', [
+            'asset_mapper' => [
+                'paths' => [
+                    __DIR__.'/../../assets/dist' => '@zhortein/symfony-toolbox-bundle',
+                ],
+            ],
+        ]);
+    }
+
+    private function isAssetMapperAvailable(ContainerBuilder $container): bool
+    {
+        if (!interface_exists(AssetMapperInterface::class)) {
+            return false;
+        }
+
+        // check that FrameworkBundle 6.3 or higher is installed
+        $bundlesMetadata = $container->getParameter('kernel.bundles_metadata');
+        if (!isset($bundlesMetadata['FrameworkBundle'])) {
+            return false;
+        }
+
+        return is_file($bundlesMetadata['FrameworkBundle']['path'].'/Resources/config/asset_mapper.php');
     }
 }
