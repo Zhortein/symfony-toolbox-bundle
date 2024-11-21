@@ -18,6 +18,8 @@ export default class extends Controller {
             order: this.orderValue || 'asc',
             search: this.searchValue || '',
         };
+
+        this.updateTable();
     }
 
     async updateTable() {
