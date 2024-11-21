@@ -25,7 +25,6 @@ class DatatableController extends AbstractController
      * @throws LoaderError
      * @throws NotFoundHttpException
      */
-    #[Route('/datatable/{datatableId}/data', name: 'datatable_fetch_data', methods: ['GET'])]
     public function fetchData(string $datatableId, Request $request): Response
     {
         $datatable = $this->datatableService->findDatatableById($datatableId);
