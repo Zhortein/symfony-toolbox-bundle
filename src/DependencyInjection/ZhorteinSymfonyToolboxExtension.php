@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 
 class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtensionInterface
 {
@@ -24,6 +25,12 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
 
         $datatableConfig = $config['datatables'] ?? [];
         $container->setParameter('zhortein_symfony_toolbox.datatables', $datatableConfig);
+
+        if ($container->hasDefinition(DatatableManager::class)) {
+            $container->getDefinition(DatatableManager::class)
+                ->setArgument(1, $config['datatables'])
+            ;
+        }
     }
 
     public function prepend(ContainerBuilder $container): void

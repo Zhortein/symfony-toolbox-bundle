@@ -2,7 +2,6 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -22,13 +21,7 @@ class DatatableService
         private DatatableManager $datatableManager,
         private readonly Environment $twig,
         private readonly PaginatorFactory $paginatorFactory,
-        private readonly ParameterBagInterface $parameterBag,
     ) {
-    }
-
-    private function getGlobalOption(string $key, mixed $default = null): mixed
-    {
-        return $this->parameterBag->get("zhortein_symfony_toolbox.datatables.$key") ?? $default;
     }
 
     public function findDatatableById(string $id): ?AbstractDatatable
@@ -38,7 +31,7 @@ class DatatableService
 
     public function getPaginator(): object
     {
-        return $this->paginator ?? $this->paginatorFactory->createPaginator($this->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR));
+        return $this->paginator ?? $this->paginatorFactory->createPaginator($this->datatableManager->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR));
     }
 
     public function getParameters(AbstractDatatable $datatable, Request $request): array
@@ -52,7 +45,7 @@ class DatatableService
 
         return [
             'page' => max(1, (int) $request->query->get('page', 1)),
-            'limit' => max(1, (int) $request->query->get('limit', $datatable->getOptions()['defaultPageSize'] ?? $this->getGlobalOption('items_per_page', Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE))),
+            'limit' => max(1, (int) $request->query->get('limit', $datatable->getOptions()['defaultPageSize'] ?? $this->datatableManager->getGlobalOption('items_per_page', Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE))),
             'sort' => $request->query->get('sort', $defaultSort['column']),
             'order' => $request->query->get('order', $defaultSort['order']),
             'search' => $request->query->get('search', null),
@@ -97,7 +90,7 @@ class DatatableService
             $queryBuilder->orderBy($params['sort'], $params['order']);
         }
 
-        $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR);
+        $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->datatableManager->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR);
         $this->paginator = $this->paginatorFactory->createPaginator($paginatorMode);
         $results = $this->paginator->paginate($queryBuilder, $params['page'], $params['limit']);
 

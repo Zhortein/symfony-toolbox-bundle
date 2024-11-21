@@ -2,6 +2,7 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 
 abstract class AbstractDatatable
@@ -9,6 +10,11 @@ abstract class AbstractDatatable
     protected ?QueryBuilder $queryBuilder = null;
     protected array $columns = [];
     protected array $options = [];
+
+    public function __construct(protected EntityManagerInterface $em)
+    {
+        $this->configure();
+    }
 
     public function setColumns(array $columns): self
     {
@@ -73,5 +79,15 @@ abstract class AbstractDatatable
 
     abstract public function configure(): array;
 
-    abstract public function buildQueryBuilder(): QueryBuilder;
+    public function buildQueryBuilder(): QueryBuilder
+    {
+        if (null === $this->queryBuilder) {
+            $this->queryBuilder = $this->em->createQueryBuilder()
+                ->select('t')
+                ->from($this->getEntityClass(), 't');
+        }
+        return $this->queryBuilder;
+    }
+
+    abstract protected function getEntityClass(): string;
 }

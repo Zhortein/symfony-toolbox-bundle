@@ -23,6 +23,7 @@ class DatatableController extends AbstractController
      * @throws RuntimeError
      * @throws LoaderError
      * @throws NotFoundHttpException
+     * @throws \JsonException
      */
     public function fetchData(string $datatableId, Request $request): Response
     {

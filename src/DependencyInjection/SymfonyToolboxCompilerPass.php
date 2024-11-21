@@ -74,7 +74,8 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
     {
         if ($container->hasDefinition(DatatableManager::class)) {
             $container->getDefinition(DatatableManager::class)
-                ->setArgument(0, $this->datatables);
+                ->setArgument(0, $this->datatables)
+            ;
         }
     }
 
