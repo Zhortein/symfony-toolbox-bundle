@@ -5,14 +5,13 @@ namespace Zhortein\SymfonyToolboxBundle\DependencyInjection;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsDatatable;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
-use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
-use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableFactory;
+use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
 use Zhortein\SymfonyToolboxBundle\Service\StringTools;
 
@@ -22,6 +21,11 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
      * @var array<string, Reference>
      */
     private array $holidayProviders = [];
+
+    /**
+     * @var array<string, Reference>
+     */
+    private array $datatables = [];
 
     public function process(ContainerBuilder $container): void
     {
@@ -35,7 +39,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
 
             $reflClass = new \ReflectionClass($class);
             // Some detected features like Datatables excludes other Toolbox attributes so we optimize by bypassing other detections.
-            if (!$this->detectDatatables($container, $definition, $reflClass)) {
+            if (!$this->detectDatatables($reflClass)) {
                 if ($this->detectHolidayProvider($reflClass)) {
                     $haveHolidayProviders = true;
                 }
@@ -55,7 +59,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
      *
      * @param \ReflectionClass<object> $class
      */
-    private function detectDatatables(ContainerBuilder $container, Definition $definition, \ReflectionClass $class): bool
+    private function detectDatatables(\ReflectionClass $class): bool
     {
         $attribute = $class->getAttributes(AsDatatable::class);
         if ($attribute) {
@@ -64,13 +68,22 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
                 return false;
             }
 
+            $serviceId = $class->getName();
             $sanitizedName = StringTools::sanitizeFileName($instance->name);
-            $definition->addTag('zhortein.datatable', ['id' => $sanitizedName]);
+            $this->datatables[$sanitizedName] = new Reference($serviceId);
 
             return true;
         }
 
         return false;
+    }
+
+    private function registerDatatables(ContainerBuilder $container): void
+    {
+        if ($container->hasDefinition(DatatableManager::class)) {
+            $container->getDefinition(DatatableManager::class)
+                ->setArgument(0, $this->datatables);
+        }
     }
 
     /**
@@ -86,6 +99,9 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         }
 
         $instance = $attribute[0]->newInstance();
+        if (!$instance instanceof AbstractHolidayProvider) {
+            return false;
+        }
         $countryCodes = $instance->countryCodes;
 
         $serviceId = $class->getName();
@@ -123,19 +139,5 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         $typeDefinitions = $container->getParameter('doctrine.dbal.connection_factory.types');
         $typeDefinitions[EnumActionType::NAME] = ['class' => EnumActionType::class];
         $container->setParameter('doctrine.dbal.connection_factory.types', $typeDefinitions);
-    }
-
-    private function registerDatatables(ContainerBuilder $container): void
-    {
-        if (!$container->has(DatatableFactory::class)) {
-            return;
-        }
-
-        foreach ($container->findTaggedServiceIds('zhortein.datatable') as $id => $tags) {
-            $container->register(sprintf('%s.service', $id), DatatableService::class)
-                ->setFactory([new Reference(DatatableFactory::class), 'createDatatableService'])
-                ->addArgument(new Reference($id))
-                ->setPublic(true); // Rendre le service accessible si nécessaire
-        }
     }
 }

@@ -2,9 +2,6 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,6 +10,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorInterface;
 
@@ -21,6 +19,7 @@ class DatatableService
     private PaginatorInterface $paginator;
 
     public function __construct(
+        private DatatableManager $datatableManager,
         private readonly Environment $twig,
         private readonly PaginatorFactory $paginatorFactory,
         private readonly ParameterBagInterface $parameterBag,
@@ -34,27 +33,7 @@ class DatatableService
 
     public function findDatatableById(string $id): ?AbstractDatatable
     {
-        if (method_exists($this->container, 'findTaggedServiceIds')) {
-            foreach ($this->container->findTaggedServiceIds('zhortein.datatable') as $serviceId => $tags) {
-                foreach ($tags as $attributes) {
-                    if ($attributes['id'] === $id) {
-                        try {
-                            $service = $this->container->get($serviceId);
-                            if ($service instanceof AbstractDatatable) {
-                                return $service;
-                            }
-
-                            return null;
-                        } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {
-                            // @todo Log error ?
-                            return null;
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
+        return $this->datatableManager->getDatatable($id);
     }
 
     public function getPaginator(): object

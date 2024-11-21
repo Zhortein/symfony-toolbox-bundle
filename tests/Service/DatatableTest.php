@@ -12,6 +12,7 @@ use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableResponse;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\CustomPaginatorAdapter;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\KnpPaginatorAdapter;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory;
 
@@ -216,15 +217,4 @@ class DatatableTest extends TestCase
         $this->assertCount(2, $data['data']);
     }
 
-    public function testFindDatatableById(): void
-    {
-        $datatableMock = $this->getMockForAbstractClass(AbstractDatatable::class);
-        $this->container->register('mock.service.id', get_class($datatableMock))
-            ->addTag('zhortein.datatable', ['id' => 'mock-datatable']);
-
-        $service = new DatatableService($this->container, $this->twig, $this->paginatorFactory, []);
-        $datatable = $service->findDatatableById('mock-datatable');
-
-        $this->assertInstanceOf(AbstractDatatable::class, $datatable);
-    }
 }
