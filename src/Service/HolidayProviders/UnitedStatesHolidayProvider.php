@@ -9,7 +9,7 @@ use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
  * Provides a list of public holidays in the United States for a given year.
  */
 #[AsHolidayProvider(countryCodes: ['US'])]
-class UnitedStatesAbstractHolidayProvider extends AbstractHolidayProvider
+class UnitedStatesHolidayProvider extends AbstractHolidayProvider
 {
     public function getHolidays(int $year): array
     {

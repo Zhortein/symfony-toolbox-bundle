@@ -6,7 +6,7 @@ use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
 
 #[AsHolidayProvider(['ES'])]
-class SpainAbstractHolidayProvider extends AbstractHolidayProvider
+class SpainHolidayProvider extends AbstractHolidayProvider
 {
     public function getHolidays($year): array
     {

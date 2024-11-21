@@ -7,7 +7,7 @@ use Zhortein\SymfonyToolboxBundle\Enum\Day;
 use Zhortein\SymfonyToolboxBundle\Service\BusinessDateTime;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderFactory;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
-use Zhortein\SymfonyToolboxBundle\Service\HolidayProviders\FranceAbstractHolidayProvider;
+use Zhortein\SymfonyToolboxBundle\Service\HolidayProviders\FranceHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviders\HolidayCalculator;
 
 class BusinessDateTimeTest extends TestCase
@@ -177,7 +177,7 @@ class BusinessDateTimeTest extends TestCase
     public function testGetProvider(): void
     {
         $provider = $this->holidayProviderManager->getProvider('FR');
-        $this->assertInstanceOf(FranceAbstractHolidayProvider::class, $provider);
+        $this->assertInstanceOf(FranceHolidayProvider::class, $provider);
 
         $invalidProvider = $this->holidayProviderManager->getProvider('INVALID');
         $this->assertNull($invalidProvider);

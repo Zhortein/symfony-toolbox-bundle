@@ -12,7 +12,7 @@ use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
  * calculations related to Easter.
  */
 #[AsHolidayProvider(countryCodes: ['FR'])]
-class FranceAbstractHolidayProvider extends AbstractHolidayProvider
+class FranceHolidayProvider extends AbstractHolidayProvider
 {
     public function getHolidays(int $year): array
     {

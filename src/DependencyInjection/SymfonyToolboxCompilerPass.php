@@ -9,6 +9,7 @@ use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsDatatable;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
+use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
 use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
@@ -24,6 +25,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
 
     public function process(ContainerBuilder $container): void
     {
+        $haveHolidayProviders = false;
         foreach ($container->getDefinitions() as $definition) {
             $class = $definition->getClass();
 
@@ -34,11 +36,15 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
             $reflClass = new \ReflectionClass($class);
             // Some detected features like Datatables excludes other Toolbox attributes so we optimize by bypassing other detections.
             if (!$this->detectDatatables($container, $definition, $reflClass)) {
-                $this->detectHolidayProvider($reflClass);
+                if ($this->detectHolidayProvider($reflClass)) {
+                    $haveHolidayProviders = true;
+                }
             }
         }
 
-        $this->registerHolidayProviders($container);
+        if ($haveHolidayProviders) {
+            $this->registerHolidayProviders($container);
+        }
         $this->detectActionEnum($container);
         $this->registerDBALTypes($container);
     }
@@ -52,14 +58,18 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         $attribute = $class->getAttributes(AsDatatable::class);
         if ($attribute) {
             $instance = $attribute[0]->newInstance();
+            if (!$instance instanceof AbstractDatatable) {
+                return false;
+            }
+
             $datatableServiceDefinition->addMethodCall('registerDatatable', [
                 $instance->name,
                 [
-                    'columns' => $instance->columns,
+                    'columns' => $instance->getColumns(),
                     'defaultPageSize' => $instance->defaultPageSize,
                     'defaultSort' => $instance->defaultSort,
                     'searchable' => $instance->searchable,
-                    'options' => $instance->options,
+                    'options' => $instance->getOptions(),
                 ],
                 new Reference($class),
             ]);
@@ -91,7 +101,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
                 return false;
             }
             foreach ($instance->countryCodes as $countryCode) {
-                $this->holidayProviders[$countryCode] = $holidayProviderInstance;
+                $this->holidayProviders[$countryCode] = new Reference($class);
                 ++$count;
             }
         }

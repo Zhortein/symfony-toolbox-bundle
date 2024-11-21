@@ -3,14 +3,16 @@
 namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
+use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorInterface;
 
@@ -22,9 +24,13 @@ class DatatableService
         private readonly ContainerInterface $container,
         private readonly Environment $twig,
         private readonly PaginatorFactory $paginatorFactory,
-        private array $globalOptions,
+        private readonly ParameterBagInterface $parameterBag,
     ) {
-        $this->validateGlobalOptions();
+    }
+
+    private function getGlobalOption(string $key, mixed $default = null): mixed
+    {
+        return $this->parameterBag->get("zhortein_symfony_toolbox.datatables.$key") ?? $default;
     }
 
     public function findDatatableById(string $id): ?AbstractDatatable
@@ -34,7 +40,11 @@ class DatatableService
                 foreach ($tags as $attributes) {
                     if ($attributes['id'] === $id) {
                         try {
-                            return $this->container->get($serviceId);
+                            $service = $this->container->get($serviceId);
+                            if ($service instanceof AbstractDatatable) {
+                                return $service;
+                            }
+                            return null;
                         } catch (ContainerExceptionInterface|NotFoundExceptionInterface) {
                             // @todo Log error ?
                             return null;
@@ -47,24 +57,9 @@ class DatatableService
         return null;
     }
 
-    private function validateGlobalOptions(): void
-    {
-        if (!isset($this->globalOptions['items_per_page'])) {
-            $this->globalOptions['items_per_page'] = 10;
-        }
-
-        if (!isset($this->globalOptions['paginator'])) {
-            $this->globalOptions['paginator'] = PaginatorFactory::PAGINATOR_CUSTOM;
-        }
-
-        if (!isset($this->globalOptions['css_mode'])) {
-            $this->globalOptions['css_mode'] = 'bootstrap';
-        }
-    }
-
     public function getPaginator(): object
     {
-        return $this->paginator ?? $this->paginatorFactory->createPaginator($this->globalOptions['paginator']);
+        return $this->paginator ?? $this->paginatorFactory->createPaginator($this->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR));
     }
 
     public function getParameters(AbstractDatatable $datatable, Request $request): array
@@ -74,11 +69,11 @@ class DatatableService
 
     private function extractParameters(Request $request, AbstractDatatable $datatable): array
     {
-        $defaultSort = $datatable->getOptions()['defaultSort'] ?? ['column' => null, 'order' => 'asc'];
+        $defaultSort = $datatable->getDefaultSort();
 
         return [
             'page' => max(1, (int) $request->query->get('page', 1)),
-            'limit' => max(10, (int) $request->query->get('limit', $datatable->getOptions()['defaultPageSize'] ?? $this->globalOptions['items_per_page'])),
+            'limit' => max(1, (int) $request->query->get('limit', $datatable->getOptions()['defaultPageSize'] ?? $this->getGlobalOption('items_per_page', Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE))),
             'sort' => $request->query->get('sort', $defaultSort['column']),
             'order' => $request->query->get('order', $defaultSort['order']),
             'search' => $request->query->get('search', null),
@@ -123,7 +118,7 @@ class DatatableService
             $queryBuilder->orderBy($params['sort'], $params['order']);
         }
 
-        $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->globalOptions['paginator'];
+        $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR);
         $this->paginator = $this->paginatorFactory->createPaginator($paginatorMode);
         $results = $this->paginator->paginate($queryBuilder, $params['page'], $params['limit']);
 

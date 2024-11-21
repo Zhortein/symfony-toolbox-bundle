@@ -10,7 +10,7 @@ use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
  * public holidays for Germany, including static and Easter-based holidays.
  */
 #[AsHolidayProvider(countryCodes: ['DE'])]
-class GermanyAbstractHolidayProvider extends AbstractHolidayProvider
+class GermanyHolidayProvider extends AbstractHolidayProvider
 {
     public function getHolidays(int $year): array
     {

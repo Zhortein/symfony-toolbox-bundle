@@ -12,7 +12,7 @@ use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
  * of holiday dates for the specified year.
  */
 #[AsHolidayProvider(countryCodes: ['BE'])]
-class BelgiumAbstractHolidayProvider extends AbstractHolidayProvider
+class BelgiumHolidayProvider extends AbstractHolidayProvider
 {
     public function getHolidays(int $year): array
     {

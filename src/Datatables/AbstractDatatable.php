@@ -49,6 +49,14 @@ abstract class AbstractDatatable
         return $this->options;
     }
 
+    /**
+     * @return array<string, string|null>
+     */
+    public function getDefaultSort(): array
+    {
+        return $this->getOptions()['defaultSort'] ?? ['column' => null, 'order' => 'asc'];
+    }
+
     public function setQueryBuilder(QueryBuilder $queryBuilder): self
     {
         $this->queryBuilder = $queryBuilder;

@@ -7,5 +7,9 @@
     <services>
         <defaults autowire="true" autoconfigure="true"/>
         <prototype namespace="Zhortein\SymfonyToolboxBundle\" resource="../src/" exclude="../src/{DependencyInjection,Entity,Kernel.php}"/>
+
+        <service id="Zhortein\SymfonyToolboxBundle\Datatables\DatatableService" autowire="true" autoconfigure="true">
+            <argument key="$container">@service_container</argument>
+        </service>
     </services>
 </container>

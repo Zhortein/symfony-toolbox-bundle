@@ -9,8 +9,16 @@ use Zhortein\SymfonyToolboxBundle\Service\HolidayProviders\HolidayCalculator;
  */
 abstract class AbstractHolidayProvider
 {
-    public function __construct(protected readonly HolidayCalculator $holidayCalculator)
+    public function __construct(protected ?HolidayCalculator $holidayCalculator = null)
     {
+        if (null === $this->holidayCalculator) {
+            $this->holidayCalculator = new HolidayCalculator();
+        }
+    }
+
+    public function setHolidayCalculator(HolidayCalculator $holidayCalculator): void
+    {
+        $this->holidayCalculator = $holidayCalculator;
     }
 
     /**

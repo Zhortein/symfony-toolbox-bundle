@@ -17,7 +17,7 @@ use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
  * - Boxing Day
  */
 #[AsHolidayProvider(countryCodes: ['EN', 'GB', 'UK'])]
-class EnglandAbstractHolidayProvider extends AbstractHolidayProvider
+class EnglandHolidayProvider extends AbstractHolidayProvider
 {
     public function getHolidays(int $year): array
     {
