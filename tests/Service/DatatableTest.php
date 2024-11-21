@@ -12,7 +12,6 @@ use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableResponse;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\CustomPaginatorAdapter;
-use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\KnpPaginatorAdapter;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory;
 
@@ -216,5 +215,4 @@ class DatatableTest extends TestCase
         $this->assertEquals(50, $data['filtered']);
         $this->assertCount(2, $data['data']);
     }
-
 }
