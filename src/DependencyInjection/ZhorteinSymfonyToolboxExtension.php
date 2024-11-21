@@ -19,5 +19,8 @@ class ZhorteinSymfonyToolboxExtension extends Extension
         $actionEnums = is_array($config['action_enums']) ? $config['action_enums'] : [];
 
         $container->setParameter('zhortein_symfony_toolbox.action_enums', $actionEnums);
+
+        $datatableConfig = $config['datatables'] ?? [];
+        $container->setParameter('zhortein_symfony_toolbox.datatables', $datatableConfig);
     }
 }

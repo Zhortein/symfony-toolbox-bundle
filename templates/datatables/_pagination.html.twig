@@ -1,0 +1,17 @@
+<nav>
+    <ul class="pagination">
+        {% if data.pagination.hasPrevious %}
+            <li><button data-page="{{ data.pagination.previous }}" data-action="click->datatable#changePage">Précédent</button></li>
+        {% endif %}
+        {% for page in data.pagination.pages %}
+            <li>
+                <button data-page="{{ page }}" data-action="click->datatable#changePage" {% if page == data.pagination.current %}class="active"{% endif %}>
+                    {{ page }}
+                </button>
+            </li>
+        {% endfor %}
+        {% if data.pagination.hasNext %}
+            <li><button data-page="{{ data.pagination.next }}" data-action="click->datatable#changePage">Suivant</button></li>
+        {% endif %}
+    </ul>
+</nav>

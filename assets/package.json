@@ -1,0 +1,20 @@
+{
+  "name": "@zhortein/symfony-toolbox-bundle",
+  "version": "1.1.0",
+  "symfony": {
+    "controllers": {
+      "ajax-call-confirm": {
+        "main": "controllers/datatable_controller.js",
+        "webpackMode": "lazy",
+        "fetch": "lazy",
+        "enabled": true
+      }
+    },
+    "importmap": {
+      "@hotwired/stimulus": "^3.0.0"
+    }
+  },
+  "peerDependencies": {
+    "@hotwired/stimulus": "^3.0.0"
+  }
+}

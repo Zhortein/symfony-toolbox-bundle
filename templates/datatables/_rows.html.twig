@@ -1,0 +1,7 @@
+{% for row in data %}
+    <tr>
+        {% for column in datatable.columns %}
+            <td>{{ attribute(row, column.name) }}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}

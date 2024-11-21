@@ -5,10 +5,15 @@ namespace Zhortein\SymfonyToolboxBundle\DependencyInjection;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
+use Zhortein\SymfonyToolboxBundle\Attribute\AsDatatable;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
+use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
 use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
+use Zhortein\SymfonyToolboxBundle\Service\StringTools;
 
 class SymfonyToolboxCompilerPass implements CompilerPassInterface
 {
@@ -27,7 +32,10 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
             }
 
             $reflClass = new \ReflectionClass($class);
-            $this->detectHolidayProvider($reflClass);
+            // Some detected features like Datatables excludes other Toolbox attributes so we optimize by bypassing other detections.
+            if (!$this->detectDatatables($container, $definition, $reflClass)) {
+                $this->detectHolidayProvider($reflClass);
+            }
         }
 
         $this->registerHolidayProviders($container);
@@ -38,24 +46,57 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
     /**
      * @param \ReflectionClass<object> $class
      */
-    private function detectHolidayProvider(\ReflectionClass $class): void
+    private function detectDatatables(ContainerBuilder $container, Definition $definition, \ReflectionClass $class): bool
+    {
+        $datatableServiceDefinition = $container->findDefinition(DatatableService::class);
+        $attribute = $class->getAttributes(AsDatatable::class);
+        if ($attribute) {
+            $instance = $attribute[0]->newInstance();
+            $datatableServiceDefinition->addMethodCall('registerDatatable', [
+                $instance->name,
+                [
+                    'columns' => $instance->columns,
+                    'defaultPageSize' => $instance->defaultPageSize,
+                    'defaultSort' => $instance->defaultSort,
+                    'searchable' => $instance->searchable,
+                    'options' => $instance->options,
+                ],
+                new Reference($class),
+            ]);
+
+            $sanitizedName = StringTools::sanitizeFileName($instance->name);
+            $definition->addTag('zhortein.datatable', ['id' => $sanitizedName]);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \ReflectionClass<object> $class
+     */
+    private function detectHolidayProvider(\ReflectionClass $class): bool
     {
         $attribute = $class->getAttributes(AsHolidayProvider::class);
-
+        $count = 0;
         if ($attribute) {
             $instance = $attribute[0]->newInstance();
             try {
                 $holidayProviderInstance = $class->newInstance();
                 if (!$holidayProviderInstance instanceof AbstractHolidayProvider) {
-                    return;
+                    return false;
                 }
             } catch (\ReflectionException) {
-                return;
+                return false;
             }
             foreach ($instance->countryCodes as $countryCode) {
                 $this->holidayProviders[$countryCode] = $holidayProviderInstance;
+                ++$count;
             }
         }
+
+        return $count > 0;
     }
 
     private function registerHolidayProviders(ContainerBuilder $container): void
