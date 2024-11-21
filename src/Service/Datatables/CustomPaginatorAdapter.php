@@ -4,7 +4,7 @@ namespace Zhortein\SymfonyToolboxBundle\Service\Datatables;
 
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
-class CustomPaginator implements PaginatorInterface
+class CustomPaginatorAdapter implements PaginatorInterface
 {
     public function paginate(object $queryBuilder, int $page, int $limit): array
     {

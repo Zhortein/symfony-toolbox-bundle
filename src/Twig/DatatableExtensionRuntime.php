@@ -8,7 +8,9 @@ use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 
 readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
 {
-    public function __construct(private DatatableService $datatableService, private TranslatorInterface $translator)
+    public function __construct(
+        private DatatableService $datatableService,
+        private TranslatorInterface $translator)
     {
     }
 

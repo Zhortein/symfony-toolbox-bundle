@@ -11,7 +11,7 @@ use Twig\Loader\ArrayLoader;
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableResponse;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
-use Zhortein\SymfonyToolboxBundle\Service\Datatables\CustomPaginator;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\CustomPaginatorAdapter;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\KnpPaginatorAdapter;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory;
 
@@ -55,7 +55,7 @@ class DatatableTest extends TestCase
 
     public function testPaginatorSelection(): void
     {
-        $customPaginator = $this->createMock(CustomPaginator::class);
+        $customPaginator = $this->createMock(CustomPaginatorAdapter::class);
         $knpPaginator = $this->createMock(KnpPaginatorAdapter::class);
 
         $paginatorFactoryMock = $this->createMock(PaginatorFactory::class);
