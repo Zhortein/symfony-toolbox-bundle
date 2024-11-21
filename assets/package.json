@@ -4,8 +4,7 @@
   "symfony": {
     "controllers": {
       "datatable": {
-        "main": "controllers/datatable_controller.js",
-        "webpackMode": "lazy",
+        "main": "dist/datatable_controller.js",
         "fetch": "lazy",
         "enabled": true
       }
