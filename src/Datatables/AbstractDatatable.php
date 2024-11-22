@@ -5,6 +5,7 @@ namespace Zhortein\SymfonyToolboxBundle\Datatables;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
+use Zhortein\SymfonyToolboxBundle\Service\StringTools;
 
 abstract class AbstractDatatable
 {
@@ -29,12 +30,27 @@ abstract class AbstractDatatable
     protected array $options = [];
 
     private array $globalOptions = [];
+    private string $mainAlias = 't';
 
     protected string $cssMode = Configuration::DEFAULT_DATATABLE_CSS_MODE;
 
     public function __construct(protected EntityManagerInterface $em)
     {
         $this->configure();
+    }
+
+    public function getMainAlias(): string
+    {
+        return $this->mainAlias;
+    }
+
+    public function setMainAlias(string $mainAlias): self
+    {
+        if (!StringTools::isValidSqlAlias($mainAlias)) {
+            throw new \InvalidArgumentException('The main alias must be a valid SQL alias.');
+        }
+        $this->mainAlias = $mainAlias;
+        return $this;
     }
 
     public function getStimulusControllerName(): string
