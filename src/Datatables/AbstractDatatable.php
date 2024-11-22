@@ -107,17 +107,38 @@ abstract class AbstractDatatable
      * @param string $label      the label of the column
      * @param bool   $searchable indicates whether the column is searchable
      * @param bool   $sortable   indicates whether the column is sortable
+     * @param string|null   $sqlAlias   indicates the SQL alias to use in orderBy and search SQL clauses, if empty no alias is used, if null MainAlias is used (default = 't')
      */
-    public function addColumn(string $name, string $label, bool $searchable = true, bool $sortable = true): self
+    public function addColumn(string $name, string $label, bool $searchable = true, bool $sortable = true, ?string $sqlAlias = null): self
     {
         $this->columns[] = [
             'name' => $name,
             'label' => $label,
             'searchable' => $searchable,
             'sortable' => $sortable,
+            'sqlAlias' => $sqlAlias ?? $this->getMainAlias(),
         ];
 
         return $this;
+    }
+
+    /**
+     * Retrieves the SQL alias for a specific column based on its name.
+     *
+     * Iterates through the columns to find a match for the provided column name and returns
+     * the corresponding SQL alias. If no matching column is found, the main alias is returned.
+     *
+     * @param string $name The name of the column to search for.
+     * @return string The SQL alias of the matching column, or the main alias if not found.
+     */
+    public function getColumnAlias(string $name): string
+    {
+        foreach ($this->getColumns() as $column) {
+            if ($column['name'] === $name) {
+                return $column['sqlAlias'];
+            }
+        }
+        return $this->getMainAlias();
     }
 
     /**

@@ -104,8 +104,7 @@ class DatatableService
         }
 
         if ($params['sort'] && $params['order']) {
-            // @todo Handle column specific alias
-            $queryBuilder->orderBy($datatable->getMainAlias().'.'.$params['sort'], $params['order']);
+            $queryBuilder->orderBy($datatable->getColumnAlias($params['sort']).'.'.$params['sort'], $params['order']);
         }
 
         $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->datatableManager->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR);
