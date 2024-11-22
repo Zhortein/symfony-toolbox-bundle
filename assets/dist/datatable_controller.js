@@ -9,6 +9,9 @@ export default class extends Controller {
         sort: String,
         order: String,
         search: String,
+        mode: String,
+        pagesize: Number,
+        url: String,
     };
 
     connect() {
@@ -25,7 +28,7 @@ export default class extends Controller {
     async updateTable() {
         this.showSpinner();
 
-        const url = new URL(`/zhortein/symfony-toolbox/datatable/${this.idValue}/data`, window.location.origin);
+        const url = new URL(this.urlValue, window.location.origin);
         url.searchParams.set('page', this.state.page);
         url.searchParams.set('sort', this.state.sort);
         url.searchParams.set('order', this.state.order);
@@ -73,15 +76,27 @@ export default class extends Controller {
     }
 
     changePage(event) {
-        this.state.page = parseInt(event.target.dataset.page, 10);
+        this.state.page = parseInt(event.target.dataset.page, this.pagesizeValue);
         this.updateTable();
     }
 
     showSpinner() {
-        this.spinnerTarget.classList.remove('hidden');
+        this.spinnerTarget.classList.remove(this.getHiddenClass());
     }
 
     hideSpinner() {
-        this.spinnerTarget.classList.add('hidden');
+        this.spinnerTarget.classList.add(this.getHiddenClass());
+    }
+
+    getHiddenClass() {
+        if (this.modeValue == 'bootstrap') {
+            return 'd-none';
+        }
+
+        if (this.modeValue == 'tailwind') {
+            return 'hidden';
+        }
+
+        return 'hidden';
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Twig;
 
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\RuntimeExtensionInterface;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
@@ -10,7 +11,9 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
 {
     public function __construct(
         private DatatableService $datatableService,
-        private TranslatorInterface $translator)
+        private TranslatorInterface $translator,
+        private RouterInterface $router,
+    )
     {
     }
 
@@ -22,14 +25,20 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
         if (!$datatable) {
             throw new \InvalidArgumentException(sprintf('Datatable with ID "%s" not found.', $datatableId));
         }
-
+        $dataPrefix = 'data-'.$controllerName.'-';
         $attributes = sprintf(
-            'data-controller="%s" data-%s-id-value="%s" %s',
+            'data-controller="%s" %sid-value="%s" %smode-value="%s" %spagesize-value="%s" %surl-value="%s" %s',
             $controllerName,
-            $controllerName,
+            $dataPrefix,
             htmlspecialchars($datatableId, ENT_QUOTES),
+            $dataPrefix,
+            $datatable->getCssMode(),
+            $dataPrefix,
+            $datatable->getOptions()['defaultPageSize'],
+            $dataPrefix,
+            $this->router->generate('zhortein_datatable_fetch_data', ['datatableId' => htmlspecialchars($datatableId, ENT_QUOTES)]),
             implode(' ', array_map(
-                static fn ($key, $value) => sprintf('data-%s-%s-value="%s"', $controllerName, $key, htmlspecialchars($value, ENT_QUOTES)),
+                static fn ($key, $value) => sprintf('%s%s-value="%s"', $dataPrefix, $key, htmlspecialchars($value, ENT_QUOTES)),
                 array_keys($options),
                 $options
             ))
@@ -38,7 +47,7 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
         $headers = '';
         foreach ($datatable->getColumns() as $column) {
             $sortableAttr = $column['sortable']
-                ? sprintf('data-action="click->%s#sort" data-%s-sort-value="%s"', $controllerName, $controllerName, htmlspecialchars($column['name'], ENT_QUOTES))
+                ? sprintf('data-action="click->%s#sort" %ssort-value="%s"', $dataPrefix, $controllerName, htmlspecialchars($column['name'], ENT_QUOTES))
                 : '';
             $headers .= sprintf('<th scope="col" %s>%s</th>', $sortableAttr, htmlspecialchars($column['label'], ENT_QUOTES));
         }
@@ -63,22 +72,27 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
             default => '',
         };
 
+        $hiddenCssClass = match ($datatable->getCssMode()) {
+            'bootstrap' => 'd-none',
+            default => 'hidden',
+        };
+
         return <<<HTML
 <div {$attributes} class="{$tableWrapperCssClasses}">
-    <div data-{$controllerName}-target="error" class="datatable-error hidden"></div>
-    <div data-{$controllerName}-target="search" class="datatable-search hidden"></div>
-    <div data-{$controllerName}-target="spinner" class="datatable-spinner hidden">{$loadingText}</div>
+    <div {$dataPrefix}target="error" class="datatable-error {$hiddenCssClass}"></div>
+    <div {$dataPrefix}target="search" class="datatable-search {$hiddenCssClass}"></div>
+    <div {$dataPrefix}target="spinner" class="datatable-spinner {$hiddenCssClass}">{$loadingText}</div>
     <table class="{$tableCssClasses}">
         <thead>
             <tr>
                 {$headers}
             </tr>
         </thead>
-        <tbody class="{$tableTbodyCssClasses}" data-{$controllerName}-target="table">
+        <tbody class="{$tableTbodyCssClasses}" {$dataPrefix}target="table">
             <!-- Initial rows will be populated dynamically -->
         </tbody>
     </table>
-    <nav class="datatable-pagination" data-{$controllerName}-target="pagination">
+    <nav class="datatable-pagination" {$dataPrefix}target="pagination">
         <!-- Pagination dynamically handled -->
     </nav>
 </div>

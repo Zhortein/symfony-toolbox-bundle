@@ -129,7 +129,7 @@ abstract class AbstractDatatable
 
     public function getOptions(): array
     {
-        if (!array_key_exists('defaultPageSize', $this->options)) {
+            if (!array_key_exists('defaultPageSize', $this->options)) {
             $this->options['defaultPageSize'] = $this->globalOptions['items_per_page'] ?? Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
         }
         if (!array_key_exists('defaultSort', $this->options)) {
