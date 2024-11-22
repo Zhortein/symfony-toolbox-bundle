@@ -17,8 +17,6 @@ class CustomPaginatorAdapter implements PaginatorInterface
 
     public function getTotal(object $queryBuilder): int
     {
-        $query = $queryBuilder->getQuery();
-        $query->setFirstResult(null)->setMaxResults(null);
-        return count($query->getResult());
+        return count($queryBuilder->getQuery()->getResult());
     }
 }
