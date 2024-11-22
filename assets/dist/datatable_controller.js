@@ -76,7 +76,14 @@ export default class extends Controller {
     }
 
     changePage(event) {
-        this.state.page = parseInt(event.target.dataset.page, this.pagesizeValue);
+        // Trouve l'élément parent ayant l'attribut `data-page`
+        const pageElement = event.target.closest('[data-page]');
+        if (!pageElement) return; // Si aucun parent trouvé, on sort
+
+        const page = parseInt(pageElement.dataset.page, 10);
+        if (isNaN(page)) return; // Si la page n'est pas un entier valide, on sort
+
+        this.state.page = page;
         this.updateTable();
     }
 
