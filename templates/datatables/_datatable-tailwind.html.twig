@@ -19,7 +19,7 @@
                     {% set headerCssClasses = 'px-3 py-3.5 text-left text-sm font-semibold text-gray-900' %}
                 {% endif %}
                 <th scope="col" class="{{ headerCssClasses }}" data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort" data-zhortein--symfony-toolbox-bundle--datatable-sort-value="{{ column.name }}">{{ column.label }}</th>
-            {% endif %}
+            {% endfor %}
         </tr>
         </thead>
         <tbody class="divide-y divide-gray-200" data-zhortein--symfony-toolbox-bundle--datatable-target="table">
