@@ -57,7 +57,7 @@ abstract class AbstractDatatable
     public function setCssMode(string $cssMode): self
     {
         if (!Configuration::isCssModeValid($cssMode)) {
-            $this->cssMode = $this->globalOptions['cssMode'] ?? Configuration::DEFAULT_DATATABLE_CSS_MODE;
+            $this->cssMode = $this->globalOptions['css_mode'] ?? Configuration::DEFAULT_DATATABLE_CSS_MODE;
         } else {
             $this->cssMode = $cssMode;
         }
