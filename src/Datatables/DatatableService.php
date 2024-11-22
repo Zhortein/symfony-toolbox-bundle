@@ -120,8 +120,8 @@ class DatatableService
             'previous' => $nbPages > 1 && $params['page'] > 1 ? $params['page'] - 1 : 1,
             'pages' => range(1, $nbPages),
             'pageSize' => $params['limit'],
-            'hasNext' => $nbPages > 1 && $params['page'] <= $nbPages,
-            'next' => $nbPages > 1 && $params['page'] <= $nbPages ? $params['page'] + 1 : $params['page'],
+            'hasNext' => $nbPages > 1 && $params['page'] < $nbPages,
+            'next' => $nbPages > 1 && $params['page'] < $nbPages ? $params['page'] + 1 : $params['page'],
         ];
 
         return (new DatatableResponse(
