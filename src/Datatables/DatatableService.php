@@ -101,7 +101,7 @@ class DatatableService
         $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->datatableManager->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR);
         $this->paginator = $this->paginatorFactory->createPaginator($paginatorMode);
         $results = $this->paginator->paginate($queryBuilder, $params['page'], $params['limit']);
-        $total = ceil(count($queryBuilder->getQuery()->getResult() ?? []) / $params['limit']);
+        $total = $this->paginator->getTotal($queryBuilder);
 
         $nbPages = ceil($total / $params['limit']);
         $pagination = [
@@ -109,6 +109,7 @@ class DatatableService
             'hasPrevious' => $nbPages > 1 && $params['page'] > 1,
             'previous' => $nbPages > 1 && $params['page'] > 1 ? $params['page'] - 1 : 1,
             'pages' => range(1, $nbPages),
+            'pageSize' => $params['limit'],
             'hasNext' => $nbPages > 1 && $params['page'] <= $nbPages,
             'next' => $nbPages > 1 && $params['page'] <= $nbPages ? $params['page'] + 1 : $params['page'],
         ];

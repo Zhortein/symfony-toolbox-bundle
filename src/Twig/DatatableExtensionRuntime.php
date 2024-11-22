@@ -46,7 +46,7 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
         $headers = '';
         foreach ($datatable->getColumns() as $rank => $column) {
             $sortableAttr = $column['sortable']
-                ? sprintf('data-action="click->%s#sort" %ssort-value="%s"', $dataPrefix, $controllerName, htmlspecialchars($column['name'], ENT_QUOTES))
+                ? sprintf('data-action="click->%s#sort" %ssort-value="%s"', $controllerName, $controllerName, htmlspecialchars($column['name'], ENT_QUOTES))
                 : '';
             $headerCssClasses = match ($datatable->getCssMode()) {
                 'tailwind' => 0 === $rank ? 'py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0' : 'px-3 py-3.5 text-left text-sm font-semibold text-gray-900',

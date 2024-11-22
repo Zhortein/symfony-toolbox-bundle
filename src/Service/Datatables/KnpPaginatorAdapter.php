@@ -14,4 +14,9 @@ readonly class KnpPaginatorAdapter implements PaginatorInterface
     {
         return $this->paginator->paginate($queryBuilder, $page, $limit)->getItems();
     }
+
+    public function getTotal(object $queryBuilder): int
+    {
+        return $this->paginator->paginate($queryBuilder, 1, 1)->getTotalItemCount();
+    }
 }
