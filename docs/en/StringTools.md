@@ -227,6 +227,32 @@ echo StringTools::getStringOrEmpty('Azerty'); // Returns: 'Azerty'
 echo StringTools::getStringOrEmpty(''); // Returns: ''
 ```
 
+### Check if a string is a valid SQL alias
+
+Returns true if the string is a valid SQL alias, false otherwise. If a length is specified,
+check also if the string doesn't exceed the given length. Any length negative or 0 disable the length test.
+
+#### Method
+```php
+public static function isValidSqlAlias(string $alias, int $maxLength = 30): bool
+```
+Returns true if the string is a valid SQL alias, false otherwise
+
+#### Parameters
+- `string $alias` : String to test.
+- `int $maxLength = 30` : The maximum length, négative or 0 for disabling length test.
+
+#### Exemple
+```php
+echo StringTools::isValidSqlAlias("validAlias"); // true
+echo StringTools::isValidSqlAlias("invalid-alias"); // false
+echo StringTools::isValidSqlAlias("TooLongAliasName12345", 30); // false
+echo StringTools::isValidSqlAlias("AliasWithNoLimit", 0); // true
+echo StringTools::isValidSqlAlias("AnotherSuperLongAliasWithoutLimit", -1); // true
+echo StringTools::isValidSqlAlias("validAlias", 64); // true
+echo StringTools::isValidSqlAlias("TooLongAliasForMyLimit", 10); // false
+```
+
 ## Notes
 
 These features will evolve with the advances in the symfony/string component. 

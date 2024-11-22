@@ -113,4 +113,32 @@ class StringTools
     {
         return (string) ($input ?? '');
     }
+
+    /**
+     * Vérifie si une chaîne est un alias SQL valide.
+     *
+     * Un alias valide :
+     * - Commence par une lettre (majuscule ou minuscule).
+     * - Contient uniquement des lettres (sans accents), chiffres et underscores.
+     * - Optionnellement, respecte une longueur maximale.
+     *
+     * @param string $alias          La chaîne à vérifier.
+     * @param int    $maxLength      Longueur maximale autorisée (par défaut 30). Pas de limite si <= 0.
+     * @return bool True si l'alias est valide, sinon False.
+     */
+    public static function isValidSqlAlias(string $alias, int $maxLength = 30): bool
+    {
+        // Vérifie le format général de l'alias
+        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/', $alias)) {
+            return false;
+        }
+
+        // Vérifie la longueur si une limite est définie
+        if ($maxLength > 0 && strlen($alias) > $maxLength) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

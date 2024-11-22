@@ -14,6 +14,7 @@ Le service `StringTools` fournit divers utilitaires pour manipuler et nettoyer l
 - [Remplacement de caractères spéciaux](#remplacement-de-caractères-spéciaux)
 - [Comptage des mots](#comptage-des-mots)
 - [S'assurer d'avoir une chaîne (pas de null)](#sassurer-davoir-une-chaîne-pas-de-null)
+- [Vérifier si une chaine est un alias SQL valide](#vérifier-si-une-chaine-est-un-alias-sql-valide)
 
 ### Détection de tableaux de chaînes
 
@@ -228,6 +229,32 @@ echo StringTools::getStringOrEmpty(null); // Retourne : ''
 echo StringTools::getStringOrEmpty(123); // Retourne : '123'
 echo StringTools::getStringOrEmpty('Azerty'); // Retourne : 'Azerty'
 echo StringTools::getStringOrEmpty(''); // Retourne : ''
+```
+
+### Vérifier si une chaine est un alias SQL valide
+
+Retourne true si la chaine peut être acceptée pour un alias SQL, false sinon. Si une longueur est spécifiée,
+vérifie également que la chaine ne dépasse pas cette longueur. Une longueur négative ou nulle supprime le test sur la longueur.
+
+#### Méthode
+```php
+public static function isValidSqlAlias(string $alias, int $maxLength = 30): bool
+```
+Retourne true si la chaine peut être acceptée pour un alias SQL, false sinon.
+
+#### Paramètres
+- `string $alias` : La chaîne à tester.
+- `int $maxLength = 30` : La longueur maximale, négatif ou 0 pour ne pas tester la longueur.
+
+#### Exemple
+```php
+echo StringTools::isValidSqlAlias("validAlias"); // true
+echo StringTools::isValidSqlAlias("invalid-alias"); // false
+echo StringTools::isValidSqlAlias("TooLongAliasName12345", 30); // false
+echo StringTools::isValidSqlAlias("AliasWithNoLimit", 0); // true
+echo StringTools::isValidSqlAlias("AnotherSuperLongAliasWithoutLimit", -1); // true
+echo StringTools::isValidSqlAlias("validAlias", 64); // true
+echo StringTools::isValidSqlAlias("TooLongAliasForMyLimit", 10); // false
 ```
 
 ## Notes
