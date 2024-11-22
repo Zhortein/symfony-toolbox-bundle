@@ -39,7 +39,12 @@ readonly class DatatableManager
                 foreach ($options as $key => $value) {
                     if ('columns' === $key) {
                         foreach ($value as $column) {
-                            $datatable->addColumn($column['name'], $column['label'], $column['searchable'] ?? true, $column['sortable'] ?? true);
+                            $datatable->addColumn(
+                                $column['name'],
+                                $column['label'],
+                                $column['searchable'] ?? true,
+                                $column['sortable'] ?? true,
+                                $column['alias'] ?? null);
                         }
                     }
 

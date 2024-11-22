@@ -2,6 +2,8 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Attribute;
 
+use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
+
 #[\Attribute(\Attribute::TARGET_CLASS)]
 class AsDatatable
 {
@@ -20,8 +22,8 @@ class AsDatatable
      */
     public function __construct(
         public string $name,
-        public array $columns = [], // Each column: ['name' => '', 'label' => '', 'searchable' => true, 'sortable' => true]
-        public int $defaultPageSize = 10,
+        public array $columns = [], // Each column: ['name' => '', 'label' => '', 'searchable' => true, 'sortable' => true, 'alias' => 't']
+        public int $defaultPageSize = Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE, // ex: 10
         public array $defaultSort = [], // ex: ['column' => 'id', 'order' => 'asc']
         public bool $searchable = true, // User can perform searches
         public bool $sortable = true, // User can change sorting
