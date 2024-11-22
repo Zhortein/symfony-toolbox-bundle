@@ -2,12 +2,13 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
-class DatatableResponse
+readonly class DatatableResponse
 {
     public function __construct(
         private int $total,
         private int $filtered,
         private array $data,
+        private array $pagination
     ) {
     }
 
@@ -17,6 +18,7 @@ class DatatableResponse
             'total' => $this->total,
             'filtered' => $this->filtered,
             'data' => $this->data,
+            'pagination' => $this->pagination,
         ];
     }
 }

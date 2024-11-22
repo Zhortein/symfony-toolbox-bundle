@@ -42,12 +42,20 @@ class DatatableService
     private function extractParameters(Request $request, AbstractDatatable $datatable): array
     {
         $defaultSort = $datatable->getDefaultSort();
+        $sortValue = $request->query->get('sort', $defaultSort['column']);
+        if ('null' === $sortValue) {
+            $sortValue = $defaultSort['column'];
+        }
+        $orderValue = strtolower($request->query->get('order', $defaultSort['order']));
+        if (!in_array($orderValue, ['asc', 'desc'], true)) {
+            $orderValue = $defaultSort['order'];
+        }
 
         return [
             'page' => max(1, (int) $request->query->get('page', 1)),
             'limit' => max(1, (int) $request->query->get('limit', $datatable->getOptions()['defaultPageSize'] ?? $this->datatableManager->getGlobalOption('items_per_page', Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE))),
-            'sort' => $request->query->get('sort', $defaultSort['column']),
-            'order' => $request->query->get('order', $defaultSort['order']),
+            'sort' => $sortValue,
+            'order' => $orderValue,
             'search' => $request->query->get('search', null),
         ];
     }
@@ -64,7 +72,7 @@ class DatatableService
         $data = $this->processRequest($datatable, $request);
 
         // Render Rows and Pagination
-        $htmlRows = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_rows.html.twig', ['data' => $data]);
+        $htmlRows = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_rows.html.twig', ['data' => $data, 'datatable' => $datatable, ]);
         $htmlPagination = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_pagination.html.twig', ['data' => $data]);
 
         return new Response(json_encode([
@@ -93,11 +101,23 @@ class DatatableService
         $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->datatableManager->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR);
         $this->paginator = $this->paginatorFactory->createPaginator($paginatorMode);
         $results = $this->paginator->paginate($queryBuilder, $params['page'], $params['limit']);
+        $total = ceil(count($queryBuilder->getQuery()->getResult() ?? []) / $params['limit']);
+
+        $nbPages = ceil($total / $params['limit']);
+        $pagination = [
+            'current' => $params['page'],
+            'hasPrevious' => $nbPages > 1 && $params['page'] > 1,
+            'previous' => $nbPages > 1 && $params['page'] > 1 ? $params['page'] - 1 : 1,
+            'pages' => range(1, $nbPages),
+            'hasNext' => $nbPages > 1 && $params['page'] <= $nbPages,
+            'next' => $nbPages > 1 && $params['page'] <= $nbPages ? $params['page'] + 1 : $params['page'],
+        ];
 
         return (new DatatableResponse(
             total: count($queryBuilder->getQuery()->getResult() ?? []), // Total without filters.
             filtered: count($results), // Total after pagination and filters.
-            data: $results
+            data: $results,
+            pagination: $pagination
         ))->toArray();
     }
 

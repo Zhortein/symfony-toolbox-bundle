@@ -68,7 +68,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
             $instance = $attribute[0]->newInstance();
             $serviceId = $class->getName();
             $this->datatables[$instance->name] = new Reference($serviceId);
-            $this->datatableOptions[$instance->name] = $instance->options;
+            $this->datatableOptions[$instance->name] = $instance->toArray();
 
             return true;
         }

@@ -31,4 +31,22 @@ class AsDatatable
             throw new \InvalidArgumentException('You must specify a name for a Datatable.');
         }
     }
+
+    /**
+     * Converts the datatable configuration to an associative array.
+     *
+     * @return array the datatable configuration as an associative array
+     */
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'columns' => $this->columns,
+            'defaultPageSize' => $this->defaultPageSize,
+            'defaultSort' => $this->defaultSort,
+            'searchable' => $this->searchable,
+            'sortable' => $this->sortable,
+            'options' => $this->options,
+        ];
+    }
 }
