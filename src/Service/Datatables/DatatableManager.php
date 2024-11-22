@@ -3,6 +3,7 @@
 namespace Zhortein\SymfonyToolboxBundle\Service\Datatables;
 
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
+use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
 
 readonly class DatatableManager
 {
@@ -31,6 +32,8 @@ readonly class DatatableManager
     {
         $datatable = $this->datatables[$name] ?? null;
         if ($datatable instanceof AbstractDatatable) {
+            $datatable->setGlobalOptions($this->globalOptions);
+            $datatable->setCssMode($this->getGlobalOption('css_mode', Configuration::DEFAULT_DATATABLE_CSS_MODE));
             $options = $this->getDatatableOptions($name);
             if (!empty($options)) {
                 foreach ($options as $key => $value) {

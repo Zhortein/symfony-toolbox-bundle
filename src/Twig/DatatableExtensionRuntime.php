@@ -18,6 +18,7 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
     {
         $controllerName = 'zhortein--symfony-toolbox-bundle--datatable';
         $datatable = $this->datatableService->findDatatableById($datatableId);
+
         if (!$datatable) {
             throw new \InvalidArgumentException(sprintf('Datatable with ID "%s" not found.', $datatableId));
         }
@@ -39,23 +40,41 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
             $sortableAttr = $column['sortable']
                 ? sprintf('data-action="click->%s#sort" data-%s-sort-value="%s"', $controllerName, $controllerName, htmlspecialchars($column['name'], ENT_QUOTES))
                 : '';
-            $headers .= sprintf('<th %s>%s</th>', $sortableAttr, htmlspecialchars($column['label'], ENT_QUOTES));
+            $headers .= sprintf('<th scope="col" %s>%s</th>', $sortableAttr, htmlspecialchars($column['label'], ENT_QUOTES));
         }
 
         $loadingText = $this->translator->trans('datatable.loading', [], 'zhortein_symfony_toolbox-datatable');
 
+        $tableWrapperCssClasses = 'datatable-wrapper '.match ($datatable->getCssMode()) {
+            'bootstrap' => 'table-responsive',
+            'tailwind' => 'inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8',
+            default => '',
+        };
+
+        $tableCssClasses = 'datatable '.match ($datatable->getCssMode()) {
+            'bootstrap' => 'table table-striped table-bordered',
+            'tailwind' => 'min-w-full divide-y divide-gray-300',
+            default => 'table',
+        };
+
+        $tableTbodyCssClasses = match ($datatable->getCssMode()) {
+            'bootstrap' => 'table-hover',
+            'tailwind' => 'divide-y divide-gray-200 hover:bg-gray-100',
+            default => '',
+        };
+
         return <<<HTML
-<div {$attributes} class="datatable-wrapper">
+<div {$attributes} class="{$tableWrapperCssClasses}">
     <div data-{$controllerName}-target="error" class="datatable-error hidden"></div>
     <div data-{$controllerName}-target="search" class="datatable-search hidden"></div>
     <div data-{$controllerName}-target="spinner" class="datatable-spinner hidden">{$loadingText}</div>
-    <table class="table datatable">
+    <table class="{$tableCssClasses}">
         <thead>
             <tr>
                 {$headers}
             </tr>
         </thead>
-        <tbody data-{$controllerName}-target="table">
+        <tbody class="{$tableTbodyCssClasses}" data-{$controllerName}-target="table">
             <!-- Initial rows will be populated dynamically -->
         </tbody>
     </table>

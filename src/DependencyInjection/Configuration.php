@@ -49,4 +49,13 @@ class Configuration implements ConfigurationInterface
 
         return $treeBuilder;
     }
+
+    public static function isCssModeValid($cssMode): bool
+    {
+        return in_array(
+            $cssMode,
+            [self::DATATABLE_CSS_MODE_BOOTSTRAP, self::DATATABLE_CSS_MODE_TAILWIND, self::DATATABLE_CSS_MODE_CUSTOM, self::DEFAULT_DATATABLE_CSS_MODE],
+            true
+        );
+    }
 }

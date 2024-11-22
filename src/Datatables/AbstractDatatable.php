@@ -28,9 +28,41 @@ abstract class AbstractDatatable
      */
     protected array $options = [];
 
+    private array $globalOptions = [];
+
+    protected string $cssMode = Configuration::DEFAULT_DATATABLE_CSS_MODE;
+
     public function __construct(protected EntityManagerInterface $em)
     {
         $this->configure();
+    }
+
+    public function setGlobalOptions(array $globalOptions): self
+    {
+        $this->globalOptions = $globalOptions;
+
+        return $this;
+    }
+
+    public function getGlobalOptions(): array
+    {
+        return $this->globalOptions;
+    }
+
+    public function setCssMode(string $cssMode): self
+    {
+        if (!Configuration::isCssModeValid($cssMode)) {
+            $this->cssMode = $this->globalOptions['cssMode'] ?? Configuration::DEFAULT_DATATABLE_CSS_MODE;
+        } else {
+            $this->cssMode = $cssMode;
+        }
+
+        return $this;
+    }
+
+    public function getCssMode(): string
+    {
+        return $this->cssMode;
     }
 
     public function setColumns(array $columns): self
@@ -98,7 +130,7 @@ abstract class AbstractDatatable
     public function getOptions(): array
     {
         if (!array_key_exists('defaultPageSize', $this->options)) {
-            $this->options['defaultPageSize'] = Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
+            $this->options['defaultPageSize'] = $this->globalOptions['items_per_page'] ?? Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
         }
         if (!array_key_exists('defaultSort', $this->options)) {
             if (!empty($this->columns)) {
@@ -182,5 +214,13 @@ abstract class AbstractDatatable
         return $this->queryBuilder;
     }
 
+    /**
+     * Gets the fully qualified class name of the main entity.
+     *
+     * This abstract method should be implemented by subclasses to return the
+     * class name of the specific main entity they are related to.
+     *
+     * @return string The fully qualified class name of the entity
+     */
     abstract protected function getEntityClass(): string;
 }

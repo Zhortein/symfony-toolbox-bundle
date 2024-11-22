@@ -8,7 +8,7 @@ readonly class DatatableResponse
         private int $total,
         private int $filtered,
         private array $data,
-        private array $pagination
+        private array $pagination,
     ) {
     }
 
