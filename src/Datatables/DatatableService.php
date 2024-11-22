@@ -73,7 +73,7 @@ class DatatableService
 
         // Render Rows and Pagination
         $htmlRows = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_rows.html.twig', ['data' => $data, 'datatable' => $datatable]);
-        $htmlPagination = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_pagination.html.twig', ['data' => $data]);
+        $htmlPagination = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_pagination.html.twig', ['data' => $data, 'datatable' => $datatable]);
 
         return new Response(json_encode([
             'rows' => $htmlRows,

@@ -6,6 +6,26 @@
                 <source>Loading...</source>
                 <target>Chargement en cours ...</target>
             </trans-unit>
+            <trans-unit id="1" resname="datatable.pagination.previous">
+                <source>Previous</source>
+                <target>Précédent</target>
+            </trans-unit>
+            <trans-unit id="2" resname="datatable.pagination.next">
+                <source>Next</source>
+                <target>Suivant</target>
+            </trans-unit>
+            <trans-unit id="3" resname="datatable.pagination">
+                <source>Pagination</source>
+                <target>Pagination</target>
+            </trans-unit>
+            <trans-unit id="4" resname="datatable.pagination.first">
+                <source>First</source>
+                <target>Début</target>
+            </trans-unit>
+            <trans-unit id="5" resname="datatable.pagination.last">
+                <source>Last</source>
+                <target>Fin</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

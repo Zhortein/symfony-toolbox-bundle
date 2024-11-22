@@ -13,18 +13,17 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
         private DatatableService $datatableService,
         private TranslatorInterface $translator,
         private RouterInterface $router,
-    )
-    {
+    ) {
     }
 
     public function renderDatatable(string $datatableId, array $options = []): string
     {
-        $controllerName = 'zhortein--symfony-toolbox-bundle--datatable';
         $datatable = $this->datatableService->findDatatableById($datatableId);
-
         if (!$datatable) {
             throw new \InvalidArgumentException(sprintf('Datatable with ID "%s" not found.', $datatableId));
         }
+
+        $controllerName = $datatable->getStimulusControllerName();
         $dataPrefix = 'data-'.$controllerName.'-';
         $attributes = sprintf(
             'data-controller="%s" %sid-value="%s" %smode-value="%s" %spagesize-value="%s" %surl-value="%s" %s',
@@ -45,11 +44,15 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
         );
 
         $headers = '';
-        foreach ($datatable->getColumns() as $column) {
+        foreach ($datatable->getColumns() as $rank => $column) {
             $sortableAttr = $column['sortable']
                 ? sprintf('data-action="click->%s#sort" %ssort-value="%s"', $dataPrefix, $controllerName, htmlspecialchars($column['name'], ENT_QUOTES))
                 : '';
-            $headers .= sprintf('<th scope="col" %s>%s</th>', $sortableAttr, htmlspecialchars($column['label'], ENT_QUOTES));
+            $headerCssClasses = match ($column['cssMode']) {
+                'tailwind' => 0 === $rank ? 'py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0' : 'px-3 py-3.5 text-left text-sm font-semibold text-gray-900',
+                default => '',
+            };
+            $headers .= sprintf('<th scope="col" class="%s" %s>%s</th>', $headerCssClasses, $sortableAttr, htmlspecialchars($column['label'], ENT_QUOTES));
         }
 
         $loadingText = $this->translator->trans('datatable.loading', [], 'zhortein_symfony_toolbox-datatable');

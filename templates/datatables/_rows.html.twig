@@ -1,7 +1,21 @@
+{% if datatable.cssMode == 'bootstrap' %}
+    {% set trCss = '' %}
+    {% set tdFirstCss = '' %}
+    {% set tdCss = '' %}
+{% elseif datatable.cssMode == 'tailwind' %}
+    {% set trCss = '' %}
+    {% set tdFirstCss = 'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0' %}
+    {% set tdCss = 'whitespace-nowrap px-3 py-4 text-sm text-gray-500' %}
+{% else %}
+    {% set trCss = '' %}
+    {% set tdFisrtCss = '' %}
+    {% set tdCss = '' %}
+{% endif %}
+
 {% for row in data.data %}
-    <tr>
+    <tr class="{{ trCss }}">
         {% for column in datatable.columns %}
-            <td>{{ attribute(row, column.name) }}</td>
+            <td class="{% if loop.index == 1 %}{{ tdFirstCss }}{% else %}{{ tdCss }}{% endif %}">{{ attribute(row, column.name) }}</td>
         {% endfor %}
     </tr>
 {% endfor %}
