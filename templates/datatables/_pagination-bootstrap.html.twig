@@ -7,7 +7,7 @@
 <ul class="{{ ulCss }}">
     {% if data.pagination.hasPrevious %}
         <li class="{{ liCss }}">
-            <a class="{{ aCss }}" data-page="{{ data.pagination.previous }}" data-action="{{ actionChangePage }}" aria-label="{{ 'Previous'|trans({}, 'zhortein_symfony_toolbox-datatable') }}">
+            <a class="{{ aCss }}" data-page="{{ data.pagination.previous }}" data-action="{{ actionChangePage }}" aria-label="{{ 'datatable.pagination.previous'|trans({}, transDomain) }}">
                 <span aria-hidden="true">&lt;</span>
             </a>
         </li>
@@ -21,7 +21,7 @@
     {% endfor %}
     {% if data.pagination.hasNext %}
         <li class="{{ liCss }}">
-            <a class="{{ aCss }}" data-page="{{ data.pagination.next }}" data-action="{{ actionChangePage }}" aria-label="{{ 'Next'|trans({}, 'zhortein_symfony_toolbox-datatable') }}">
+            <a class="{{ aCss }}" data-page="{{ data.pagination.next }}" data-action="{{ actionChangePage }}" aria-label="{{ 'datatable.pagination.next'|trans({}, transDomain) }}">
                 <span aria-hidden="true">&gt;</span>
             </a>
         </li>

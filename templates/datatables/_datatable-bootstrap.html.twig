@@ -1,18 +1,28 @@
-<div {{ attributes }} class="{{ tableWrapperCssClasses }}">
-    <div {{ dataPrefix }}target="error" class="datatable-error {{ hiddenCssClass }}"></div>
-    <div {{ dataPrefix }}target="search" class="datatable-search {{ hiddenCssClass }}"></div>
-    <div {{ dataPrefix }}target="spinner" class="datatable-spinner {{ hiddenCssClass }}">{{ loadingText }}</div>
-    <table class="{{ tableCssClasses }}">
+<div
+        data-controller="zhortein--symfony-toolbox-bundle--datatable"
+        data-zhortein--symfony-toolbox-bundle--datatable-id-value="{{ datatableId }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-mode-value="{{ datatable.cssMode }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-pagesize-value="{{ datatable.defaultPageSize }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-url-value="{{ path('zhortein_datatable_fetch_data', {'datatableId': datatableId}) }}"
+        {{ attributes }}
+        class="table-responsive">
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error d-none"></div>
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search d-none"></div>
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="spinner" class="datatable-spinner d-none">{{ 'datatable.loading'|trans({}, transDomain) }}</div>
+    <table class="datatable table table-striped table-bordered table-hover">
         <thead>
         <tr>
-            {{ headers }}
+            {% for column in datatable.columns %}
+                {% set headerCssClasses = '' %}
+                <th scope="col" class="{{ headerCssClasses }}" data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort" data-zhortein--symfony-toolbox-bundle--datatable-sort-value="{{ column.name }}">{{ column.label }}</th>
+            {% endfor %}
         </tr>
         </thead>
-        <tbody class="{{ tableTbodyCssClasses }}" {{ dataPrefix }}target="table">
+        <tbody class="" data-zhortein--symfony-toolbox-bundle--datatable-target="table">
         <!-- Initial rows will be populated dynamically -->
         </tbody>
     </table>
-    <nav class="datatable-pagination" aria-label="{{ 'Pagination'|trans({}, 'zhortein_symfony_toolbox-datatable') }}" {{ dataPrefix }}target="pagination">
+    <nav class="datatable-pagination" aria-label="{{ 'Pagination'|trans({}, transDomain) }}" data-zhortein--symfony-toolbox-bundle--datatable-target="pagination">
         <!-- Pagination dynamically handled -->
     </nav>
 </div>

@@ -9,6 +9,8 @@ use Zhortein\SymfonyToolboxBundle\Service\StringTools;
 
 abstract class AbstractDatatable
 {
+    public const string DEFAULT_TRANSLATION_DOMAIN = 'zhortein_symfony_toolbox-datatable';
+
     protected ?QueryBuilder $queryBuilder = null;
 
     /**
@@ -206,6 +208,11 @@ abstract class AbstractDatatable
     public function getDefaultSort(): array
     {
         return $this->getOptions()['defaultSort'];
+    }
+
+    public function getDefaultPageSize(): int
+    {
+        return (int) $this->getOptions()['defaultPageSize'];
     }
 
     public function setQueryBuilder(QueryBuilder $queryBuilder): self

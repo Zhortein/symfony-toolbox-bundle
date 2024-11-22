@@ -68,12 +68,21 @@ class DatatableService
      */
     public function render(AbstractDatatable $datatable, Request $request): Response
     {
+        $translationDomain = AbstractDatatable::DEFAULT_TRANSLATION_DOMAIN;
         $this->validateDatatable($datatable);
         $data = $this->processRequest($datatable, $request);
 
         // Render Rows and Pagination
-        $htmlRows = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_rows-'.$datatable->getCssMode().'.html.twig', ['data' => $data, 'datatable' => $datatable]);
-        $htmlPagination = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_pagination-'.$datatable->getCssMode().'.html.twig', ['data' => $data, 'datatable' => $datatable]);
+        $htmlRows = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_rows-'.$datatable->getCssMode().'.html.twig', [
+            'data' => $data,
+            'datatable' => $datatable,
+            'transDomain' => $translationDomain,
+        ]);
+        $htmlPagination = $this->twig->render('@ZhorteinSymfonyToolbox/datatables/_pagination-'.$datatable->getCssMode().'.html.twig', [
+            'data' => $data,
+            'datatable' => $datatable,
+            'transDomain' => $translationDomain,
+        ]);
 
         return new Response(json_encode([
             'rows' => $htmlRows,
