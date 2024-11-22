@@ -4,6 +4,7 @@ namespace Zhortein\SymfonyToolboxBundle\Twig;
 
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Twig\Environment;
 use Twig\Extension\RuntimeExtensionInterface;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 
@@ -16,7 +17,7 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
     ) {
     }
 
-    public function renderDatatable(string $datatableId, array $options = []): string
+    public function renderDatatable(Environment $environment, string $datatableId, array $options = []): string
     {
         $datatable = $this->datatableService->findDatatableById($datatableId);
         if (!$datatable) {
@@ -80,25 +81,17 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
             default => 'hidden',
         };
 
-        return <<<HTML
-<div {$attributes} class="{$tableWrapperCssClasses}">
-    <div {$dataPrefix}target="error" class="datatable-error {$hiddenCssClass}"></div>
-    <div {$dataPrefix}target="search" class="datatable-search {$hiddenCssClass}"></div>
-    <div {$dataPrefix}target="spinner" class="datatable-spinner {$hiddenCssClass}">{$loadingText}</div>
-    <table class="{$tableCssClasses}">
-        <thead>
-            <tr>
-                {$headers}
-            </tr>
-        </thead>
-        <tbody class="{$tableTbodyCssClasses}" {$dataPrefix}target="table">
-            <!-- Initial rows will be populated dynamically -->
-        </tbody>
-    </table>
-    <nav class="datatable-pagination" {$dataPrefix}target="pagination">
-        <!-- Pagination dynamically handled -->
-    </nav>
-</div>
-HTML;
+        return $environment->render('@ZhorteinSymfonyToolbox/datatables/_datatable-'.$datatable->getCssMode().'.html.twig', [
+            'datatable' => $datatable,
+            'controllerName' => $controllerName,
+            'attributes' => $attributes,
+            'headers' => $headers,
+            'loadingText' => $loadingText,
+            'tableWrapperCssClasses' => $tableWrapperCssClasses,
+            'tableCssClasses' => $tableCssClasses,
+            'tableTbodyCssClasses' => $tableTbodyCssClasses,
+            'hiddenCssClass' => $hiddenCssClass,
+            'dataPrefix' => $dataPrefix,
+        ]);
     }
 }

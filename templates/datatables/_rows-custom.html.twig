@@ -1,0 +1,11 @@
+{% set trCss = '' %}
+{% set tdFisrtCss = '' %}
+{% set tdCss = '' %}
+
+{% for row in data.data %}
+    <tr class="{{ trCss }}">
+        {% for column in datatable.columns %}
+            <td class="{% if loop.index == 1 %}{{ tdFirstCss }}{% else %}{{ tdCss }}{% endif %}">{{ attribute(row, column.name) }}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}

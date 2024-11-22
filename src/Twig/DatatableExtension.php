@@ -10,7 +10,7 @@ class DatatableExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('datatable', [DatatableExtensionRuntime::class, 'renderDatatable'], ['is_safe' => ['html']]),
+            new TwigFunction('datatable', [DatatableExtensionRuntime::class, 'renderDatatable'], ['is_safe' => ['html'], 'needs_environment' => true]),
         ];
     }
 }

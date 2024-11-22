@@ -1,0 +1,18 @@
+<div {{ attributes }} class="{{ tableWrapperCssClasses }}">
+    <div {{ dataPrefix }}target="error" class="datatable-error {{ hiddenCssClass }}"></div>
+    <div {{ dataPrefix }}target="search" class="datatable-search {{ hiddenCssClass }}"></div>
+    <div {{ dataPrefix }}target="spinner" class="datatable-spinner {{ hiddenCssClass }}">{{ loadingText }}</div>
+    <table class="{{ tableCssClasses }}">
+        <thead>
+        <tr>
+            {{ headers }}
+        </tr>
+        </thead>
+        <tbody class="{{ tableTbodyCssClasses }}" {{ dataPrefix }}target="table">
+        <!-- Initial rows will be populated dynamically -->
+        </tbody>
+    </table>
+    <nav class="datatable-pagination" aria-label="{{ 'Pagination'|trans({}, 'zhortein_symfony_toolbox-datatable') }}" {{ dataPrefix }}target="pagination">
+        <!-- Pagination dynamically handled -->
+    </nav>
+</div>

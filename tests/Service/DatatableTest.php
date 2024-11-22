@@ -141,8 +141,8 @@ class DatatableTest extends TestCase
     {
         // Configure Twig
         $loader = new ArrayLoader([
-            '@ZhorteinSymfonyToolbox/datatables/_rows.html.twig' => '<tr><td>Mock Table rows</td></tr>',
-            '@ZhorteinSymfonyToolbox/datatables/_pagination.html.twig' => '<nav><ul class="pagination"><li>Mock Table Pagination</li></ul></nav>',
+            '@ZhorteinSymfonyToolbox/datatables/_rows-custom.html.twig' => '<tr><td>Mock Table rows</td></tr>',
+            '@ZhorteinSymfonyToolbox/datatables/_pagination-custom.html.twig' => '<nav><ul class="pagination"><li>Mock Table Pagination</li></ul></nav>',
         ]);
         $twig = new Environment($loader);
 
