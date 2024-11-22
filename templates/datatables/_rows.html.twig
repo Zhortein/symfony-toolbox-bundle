@@ -3,7 +3,7 @@
     {% set tdFirstCss = '' %}
     {% set tdCss = '' %}
 {% elseif datatable.cssMode == 'tailwind' %}
-    {% set trCss = '' %}
+    {% set trCss = 'hover:bg-gray-100' %}
     {% set tdFirstCss = 'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0' %}
     {% set tdCss = 'whitespace-nowrap px-3 py-4 text-sm text-gray-500' %}
 {% else %}

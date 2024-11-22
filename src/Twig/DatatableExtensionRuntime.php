@@ -71,7 +71,7 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
 
         $tableTbodyCssClasses = match ($datatable->getCssMode()) {
             'bootstrap' => 'table-hover',
-            'tailwind' => 'divide-y divide-gray-200 hover:bg-gray-100',
+            'tailwind' => 'divide-y divide-gray-200',
             default => '',
         };
 
