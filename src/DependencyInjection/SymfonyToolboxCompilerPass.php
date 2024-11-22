@@ -24,6 +24,11 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
      */
     private array $datatables = [];
 
+    /**
+     * @var array<string, mixed>
+     */
+    private array $datatableOptions = [];
+
     public function process(ContainerBuilder $container): void
     {
         $haveHolidayProviders = false;
@@ -63,6 +68,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
             $instance = $attribute[0]->newInstance();
             $serviceId = $class->getName();
             $this->datatables[$instance->name] = new Reference($serviceId);
+            $this->datatableOptions[$instance->name] = $instance->options;
 
             return true;
         }
@@ -75,6 +81,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         if ($container->hasDefinition(DatatableManager::class)) {
             $container->getDefinition(DatatableManager::class)
                 ->setArgument(0, $this->datatables)
+                ->setArgument(1, $this->datatableOptions)
             ;
         }
     }

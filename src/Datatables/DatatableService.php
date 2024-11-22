@@ -18,7 +18,7 @@ class DatatableService
     private PaginatorInterface $paginator;
 
     public function __construct(
-        private DatatableManager $datatableManager,
+        private readonly DatatableManager $datatableManager,
         private readonly Environment $twig,
         private readonly PaginatorFactory $paginatorFactory,
     ) {
@@ -117,7 +117,7 @@ class DatatableService
     private function validateSortField(string $sortField, array $columns): bool
     {
         foreach ($columns as $column) {
-            if ($column['name'] === $sortField && $column['orderable']) {
+            if ($column['name'] === $sortField && $column['sortable']) {
                 return true;
             }
         }

@@ -4,11 +4,28 @@ namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
+use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
 
 abstract class AbstractDatatable
 {
     protected ?QueryBuilder $queryBuilder = null;
+
+    /**
+     * Columns definitions. Each column is represented by an array.
+     * Example:
+     * [['name' => 'id', 'label' => 'Identifier', 'searchable' => true, 'sortable' => true,], ['name' => 'label', 'label' => 'Name', 'searchable' => true, 'sortable' => true,],].
+     *
+     * @var array<int, array<string, string|bool>>
+     */
     protected array $columns = [];
+
+    /**
+     * Datatable options.
+     * Example :
+     * ['defaultPageSize' => 10, 'defaultSort' => 'id', 'defaultSortDirection' => 'asc', ].
+     *
+     * @var array<string, string|int|bool|string[]>
+     */
     protected array $options = [];
 
     public function __construct(protected EntityManagerInterface $em)
@@ -28,6 +45,34 @@ abstract class AbstractDatatable
         return $this->columns;
     }
 
+    /**
+     * Adds a column configuration to the columns array.
+     *
+     * @param string $name       the name of the column
+     * @param string $label      the label of the column
+     * @param bool   $searchable indicates whether the column is searchable
+     * @param bool   $sortable   indicates whether the column is sortable
+     */
+    public function addColumn(string $name, string $label, bool $searchable = true, bool $sortable = true): self
+    {
+        $this->columns[] = [
+            'name' => $name,
+            'label' => $label,
+            'searchable' => $searchable,
+            'sortable' => $sortable,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Validates the columns of the table configuration.
+     *
+     * Ensures each column has a "name" and a "label". Sets default values for
+     * "searchable" and "sortable" attributes if they are not defined.
+     *
+     * @throws \InvalidArgumentException if a column does not have the required "name" and "label"
+     */
     public function validateColumns(): void
     {
         foreach ($this->getColumns() as $column) {
@@ -37,8 +82,8 @@ abstract class AbstractDatatable
             if (!isset($column['searchable'])) {
                 $column['searchable'] = true; // Default to true if not defined
             }
-            if (!isset($column['orderable'])) {
-                $column['orderable'] = true; // Default to true if not defined
+            if (!isset($column['sortable'])) {
+                $column['sortable'] = true; // Default to true if not defined
             }
         }
     }
@@ -52,7 +97,54 @@ abstract class AbstractDatatable
 
     public function getOptions(): array
     {
+        if (!array_key_exists('defaultPageSize', $this->options)) {
+            $this->options['defaultPageSize'] = Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
+        }
+        if (!array_key_exists('defaultSort', $this->options)) {
+            if (!empty($this->columns)) {
+                $this->options['defaultSort'] = ['column' => $this->columns[0]['name'], 'order' => 'asc'];
+            } else {
+                $this->options['defaultSort'] = ['column' => null, 'order' => 'asc'];
+            }
+        }
+        if (!array_key_exists('searchable', $this->options)) {
+            $this->options['searchable'] = true;
+        }
+        if (!array_key_exists('sortable', $this->options)) {
+            $this->options['sortable'] = true;
+        }
+
         return $this->options;
+    }
+
+    public function addOption(string $name, $value): self
+    {
+        switch ($name) {
+            case 'defaultPageSize':
+                if (!is_int($value)) {
+                    $value = Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
+                }
+                break;
+            case 'defaultSort':
+                if (!is_array($value) || empty($value)) {
+                    if (!empty($this->columns)) {
+                        $value = ['column' => $this->columns[0]['name'], 'order' => 'asc'];
+                    } else {
+                        $value = ['column' => null, 'order' => 'asc'];
+                    }
+                }
+                break;
+            case 'searchable':
+            case 'sortable':
+                $value = (bool) $value;
+                break;
+            default:
+                break;
+        }
+
+        $this->options[$name] = $value;
+
+        return $this;
     }
 
     /**
@@ -60,7 +152,7 @@ abstract class AbstractDatatable
      */
     public function getDefaultSort(): array
     {
-        return $this->getOptions()['defaultSort'] ?? ['column' => null, 'order' => 'asc'];
+        return $this->getOptions()['defaultSort'];
     }
 
     public function setQueryBuilder(QueryBuilder $queryBuilder): self
@@ -86,6 +178,7 @@ abstract class AbstractDatatable
                 ->select('t')
                 ->from($this->getEntityClass(), 't');
         }
+
         return $this->queryBuilder;
     }
 

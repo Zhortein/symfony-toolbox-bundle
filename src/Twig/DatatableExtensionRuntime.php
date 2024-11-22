@@ -36,7 +36,7 @@ readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
 
         $headers = '';
         foreach ($datatable->getColumns() as $column) {
-            $sortableAttr = $column['orderable']
+            $sortableAttr = $column['sortable']
                 ? sprintf('data-action="click->%s#sort" data-%s-sort-value="%s"', $controllerName, $controllerName, htmlspecialchars($column['name'], ENT_QUOTES))
                 : '';
             $headers .= sprintf('<th %s>%s</th>', $sortableAttr, htmlspecialchars($column['label'], ENT_QUOTES));

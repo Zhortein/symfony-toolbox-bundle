@@ -67,7 +67,7 @@ class DatatableTest extends TestCase
         // Mock datatable with custom paginator
         $datatableMock = $this->getMockForAbstractClass(AbstractDatatable::class);
         $datatableMock->setColumns([
-            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'orderable' => true],
+            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'sortable' => true],
         ]);
         $datatableMock->setOptions(['paginator' => PaginatorFactory::PAGINATOR_CUSTOM]);
 
@@ -93,7 +93,7 @@ class DatatableTest extends TestCase
     {
         $datatable = $this->getMockForAbstractClass(AbstractDatatable::class);
         $datatable->setColumns([
-            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'orderable' => true],
+            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'sortable' => true],
         ]);
 
         $this->assertCount(1, $datatable->getColumns());
@@ -123,7 +123,7 @@ class DatatableTest extends TestCase
 
         $datatableMock = $this->getMockForAbstractClass(AbstractDatatable::class);
         $datatableMock->setColumns([
-            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'orderable' => true],
+            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'sortable' => true],
         ]);
         $datatableMock->setOptions(['defaultPageSize' => 10, 'defaultSort' => ['column' => 'id', 'order' => 'asc']]);
 
@@ -151,7 +151,7 @@ class DatatableTest extends TestCase
         $datatableMock->method('configure')->willReturn(['columns' => [['name' => 'id', 'label' => 'ID']]]);
 
         $datatableMock->setColumns([
-            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'orderable' => true],
+            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'sortable' => true],
         ]);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
@@ -174,24 +174,24 @@ class DatatableTest extends TestCase
     {
         $datatable = $this->getMockForAbstractClass(AbstractDatatable::class);
         $datatable->setColumns([
-            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'orderable' => true],
-            ['name' => 'name', 'label' => 'Name', 'searchable' => false, 'orderable' => false],
+            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'sortable' => true],
+            ['name' => 'name', 'label' => 'Name', 'searchable' => false, 'sortable' => false],
         ]);
 
         $this->assertEquals('ID', $datatable->getColumns()[0]['label']);
         $this->assertEquals('name', $datatable->getColumns()[1]['name']);
         $this->assertTrue($datatable->getColumns()[0]['searchable']);
         $this->assertFalse($datatable->getColumns()[1]['searchable']);
-        $this->assertTrue($datatable->getColumns()[0]['orderable']);
-        $this->assertFalse($datatable->getColumns()[1]['orderable']);
+        $this->assertTrue($datatable->getColumns()[0]['sortable']);
+        $this->assertFalse($datatable->getColumns()[1]['sortable']);
     }
 
     public function testDatatableConfiguration(): void
     {
         $datatable = $this->getMockForAbstractClass(AbstractDatatable::class);
         $datatable->setColumns([
-            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'orderable' => false],
-            ['name' => 'name', 'label' => 'Name', 'searchable' => false, 'orderable' => true],
+            ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'sortable' => false],
+            ['name' => 'name', 'label' => 'Name', 'searchable' => false, 'sortable' => true],
         ]);
 
         $this->assertCount(2, $datatable->getColumns());
@@ -199,11 +199,11 @@ class DatatableTest extends TestCase
         $this->assertEquals('id', $datatable->getColumns()[0]['name']);
         $this->assertEquals('ID', $datatable->getColumns()[0]['label']);
         $this->assertTrue($datatable->getColumns()[0]['searchable']);
-        $this->assertFalse($datatable->getColumns()[0]['orderable']);
+        $this->assertFalse($datatable->getColumns()[0]['sortable']);
         $this->assertEquals('name', $datatable->getColumns()[1]['name']);
         $this->assertEquals('Name', $datatable->getColumns()[1]['label']);
         $this->assertFalse($datatable->getColumns()[1]['searchable']);
-        $this->assertTrue($datatable->getColumns()[1]['orderable']);
+        $this->assertTrue($datatable->getColumns()[1]['sortable']);
     }
 
     public function testToArray(): void
