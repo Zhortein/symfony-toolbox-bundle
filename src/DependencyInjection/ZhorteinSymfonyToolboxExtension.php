@@ -28,7 +28,7 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
 
         if ($container->hasDefinition(DatatableManager::class)) {
             $container->getDefinition(DatatableManager::class)
-                ->setArgument(1, $config['datatables'])
+                ->setArgument(2, $config['datatables'])
             ;
         }
     }
