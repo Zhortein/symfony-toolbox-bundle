@@ -258,17 +258,33 @@ abstract class AbstractDatatable
         $columns = $this->getColumns();
 
         foreach ($columns as &$column) {
+            // Check that each column have at least a name and a label
             if (!isset($column['name'], $column['label'])) {
                 throw new \InvalidArgumentException('Each column must have a "name" and a "label".');
             }
+
+            // All column will be automatically aliased unless an explicit alias is given (and valid)
+            if (!isset($column['nameAs']) || !StringTools::isValidSqlAlias($column['nameAs'])) {
+                if (!isset($column['sqlAlias']) || $column['sqlAlias'] === $this->getMainAlias()) {
+                    $column['nameAs'] = $column['name'];
+                } else {
+                    $column['nameAs'] = $column['sqlAlias'].'_'.$column['name'];
+                }
+            }
+
+            // Default to true if not defined
             if (!isset($column['searchable'])) {
-                $column['searchable'] = true; // Default to true if not defined
+                $column['searchable'] = true;
             }
+
+            // Default to true if not defined
             if (!isset($column['sortable'])) {
-                $column['sortable'] = true; // Default to true if not defined
+                $column['sortable'] = true;
             }
+
+            // Default to true if not defined
             if (!isset($column['autoColumns'])) {
-                $column['autoColumns'] = false; // Default to true if not defined
+                $column['autoColumns'] = false;
             }
 
             foreach (['header', 'dataset', 'footer'] as $key) {
@@ -446,9 +462,14 @@ abstract class AbstractDatatable
     public function buildQueryBuilder(): QueryBuilder
     {
         if (null === $this->queryBuilder) {
-            $this->queryBuilder = $this->em->createQueryBuilder()
-                ->select('t')
-                ->from($this->getEntityClass(), 't');
+            $this->queryBuilder = $this->em->getRepository($this->getEntityClass())->createQueryBuilder('t')
+                ->select('t');
+        }
+
+        // Compose columns selected query. Each column is named with its alias to allow dynamic filtering / sorting...
+        foreach ($this->columns as $column) {
+            $this->queryBuilder
+                ->addSelect(sprintf('%s.%s AS %s', $column['sqlAlias'], $column['name'], $column['nameAs']));
         }
 
         return $this->queryBuilder;
@@ -460,9 +481,9 @@ abstract class AbstractDatatable
      * This abstract method should be implemented by subclasses to return the
      * class name of the specific main entity they are related to.
      *
-     * @return string The fully qualified class name of the entity
+     * @return class-string The fully qualified class name of the entity
      */
-    abstract protected function getEntityClass(): string;
+    abstract public function getEntityClass(): string;
 
     /**
      * Calculates a unique checksum for a given datatable.

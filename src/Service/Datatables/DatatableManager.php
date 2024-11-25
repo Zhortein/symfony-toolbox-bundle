@@ -68,7 +68,7 @@ readonly class DatatableManager
             });
 
             // Load datatypes in datatable columns
-            //$datatable->setCachedTypes($cachedTypes);
+            // $datatable->setCachedTypes($cachedTypes);
 
             $datatable->validateColumns();
             $datatable->validateTableOptions();
@@ -124,7 +124,6 @@ readonly class DatatableManager
      */
     private function getEntityMappings(array $rootEntities, array $joins, EntityManagerInterface $entityManager): array
     {
-
         // Ajouter les entités racines
         $mappings = array_map(static function ($entity) use ($entityManager) {
             return $entityManager->getClassMetadata($entity);
