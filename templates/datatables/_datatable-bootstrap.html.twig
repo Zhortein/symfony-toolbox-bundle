@@ -12,10 +12,10 @@
     <table class="datatable table table-striped table-bordered table-hover">
 
         <thead
-                class="{% if datatable.options.thead.keep_default_classes %}{% endif %}{{ datatable.options.thead.class }}"
-                {% for headerKey,headerValue in datatable.options.thead %}
+                class="{% if datatable.options.options.thead.keep_default_classes %}{% endif %}{{ datatable.options.options.thead.class }}"
+                {% for headerKey,headerValue in datatable.options.options.thead %}
                     {% if headerKey == 'data' %}
-                        {% for dataKey,dataValue in datatable.options.thead.data %}
+                        {% for dataKey,dataValue in datatable.options.options.thead.data %}
                             data-{{ dataKey }}="{{ dataValue }}"
                         {% endfor %}
                     {% endif %}
@@ -54,11 +54,11 @@
         </tr>
         </thead>
         <tbody
-                class="{% if datatable.options.tbody.keep_default_classes %}{% endif %}{{ datatable.options.tbody.class }}"
+                class="{% if datatable.options.options.tbody.keep_default_classes %}{% endif %}{{ datatable.options.options.tbody.class }}"
                 data-zhortein--symfony-toolbox-bundle--datatable-target="table"
-                {% for key,value in datatable.options.tbody %}
+                {% for key,value in datatable.options.options.tbody %}
                     {% if key == 'data' %}
-                        {% for dataKey,dataValue in datatable.options.tbody.data %}
+                        {% for dataKey,dataValue in datatable.options.options.tbody.data %}
                             data-{{ dataKey }}="{{ dataValue }}"
                         {% endfor %}
                     {% endif %}
@@ -72,11 +72,11 @@
         </tbody>
         {% if datatable.displayFooter %}
             <tfoot
-                    class="{% if datatable.options.tfoot.keep_default_classes %}{% endif %}{{ datatable.options.tfoot.class }}"
+                    class="{% if datatable.options.options.tfoot.keep_default_classes %}{% endif %}{{ datatable.options.options.tfoot.class }}"
                     data-zhortein--symfony-toolbox-bundle--datatable-target="footer"
-                    {% for key,value in datatable.options.tfoot %}
+                    {% for key,value in datatable.options.options.tfoot %}
                         {% if key == 'data' %}
-                            {% for dataKey,dataValue in datatable.options.tfoot.data %}
+                            {% for dataKey,dataValue in datatable.options.options.tfoot.data %}
                                 data-{{ dataKey }}="{{ dataValue }}"
                             {% endfor %}
                         {% endif %}
@@ -91,12 +91,12 @@
         {% endif %}
     </table>
     <nav
-            class="{% if datatable.options.pagination.keep_default_classes %}datatable-pagination {% endif %}{{ datatable.options.pagination.class }}"
+            class="{% if datatable.options.options.pagination.keep_default_classes %}datatable-pagination {% endif %}{{ datatable.options.options.pagination.class }}"
             aria-label="{{ 'datatable.pagination'|trans({}, transDomain) }}"
             data-zhortein--symfony-toolbox-bundle--datatable-target="pagination"
-            {% for key,value in datatable.options.pagination %}
+            {% for key,value in datatable.options.options.pagination %}
                 {% if key == 'data' %}
-                    {% for dataKey,dataValue in datatable.options.pagination.data %}
+                    {% for dataKey,dataValue in datatable.options.options.pagination.data %}
                         data-{{ dataKey }}="{{ dataValue }}"
                     {% endfor %}
                 {% endif %}
