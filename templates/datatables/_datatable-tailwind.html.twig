@@ -35,7 +35,7 @@
                                 {% endfor %}
                             {% endif %}
 
-                            {% if headerKey != 'class' and headerKey != 'keep_default_classes' %}
+                            {% if headerKey != 'class' and headerKey != 'data' and headerKey != 'keep_default_classes' %}
                                 {{ headerKey }}="{{ headerValue }}"
                             {% endif %}
                         {% endfor %}

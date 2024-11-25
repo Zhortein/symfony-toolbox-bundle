@@ -45,9 +45,9 @@ readonly class DatatableManager
                                 $column['searchable'] ?? true,
                                 $column['sortable'] ?? true,
                                 $column['alias'] ?? null,
-                                $column['header'] ?? [],
-                                $column['dataset'] ?? [],
-                                $column['footer'] ?? [],
+                                $column['header'] ?? ['keep_default_classes' => true, 'class' => '', ],
+                                $column['dataset'] ?? ['keep_default_classes' => true, 'class' => '', ],
+                                $column['footer'] ?? ['keep_default_classes' => true, 'class' => '', 'auto' => '', ],
                             );
                         }
                     }
@@ -57,6 +57,8 @@ readonly class DatatableManager
                     }
                 }
             }
+
+            $datatable->validateColumns();
         }
 
         return $datatable;

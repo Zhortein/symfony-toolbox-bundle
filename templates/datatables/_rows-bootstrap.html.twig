@@ -20,7 +20,7 @@
                             {% endfor %}
                         {% endif %}
 
-                        {% if datasetKey != 'class' and datasetKey != 'keep_default_classes' %}
+                        {% if datasetKey != 'class' and datasetKey != 'data' and datasetKey != 'keep_default_classes' %}
                             {{ datasetKey }}="{{ datasetValue }}"
                         {% endif %}
                     {% endfor %}
