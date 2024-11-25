@@ -207,8 +207,9 @@ abstract class AbstractDatatable
     public function validateColumns(): void
     {
         $this->displayFooter = false;
+        $columns = $this->getColumns();
 
-        foreach ($this->getColumns() as $column) {
+        foreach ($columns as $column) {
             if (!isset($column['name'], $column['label'])) {
                 throw new \InvalidArgumentException('Each column must have a "name" and a "label".');
             }
@@ -248,6 +249,8 @@ abstract class AbstractDatatable
                 }
             }
         }
+
+        $this->setColumns($columns);
     }
 
     public function setOptions(array $options): self
