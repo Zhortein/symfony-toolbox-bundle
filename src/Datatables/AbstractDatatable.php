@@ -218,17 +218,23 @@ abstract class AbstractDatatable
 
     public function validateTableOptions(): void
     {
+        if (!isset($this->options['options']) || !is_array($this->options['options'])) {
+            $this->options['options'] = [];
+        }
+
         foreach (['thead', 'tbody', 'tfoot', 'pagination'] as $key) {
-            if (!isset($this->options[$key])) {
-                $this->options[$key] = [];
+            if (!isset($this->options['options'][$key])) {
+                $this->options['options'][$key] = [];
             }
 
-            if (!isset($this->options[$key]['keep_default_classes'])) {
-                $this->options[$key]['keep_default_classes'] = true;
-            }
+            if (is_array($this->options['options'][$key])) {
+                if (!isset($this->options['options'][$key]['keep_default_classes'])) {
+                    $this->options['options'][$key]['keep_default_classes'] = true;
+                }
 
-            if (!isset($this->options[$key]['class'])) {
-                $this->options[$key]['class'] = '';
+                if (!isset($this->options['options'][$key]['class'])) {
+                    $this->options['options'][$key]['class'] = '';
+                }
             }
         }
     }
