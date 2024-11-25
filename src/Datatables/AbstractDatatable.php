@@ -282,6 +282,11 @@ abstract class AbstractDatatable
                 $column['sortable'] = true;
             }
 
+            // Default to string in case a column can't be defined
+            if (!isset($column['datatype'])) {
+                $column['datatype'] = 'string';
+            }
+
             // Default to true if not defined
             if (!isset($column['autoColumns'])) {
                 $column['autoColumns'] = false;
@@ -461,6 +466,8 @@ abstract class AbstractDatatable
 
     public function buildQueryBuilder(): QueryBuilder
     {
+        $this->validateColumns();
+
         if (null === $this->queryBuilder) {
             $this->queryBuilder = $this->em->getRepository($this->getEntityClass())->createQueryBuilder('t')
                 ->select('t');
@@ -516,7 +523,7 @@ abstract class AbstractDatatable
     /**
      * @param array<string, array<string, int|string>> $cachedTypes
      */
-    protected function setCachedTypes(array $cachedTypes): void
+    public function setCachedTypes(array $cachedTypes): void
     {
         foreach ($cachedTypes as $columnTypeDefinition) {
             if (is_int($columnTypeDefinition['rank'])) {

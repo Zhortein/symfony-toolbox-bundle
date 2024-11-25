@@ -61,6 +61,9 @@ readonly class DatatableManager
                 }
             }
 
+            $datatable->validateColumns();
+            $datatable->validateTableOptions();
+
             // Get cached datatypes
             $cachedTypes = $this->cache->get($checksum, function () use ($datatable) {
                 return $this->buildDatatableTypesForCache($datatable);
@@ -68,9 +71,6 @@ readonly class DatatableManager
 
             // Load datatypes in datatable columns
             $datatable->setCachedTypes($cachedTypes);
-
-            $datatable->validateColumns();
-            $datatable->validateTableOptions();
         }
 
         return $datatable;
