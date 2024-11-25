@@ -44,11 +44,15 @@ readonly class DatatableManager
                                 $column['label'],
                                 $column['searchable'] ?? true,
                                 $column['sortable'] ?? true,
-                                $column['alias'] ?? null);
+                                $column['alias'] ?? null,
+                                $column['header'] ?? [],
+                                $column['dataset'] ?? [],
+                                $column['footer'] ?? [],
+                            );
                         }
                     }
 
-                    if (in_array($key, ['defaultPageSize', 'defaultSort', 'searchable', 'sortable', 'options'])) {
+                    if (in_array($key, ['defaultPageSize', 'defaultSort', 'searchable', 'sortable', 'options', 'autoColumns'])) {
                         $datatable->addOption($key, $value);
                     }
                 }

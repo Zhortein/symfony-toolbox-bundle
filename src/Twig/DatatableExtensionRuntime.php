@@ -10,11 +10,11 @@ use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 readonly class DatatableExtensionRuntime implements RuntimeExtensionInterface
 {
     public function __construct(
-        private DatatableService $datatableService
+        private DatatableService $datatableService,
     ) {
     }
 
-    public function renderDatatable(Environment $environment, string $datatableId, string $translationDomain = null, array $options = []): string
+    public function renderDatatable(Environment $environment, string $datatableId, ?string $translationDomain = null, array $options = []): string
     {
         $datatable = $this->datatableService->findDatatableById($datatableId);
         if (!$datatable) {

@@ -12,14 +12,40 @@
         <thead>
         <tr>
             {% for column in datatable.columns %}
-                {% set headerCssClasses = '' %}
-                <th scope="col" class="{{ headerCssClasses }}" data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort" data-field="{{ column.name }}">{{ column.label }}</th>
+                {% if column.header.keep_default_classes %}
+                    {% set headerCssClasses = '' %}
+                {% endif %}
+                {% set headerCssClasses = headerCssClasses ~ ' ' ~ column.header.css %}
+                <th
+                        scope="col"
+                        class="{{ headerCssClasses }}"
+                        data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort"
+                        data-field="{{ column.name }}"
+                        {% for headerKey,headerValue in column.header %}
+                            {% if headerKey == 'data' %}
+                                {% for dataKey,dataValue in column.header.data %}
+                                    {% if dataKey != 'field' and dataKey != 'action' %}
+                                        data-{{ dataKey }}="{{ dataValue }}"
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if headerKey != 'css' and headerKey != 'keep_default_classes' %}
+                                {{ headerKey }}="{{ headerValue }}"
+                            {% endif %}
+                        {% endfor %}
+                >{{ column.label }}</th>
             {% endfor %}
         </tr>
         </thead>
         <tbody class="" data-zhortein--symfony-toolbox-bundle--datatable-target="table">
         <!-- Initial rows will be populated dynamically -->
         </tbody>
+        {% if datatable.displayFooter %}
+            <tfoot class="" data-zhortein--symfony-toolbox-bundle--datatable-target="footer">
+            {# @todo Datatable footer : To be implemented #}
+            </tfoot>
+        {% endif %}
     </table>
     <nav class="datatable-pagination" aria-label="{{ 'Pagination'|trans({}, transDomain) }}" data-zhortein--symfony-toolbox-bundle--datatable-target="pagination">
         <!-- Pagination dynamically handled -->

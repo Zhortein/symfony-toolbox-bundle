@@ -13,10 +13,34 @@ abstract class AbstractDatatable
 
     protected ?QueryBuilder $queryBuilder = null;
 
+    protected bool $displayFooter = false;
+
     /**
      * Columns definitions. Each column is represented by an array.
      * Example:
-     * [['name' => 'id', 'label' => 'Identifier', 'searchable' => true, 'sortable' => true,], ['name' => 'label', 'label' => 'Name', 'searchable' => true, 'sortable' => true,],].
+     * [
+     *  [
+     *      'name' => 'id',
+     *      'label' => 'Identifier',
+     *      'searchable' => true,
+     *      'sortable' => true,
+     *      'header' => [
+     *          'keep_default_classes' => true,
+     *          'css' => 'myCssClasses',
+     *          'data' => ['custom-dataname' => 'myValue', ],
+     *      ],
+     *      'dataset' => [
+     *          'keep_default_classes' => true,
+     *          'css' => 'myCssClassesForData',
+     *          'data' => ['mycustom-dataname' => 'myOtherValue', ],
+     *      ],
+     *      'footer' => [
+     *          'auto' => 'count',
+     *          'keep_default_classes' => true,
+     *          'css' => 'myCssClassesForFooter',
+     *          'data' => ['myfooter-dataname' => 'myFooterValue', ],
+     *      ],
+     *  ], ['name' => 'label', 'label' => 'Name', 'searchable' => true, 'sortable' => true,],].
      *
      * @var array<int, array<string, string|bool>>
      */
@@ -25,7 +49,16 @@ abstract class AbstractDatatable
     /**
      * Datatable options.
      * Example :
-     * ['defaultPageSize' => 10, 'defaultSort' => 'id', 'defaultSortDirection' => 'asc', ].
+     * [
+     *  'defaultPageSize' => 10,
+     *  'defaultSort' => [
+     *      'column' => 'id',
+     *      'order' => 'asc',
+     *  ],
+     *  'searchable' => true,
+     *  'sortable' => true,
+     *  'autoColumns' => false,
+     * ].
      *
      * @var array<string, string|int|bool|string[]>
      */
@@ -41,6 +74,11 @@ abstract class AbstractDatatable
         $this->configure();
     }
 
+    public function getDisplayFooter(): bool
+    {
+        return $this->displayFooter;
+    }
+
     public function getMainAlias(): string
     {
         return $this->mainAlias;
@@ -52,6 +90,7 @@ abstract class AbstractDatatable
             throw new \InvalidArgumentException('The main alias must be a valid SQL alias.');
         }
         $this->mainAlias = $mainAlias;
+
         return $this;
     }
 
@@ -101,22 +140,36 @@ abstract class AbstractDatatable
     }
 
     /**
-     * Adds a column configuration to the columns array.
+     * Adds a new column to the table configuration.
      *
-     * @param string $name       the name of the column
-     * @param string $label      the label of the column
-     * @param bool   $searchable indicates whether the column is searchable
-     * @param bool   $sortable   indicates whether the column is sortable
-     * @param string|null   $sqlAlias   indicates the SQL alias to use in orderBy and search SQL clauses, if empty no alias is used, if null MainAlias is used (default = 't')
+     * @param string                $name       the name of the column
+     * @param string                $label      the label of the column
+     * @param bool                  $searchable Indicates if the column is searchable. Defaults to true.
+     * @param bool                  $sortable   Indicates if the column is sortable. Defaults to true.
+     * @param ?string               $sqlAlias   optional SQL alias for the column
+     * @param array<string, string> $header     optional header configuration array
+     * @param array<string, string> $dataset    optional dataset configuration array
+     * @param array<string, string> $footer     optional footer configuration array
      */
-    public function addColumn(string $name, string $label, bool $searchable = true, bool $sortable = true, ?string $sqlAlias = null): self
-    {
+    public function addColumn(
+        string $name,
+        string $label,
+        bool $searchable = true,
+        bool $sortable = true,
+        ?string $sqlAlias = null,
+        ?array $header = [],
+        ?array $dataset = [],
+        ?array $footer = [],
+    ): self {
         $this->columns[] = [
             'name' => $name,
             'label' => $label,
             'searchable' => $searchable,
             'sortable' => $sortable,
             'sqlAlias' => $sqlAlias ?? $this->getMainAlias(),
+            'header' => $header ?? [],
+            'dataset' => $dataset ?? [],
+            'footer' => $footer ?? [],
         ];
 
         return $this;
@@ -128,8 +181,9 @@ abstract class AbstractDatatable
      * Iterates through the columns to find a match for the provided column name and returns
      * the corresponding SQL alias. If no matching column is found, the main alias is returned.
      *
-     * @param string $name The name of the column to search for.
-     * @return string The SQL alias of the matching column, or the main alias if not found.
+     * @param string $name the name of the column to search for
+     *
+     * @return string the SQL alias of the matching column, or the main alias if not found
      */
     public function getColumnAlias(string $name): string
     {
@@ -138,6 +192,7 @@ abstract class AbstractDatatable
                 return $column['sqlAlias'];
             }
         }
+
         return $this->getMainAlias();
     }
 
@@ -151,6 +206,8 @@ abstract class AbstractDatatable
      */
     public function validateColumns(): void
     {
+        $this->displayFooter = false;
+
         foreach ($this->getColumns() as $column) {
             if (!isset($column['name'], $column['label'])) {
                 throw new \InvalidArgumentException('Each column must have a "name" and a "label".');
@@ -160,6 +217,35 @@ abstract class AbstractDatatable
             }
             if (!isset($column['sortable'])) {
                 $column['sortable'] = true; // Default to true if not defined
+            }
+            if (!isset($column['autoColumns'])) {
+                $column['autoColumns'] = false; // Default to true if not defined
+            }
+
+            foreach (['header', 'dataset', 'footer'] as $key) {
+                if (!isset($column[$key])) {
+                    $column[$key] = [];
+                }
+                if (!isset($column[$key]['keep_default_classes'])) {
+                    $column[$key]['keep_default_classes'] = true;
+                }
+                if (!isset($column[$key]['css'])) {
+                    $column[$key]['css'] = '';
+                }
+
+                if ('footer' === $key) {
+                    if (!isset($column[$key]['auto'])) {
+                        $column[$key]['auto'] = '';
+                    }
+                    // @todo Datatable auto-footer types should be constants + handled for each type + if empty don't display the footer line
+                    if (!in_array($column[$key]['auto'], ['count', 'sum', 'avg', 'min', 'max'], true)) {
+                        $column[$key]['auto'] = '';
+                    }
+
+                    if (!empty($column[$key]['auto'])) {
+                        $this->displayFooter = true;
+                    }
+                }
             }
         }
     }
@@ -212,6 +298,7 @@ abstract class AbstractDatatable
                 break;
             case 'searchable':
             case 'sortable':
+            case 'autoColumns':
                 $value = (bool) $value;
                 break;
             default:

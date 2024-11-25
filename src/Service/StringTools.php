@@ -122,9 +122,10 @@ class StringTools
      * - Contient uniquement des lettres (sans accents), chiffres et underscores.
      * - Optionnellement, respecte une longueur maximale.
      *
-     * @param string $alias          La chaîne à vérifier.
-     * @param int    $maxLength      Longueur maximale autorisée (par défaut 30). Pas de limite si <= 0.
-     * @return bool True si l'alias est valide, sinon False.
+     * @param string $alias     la chaîne à vérifier
+     * @param int    $maxLength Longueur maximale autorisée (par défaut 30). Pas de limite si <= 0.
+     *
+     * @return bool true si l'alias est valide, sinon False
      */
     public static function isValidSqlAlias(string $alias, int $maxLength = 30): bool
     {
@@ -140,5 +141,4 @@ class StringTools
 
         return true;
     }
-
 }
