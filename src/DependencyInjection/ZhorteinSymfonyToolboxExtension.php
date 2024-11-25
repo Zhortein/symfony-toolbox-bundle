@@ -3,6 +3,7 @@
 namespace Zhortein\SymfonyToolboxBundle\DependencyInjection;
 
 use Symfony\Component\AssetMapper\AssetMapperInterface;
+use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -30,6 +31,15 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
             $container->getDefinition(DatatableManager::class)
                 ->setArgument(2, $config['datatables'])
             ;
+        }
+
+        $iconLibrary = $config['datatables']['icons']['library'] ?? Configuration::ICON_LIBRARY_FONTAWESOME;
+        if ('fontawesome' === $iconLibrary) {
+            $this->addFontAwesomeToImportMap($container);
+        } elseif ('bootstrap' === $iconLibrary) {
+            $this->addBootstrapIconsToImportMap($container);
+        } else {
+            $this->addCustomIconsToImportMap($container, $config['datatables']['icons']['custom_libraries']);
         }
     }
 
@@ -62,5 +72,28 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
         $frameworkBundle = $container->getParameter('kernel.bundles_metadata')['FrameworkBundle'] ?? null;
 
         return $frameworkBundle && is_file($frameworkBundle['path'].'/Resources/config/asset_mapper.php');
+    }
+
+    private function addFontAwesomeToImportMap(ContainerBuilder $container): void
+    {
+        $container->register('asset_mapper.import_map_manager', ImportMapManager::class)
+            ->addMethodCall('addImport', ['@fortawesome/fontawesome-free']);
+    }
+
+    private function addBootstrapIconsToImportMap(ContainerBuilder $container): void
+    {
+        $container->register('asset_mapper.import_map_manager', ImportMapManager::class)
+            ->addMethodCall('addImport', ['bootstrap-icons']);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param string[] $customLibraries
+     * @return void
+     */
+    private function addCustomIconsToImportMap(ContainerBuilder $container, array $customLibraries): void
+    {
+        $container->register('asset_mapper.import_map_manager', ImportMapManager::class)
+            ->addMethodCall('addImport', $customLibraries);
     }
 }

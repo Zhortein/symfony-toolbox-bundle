@@ -89,8 +89,12 @@ readonly class DatatableManager
             foreach ($result[0] as $key => $value) {
                 // Détection du type PHP
                 $detectedType = gettype($value);
+                $isEnum = false;
+                $isTranslatableEnum = false;
                 if ('object' === $detectedType) {
                     $detectedType = get_class($value);
+                    $isEnum = $value instanceof \BackedEnum;
+                    $isTranslatableEnum = method_exists($value, 'label') && method_exists($value, 'getTranslationDomain');
                 }
 
                 foreach ($datatable->getColumns() as $rank => $column) {
@@ -98,6 +102,8 @@ readonly class DatatableManager
                         $types[$key] = [
                             'rank' => $rank,
                             'datatype' => $detectedType,  // Type détecté
+                            'isEnum' => $isEnum,
+                            'isTranslatableEnum' => $isTranslatableEnum,
                         ];
                         break;
                     }

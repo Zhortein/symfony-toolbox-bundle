@@ -285,9 +285,10 @@ abstract class AbstractDatatable
             // Default to string in case a column can't be defined
             if (!isset($column['datatype'])) {
                 $column['datatype'] = 'string';
+                $column['template'] = '@ZhorteinSymfonyToolbox/datatable/column_types/_string.html.twig';
             }
 
-            // Default to true if not defined
+            // Default to true if not defined @todo Implement autoColumns mode (Read Entity metadata and construct the columns automatically)
             if (!isset($column['autoColumns'])) {
                 $column['autoColumns'] = false;
             }
@@ -528,6 +529,30 @@ abstract class AbstractDatatable
         foreach ($cachedTypes as $columnTypeDefinition) {
             if (is_int($columnTypeDefinition['rank'])) {
                 $this->columns[$columnTypeDefinition['rank']]['datatype'] = (string) $columnTypeDefinition['datatype'];
+                $this->columns[$columnTypeDefinition['rank']]['isEnum'] = (bool) $columnTypeDefinition['isEnum'];
+                $this->columns[$columnTypeDefinition['rank']]['isTranslatableEnum'] = $columnTypeDefinition['isEnum'] && $columnTypeDefinition['isTranslatableEnum'];
+
+                if (!isset($this->columns[$columnTypeDefinition['rank']]['template'])) {
+                    $this->columns[$columnTypeDefinition['rank']]['template'] = match ((string) $columnTypeDefinition['datatype']) {
+                        'enum' => '@ZhorteinSymfonyToolbox/datatable/column_types/_enum.html.twig',
+                        'enum_translatable' => '@ZhorteinSymfonyToolbox/datatable/column_types/_enum-translatable.html.twig',
+                        'array' => '@ZhorteinSymfonyToolbox/datatable/column_types/_array.html.twig',
+                        'string' => '@ZhorteinSymfonyToolbox/datatable/column_types/_string.html.twig',
+                        'boolean' => '@ZhorteinSymfonyToolbox/datatable/column_types/_boolean.html.twig',
+                        \DateTimeInterface::class, \DateTime::class, \DateTimeImmutable::class => '@ZhorteinSymfonyToolbox/datatable/column_types/_datetime.html.twig',
+                        \DateInterval::class => '@ZhorteinSymfonyToolbox/datatable/column_types/_dateinterval.html.twig',
+                        \DatePeriod::class => '@ZhorteinSymfonyToolbox/datatable/column_types/_dateperiod.html.twig',
+                        \DateTimeZone::class => '@ZhorteinSymfonyToolbox/datatable/column_types/_timezone.html.twig',
+                        'double' => '@ZhorteinSymfonyToolbox/datatable/column_types/_double.html.twig',
+                        'integer' => '@ZhorteinSymfonyToolbox/datatable/column_types/_integer.html.twig',
+                        'object' => '@ZhorteinSymfonyToolbox/datatable/column_types/_object.html.twig',
+                        'resource' => '@ZhorteinSymfonyToolbox/datatable/column_types/_resource.html.twig',
+                        'resource (closed)' => '@ZhorteinSymfonyToolbox/datatable/column_types/_resource-closed.html.twig',
+                        'unknown type' => '@ZhorteinSymfonyToolbox/datatable/column_types/_unknown.html.twig',
+                        'NULL' => '@ZhorteinSymfonyToolbox/datatable/column_types/_null.html.twig',
+                        default => '@ZhorteinSymfonyToolbox/datatable/column_types/_default.html.twig',
+                    };
+                }
             }
         }
     }
