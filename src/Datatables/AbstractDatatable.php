@@ -14,6 +14,7 @@ abstract class AbstractDatatable
     protected ?QueryBuilder $queryBuilder = null;
 
     protected bool $displayFooter = false;
+    protected bool $queryBuilderOk = false;
 
     /**
      * Columns definitions. Each column is represented by an array.
@@ -417,7 +418,8 @@ abstract class AbstractDatatable
     public function setQueryBuilder(QueryBuilder $queryBuilder): self
     {
         $this->queryBuilder = $queryBuilder;
-
+        $this->validateColumns();
+        $this->queryBuilder = $this->buildQueryBuilder();
         return $this;
     }
 
@@ -467,7 +469,7 @@ abstract class AbstractDatatable
 
     public function getQueryBuilder(): QueryBuilder
     {
-        if (null === $this->queryBuilder) {
+        if (false === $this->queryBuilderOk) {
             $this->queryBuilder = $this->buildQueryBuilder();
         }
         return $this->queryBuilder;
@@ -478,8 +480,10 @@ abstract class AbstractDatatable
         $this->validateColumns();
 
         if (null === $this->queryBuilder) {
-            $this->queryBuilder = $this->em->getRepository($this->getEntityClass())->createQueryBuilder('t')
-                ->select('t');
+            $this->queryBuilder = $this->em->createQueryBuilder()
+                ->select('t')
+                ->from($this->getEntityClass(), $this->mainAlias)
+            ;
         }
 
         // Compose columns selected query. Each column is named with its alias to allow dynamic filtering / sorting...
@@ -488,6 +492,7 @@ abstract class AbstractDatatable
                 ->addSelect(sprintf('%s.%s AS %s', $column['sqlAlias'], $column['name'], $column['nameAs']));
         }
 
+        $this->queryBuilderOk = true;
         return $this->queryBuilder;
     }
 
