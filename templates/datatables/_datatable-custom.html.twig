@@ -9,7 +9,20 @@
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search hidden"></div>
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="spinner" class="datatable-spinner hidden">{{ 'datatable.loading'|trans({}, transDomain) }}</div>
     <table class="datatable table">
-        <thead>
+        <thead
+                class="{% if datatable.options.thead.keep_default_classes %}{% endif %}{{ datatable.options.thead.class }}"
+                {% for headerKey,headerValue in datatable.options.thead %}
+                    {% if headerKey == 'data' %}
+                        {% for dataKey,dataValue in datatable.options.thead.data %}
+                            data-{{ dataKey }}="{{ dataValue }}"
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if headerKey not in ['class','data','keep_default_classes','translate'] %}
+                        {{ headerKey }}="{{ headerValue }}"
+                    {% endif %}
+                {% endfor %}
+        >
         <tr>
             {% for column in datatable.columns %}
                 {% if column.header.keep_default_classes %}
@@ -38,16 +51,60 @@
             {% endfor %}
         </tr>
         </thead>
-        <tbody class="" data-zhortein--symfony-toolbox-bundle--datatable-target="table">
+        <tbody
+                class="{% if datatable.options.tbody.keep_default_classes %}divide-y divide-gray-200 {% endif %}{{ datatable.options.tbody.class }}"
+                data-zhortein--symfony-toolbox-bundle--datatable-target="table"
+                {% for key,value in datatable.options.tbody %}
+                    {% if key == 'data' %}
+                        {% for dataKey,dataValue in datatable.options.tbody.data %}
+                            data-{{ dataKey }}="{{ dataValue }}"
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if key not in ['class','data','keep_default_classes','translate'] %}
+                        {{ key }}="{{ value }}"
+                    {% endif %}
+                {% endfor %}
+        >
         <!-- Initial rows will be populated dynamically -->
         </tbody>
         {% if datatable.displayFooter %}
-            <tfoot class="" data-zhortein--symfony-toolbox-bundle--datatable-target="footer">
+            <tfoot
+                    class="{% if datatable.options.tfoot.keep_default_classes %}{% endif %}{{ datatable.options.tfoot.class }}"
+                    data-zhortein--symfony-toolbox-bundle--datatable-target="footer"
+                    {% for key,value in datatable.options.tfoot %}
+                        {% if key == 'data' %}
+                            {% for dataKey,dataValue in datatable.options.tfoot.data %}
+                                data-{{ dataKey }}="{{ dataValue }}"
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if key not in ['class','data','keep_default_classes','translate'] %}
+                            {{ key }}="{{ value }}"
+                        {% endif %}
+                    {% endfor %}
+            >
             {# @todo Datatable footer : To be implemented #}
             </tfoot>
         {% endif %}
     </table>
-    <nav class="datatable-pagination" aria-label="{{ 'datatable.pagination'|trans({}, transDomain) }}" data-zhortein--symfony-toolbox-bundle--datatable-target="pagination">
+    <nav
+            class="{% if datatable.options.pagination.keep_default_classes %}datatable-pagination {% endif %}{{ datatable.options.pagination.class }}"
+            aria-label="{{ 'datatable.pagination'|trans({}, transDomain) }}"
+            data-zhortein--symfony-toolbox-bundle--datatable-target="pagination"
+
+            {% for key,value in datatable.options.pagination %}
+                {% if key == 'data' %}
+                    {% for dataKey,dataValue in datatable.options.pagination.data %}
+                        data-{{ dataKey }}="{{ dataValue }}"
+                    {% endfor %}
+                {% endif %}
+
+                {% if key not in ['class','data','keep_default_classes','translate'] %}
+                    {{ key }}="{{ value }}"
+                {% endif %}
+            {% endfor %}
+    >
         <!-- Pagination dynamically handled -->
     </nav>
 </div>

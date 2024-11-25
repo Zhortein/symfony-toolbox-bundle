@@ -59,6 +59,7 @@ readonly class DatatableManager
             }
 
             $datatable->validateColumns();
+            $datatable->validateTableOptions();
         }
 
         return $datatable;

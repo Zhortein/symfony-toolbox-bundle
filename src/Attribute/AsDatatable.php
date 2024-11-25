@@ -29,7 +29,7 @@ class AsDatatable
         public bool $sortable = true, // User can change sorting
         public bool $autoColumns = false, // Construct columns from request then merge column settings (settings erase auto cols detection)
         public string $translationDomain = '', // Define data translation domain for this Datatable, no translations if empty
-        public array $options = [], // Additional Options
+        public array $options = [], // Additional Options ['table' => ['keep_default_classes' => true, 'class' => '', 'style' => '', 'data' => ['key' => 'value', ]], 'thead' => [], 'tfoot' => [], 'pagination' => []]
     ) {
         if (empty($name)) {
             throw new \InvalidArgumentException('You must specify a name for a Datatable.');

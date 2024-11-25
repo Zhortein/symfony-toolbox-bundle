@@ -27,20 +27,20 @@ abstract class AbstractDatatable
      *      'header' => [
      *          'translate' => true,
      *          'keep_default_classes' => true,
-     *          'css' => 'myCssClasses',
+     *          'class' => 'myCssClasses',
      *          'data' => ['custom-dataname' => 'myValue', ],
      *      ],
      *      'dataset' => [
      *          'translate' => false,
      *          'keep_default_classes' => true,
-     *          'css' => 'myCssClassesForData',
+     *          'class' => 'myCssClassesForData',
      *          'data' => ['mycustom-dataname' => 'myOtherValue', ],
      *      ],
      *      'footer' => [
      *          'translate' => false,
      *          'auto' => 'count',
      *          'keep_default_classes' => true,
-     *          'css' => 'myCssClassesForFooter',
+     *          'class' => 'myCssClassesForFooter',
      *          'data' => ['myfooter-dataname' => 'myFooterValue', ],
      *      ],
      *  ], ['name' => 'label', 'label' => 'Name', 'searchable' => true, 'sortable' => true,],].
@@ -61,6 +61,23 @@ abstract class AbstractDatatable
      *  'searchable' => true,
      *  'sortable' => true,
      *  'autoColumns' => false,
+     *  'options' => [
+     *      'thead' => [
+     *          'keep_default_classes' => true,
+     *          'class' => 'myCssClasses',
+     *          'data' => ['custom-dataname' => 'myValue', ],
+     *      ],
+     *      'tbody' => [
+     *           'keep_default_classes' => true,
+     *           'class' => 'myCssClasses',
+     *           'data' => ['custom-dataname' => 'myValue', ],
+     *       ],
+     *      'tfoot' => [
+     *           'keep_default_classes' => true,
+     *           'class' => 'myCssClasses',
+     *           'data' => ['custom-dataname' => 'myValue', ],
+     *       ],
+     *  ]
      * ].
      *
      * @var array<string, string|int|bool|string[]>
@@ -199,8 +216,25 @@ abstract class AbstractDatatable
         return $this->getMainAlias();
     }
 
+    public function validateTableOptions(): void
+    {
+        foreach (['thead', 'tbody', 'tfoot', 'pagination'] as $key) {
+            if (!isset($this->options[$key])) {
+                $this->options[$key] = [];
+            }
+
+            if (!isset($this->options[$key]['keep_default_classes'])) {
+                $this->options[$key]['keep_default_classes'] = true;
+            }
+
+            if (!isset($this->options[$key]['class'])) {
+                $this->options[$key]['class'] = '';
+            }
+        }
+    }
+
     /**
-     * Validates the columns of the table configuration.
+     * Validates the columns of the table configuration and complete missing values with defaults.
      *
      * Ensures each column has a "name" and a "label". Sets default values for
      * "searchable" and "sortable" attributes if they are not defined.
