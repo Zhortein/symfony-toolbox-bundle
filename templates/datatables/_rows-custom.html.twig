@@ -27,7 +27,7 @@
             >
                 {% set fieldValue = attribute(row, column.nameAs) %}
                 {% if datatable.translationDomain is not empty and column.dataset.translate %}
-                    {% set fieldValue = fieldValue|trans({}, datatable.translationDomain) }}
+                    {% set fieldValue = fieldValue|trans({}, datatable.translationDomain) %}
                 {% endif %}
                 {% include column.template with {fieldValue: fieldValue, entityObject: row.0, row: row} %}
             </td>
