@@ -24,7 +24,13 @@
                             {{ datasetKey }}="{{ datasetValue }}"
                         {% endif %}
                     {% endfor %}
-            >{% if datatable.translationDomain is not empty and column.dataset.translate %}{{ attribute(row, column.nameAs)|trans({}, datatable.translationDomain) }}{% else %}{{ attribute(row, column.nameAs) }}{% endif %}</td>
+            >
+                {% set fieldValue = attribute(row, column.nameAs) %}
+                {% if datatable.translationDomain is not empty and column.dataset.translate %}
+                    {% set fieldValue = fieldValue|trans({}, datatable.translationDomain) }}
+                {% endif %}
+                {% include column.template with {fieldValue: fieldValue, entityObject: row.0, row: row} %}
+            </td>
         {% endfor %}
     </tr>
 {% endfor %}
