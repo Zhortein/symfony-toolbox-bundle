@@ -6,10 +6,10 @@ use Doctrine\DBAL\Types\Type;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Contracts\Cache\CacheInterface;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsDatatable;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
+use Zhortein\SymfonyToolboxBundle\Service\Cache\CacheManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
 
@@ -83,7 +83,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
             $container->getDefinition(DatatableManager::class)
                 ->setArgument(0, $this->datatables)
                 ->setArgument(1, $this->datatableOptions)
-                ->setArgument(3, new Reference(CacheInterface::class))
+                ->setArgument(3, new Reference(CacheManager::class))
             ;
         }
     }
