@@ -212,7 +212,7 @@ abstract class AbstractDatatable
         $this->displayFooter = false;
         $columns = $this->getColumns();
 
-        foreach ($columns as $column) {
+        foreach ($columns as &$column) {
             if (!isset($column['name'], $column['label'])) {
                 throw new \InvalidArgumentException('Each column must have a "name" and a "label".');
             }
