@@ -137,11 +137,7 @@ class DatatableService
             throw new \InvalidArgumentException('The datatable must define at least one column.');
         }
 
-        foreach ($datatable->getColumns() as $column) {
-            if (!isset($column['name'], $column['label'])) {
-                throw new \InvalidArgumentException('Each column must have a "name" and a "label".');
-            }
-        }
+        $datatable->validateColumns();
     }
 
     private function validateSortField(string $sortField, array $columns): bool
