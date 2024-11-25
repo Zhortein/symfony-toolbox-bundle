@@ -186,6 +186,9 @@ abstract class AbstractDatatable
         ?array $header = [],
         ?array $dataset = [],
         ?array $footer = [],
+        ?string $nameAs = '',
+        ?string $dataType = '',
+        string $template = '',
     ): self {
         $this->columns[] = [
             'name' => $name,
@@ -196,6 +199,9 @@ abstract class AbstractDatatable
             'header' => $header ?? [],
             'dataset' => $dataset ?? [],
             'footer' => $footer ?? [],
+            'nameAs' => $nameAs ?? '',
+            'dataType' => $dataType ?? '',
+            'template' => $template ?? '',
         ];
 
         return $this;
@@ -265,7 +271,7 @@ abstract class AbstractDatatable
             }
 
             // All column will be automatically aliased unless an explicit alias is given (and valid)
-            if (!isset($column['nameAs']) || !StringTools::isValidSqlAlias($column['nameAs'])) {
+            if (empty($column['nameAs'] ?? '') || !StringTools::isValidSqlAlias($column['nameAs'])) {
                 if (!isset($column['sqlAlias']) || $column['sqlAlias'] === $this->getMainAlias()) {
                     $column['nameAs'] = $column['name'];
                 } else {
@@ -284,8 +290,12 @@ abstract class AbstractDatatable
             }
 
             // Default to string in case a column can't be defined
-            if (!isset($column['datatype'])) {
+            if (empty($column['datatype'] ?? '')) {
                 $column['datatype'] = 'string';
+            }
+
+            // Default to an empty template, real default will be applied after column_type detection
+            if (!isset($column['template'])) {
                 $column['template'] = '';
             }
 

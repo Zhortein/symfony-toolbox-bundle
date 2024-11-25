@@ -32,7 +32,7 @@
                         {% set selectorLabel =  datatable.options.selectorColumn.label %}
                     {% endif %}
                     {% if datatable.translationDomain is not empty %}
-                        {{ selectorLabel|trans({}, datatable.translationDomain) }}
+                        {% set selectorLabel = selectorLabel|trans({}, datatable.translationDomain) %}
                     {% endif %}
                     {{ selectorLabel }}
                 </th>

@@ -37,10 +37,12 @@
                 {% include column.template with {fieldValue: fieldValue, entityObject: row.0, row: row} %}
             </td>
         {% endfor %}
-        {% if  datatable.options.actionColumn is defined %}
-            {% if  datatable.options.actionColumn.template is defined %}
-                {% include  datatable.options.actionColumn.template with {row: row, entityObject: row.0} %}
-            {% endif %}
+        {% if datatable.options.actionColumn is defined %}
+            <td class="">
+                {% if datatable.options.actionColumn.template is defined %}
+                    {% include datatable.options.actionColumn.template with {row: row, entityObject: row.0} %}
+                {% endif %}
+            </td>
         {% endif %}
     </tr>
 {% endfor %}
