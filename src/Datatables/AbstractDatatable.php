@@ -394,11 +394,46 @@ abstract class AbstractDatatable
         return $this;
     }
 
-    public function applySearch(QueryBuilder $queryBuilder, string $search): void
+    /**
+     * Applies search criteria to the QueryBuilder based on the provided search string.
+     * This method incorporates search functionality only if the datatable is marked as searchable
+     * and considers only columns that are flagged as searchable.
+     *
+     * @param string $search the search string to apply to the query
+     */
+    public function applySearch(string $search): void
     {
+        $searchParamCount = 0;
+        if ($this->options['searchable']) {
+            // The datatable must be searchable to use search features...
+            $queryBuilder = $this->buildQueryBuilder();
+            $columns = $this->getColumns();
+            foreach ($columns as $column) {
+                if ($column['searchable']) {
+                    // Only search on "searchable" columns
+                    $queryBuilder
+                        ->andWhere($column['sqlAlias'].'.'.$column['name'].' LIKE :search'.$searchParamCount)
+                        ->setParameter('search'.$searchParamCount, "%$search%");
+
+                    // @todo Handle different datatypes for searching
+
+                    ++$searchParamCount;
+                }
+            }
+        }
+        $this->applyStaticFilters();
         // Exemple : Rechercher sur des colonnes spécifiques.
         //  $queryBuilder->andWhere('entity.name LIKE :search')
         //      ->setParameter('search', "%$search%");
+    }
+
+    /**
+     * Redefine this method to set static filters on the QueryBuilder.
+     * All searches, sorts, ... on the Datatable will use those static filters.
+     */
+    public function applyStaticFilters(): QueryBuilder
+    {
+        return $this->buildQueryBuilder();
     }
 
     abstract public function configure(): array;

@@ -96,7 +96,7 @@ class DatatableService
         $queryBuilder = $datatable->buildQueryBuilder();
 
         if ($params['search']) {
-            $datatable->applySearch($queryBuilder, $params['search']);
+            $datatable->applySearch($params['search']);
         }
 
         if ($params['sort'] && !$this->validateSortField($params['sort'], $datatable->getColumns())) {
