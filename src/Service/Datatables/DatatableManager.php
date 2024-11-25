@@ -2,7 +2,6 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Service\Datatables;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
 use Zhortein\SymfonyToolboxBundle\Service\Cache\CacheManager;
@@ -68,7 +67,7 @@ readonly class DatatableManager
             });
 
             // Load datatypes in datatable columns
-            // $datatable->setCachedTypes($cachedTypes);
+            $datatable->setCachedTypes($cachedTypes);
 
             $datatable->validateColumns();
             $datatable->validateTableOptions();
@@ -85,13 +84,6 @@ readonly class DatatableManager
             ->getQuery();
         $result = $query->getArrayResult();
 
-        // Récupérer les alias et métadonnées
-        $queryBuilder = $datatable->buildQueryBuilder();
-        $rootAliases = $queryBuilder->getRootAliases(); // Alias racines
-        $rootEntities = $queryBuilder->getRootEntities(); // Entités racines
-        $joins = $queryBuilder->getDQLPart('join'); // Récupérer les jointures
-        $entityMappings = $this->getEntityMappings($rootEntities, $joins, $datatable->getEntityManager());
-
         $types = [];
         if (!empty($result[0])) {
             foreach ($result[0] as $key => $value) {
@@ -101,62 +93,18 @@ readonly class DatatableManager
                     $detectedType = get_class($value);
                 }
 
-                // Recherche dans les mappings pour retrouver le champ
-                [$entityName, $fieldName] = $this->getFieldNameFromAlias($key, $entityMappings);
-
-                $types[$key] = [
-                    'entityName' => $entityName,
-                    'name' => $fieldName ?: $key, // Nom du champ
-                    'sqlAlias' => $key,           // Alias SQL utilisé
-                    'datatype' => $detectedType,  // Type détecté
-                ];
-            }
-        }
-
-        return $types;
-    }
-
-    /**
-     * Récupère les métadonnées des entités racines et jointes.
-     *
-     * @param array $rootEntities Entités racines
-     * @param array $joins        Jointures
-     */
-    private function getEntityMappings(array $rootEntities, array $joins, EntityManagerInterface $entityManager): array
-    {
-        // Ajouter les entités racines
-        $mappings = array_map(static function ($entity) use ($entityManager) {
-            return $entityManager->getClassMetadata($entity);
-        }, $rootEntities);
-
-        // Ajouter les entités jointes
-        foreach ($joins as $alias => $joinParts) {
-            foreach ($joinParts as $join) {
-                $joinAlias = $join->getAlias();
-                $entityClass = $join->getJoin();
-                $mappings[$joinAlias] = $entityManager->getClassMetadata($entityClass);
-            }
-        }
-
-        return $mappings;
-    }
-
-    /**
-     * Retrouve le champ d'une entité à partir d'un alias SQL.
-     *
-     * @return array [nom de l'entité, nom du champ]
-     */
-    private function getFieldNameFromAlias(string $sqlAlias, array $entityMappings): array
-    {
-        foreach ($entityMappings as $alias => $metadata) {
-            if (str_starts_with($sqlAlias, $alias.'.')) {
-                $field = str_replace($alias.'.', '', $sqlAlias);
-                if ($metadata->hasField($field)) {
-                    return [$metadata->getName(), $field];
+                foreach ($datatable->getColumns() as $rank => $column) {
+                    if ($column['nameAs'] === $key) {
+                        $types[$key] = [
+                            'rank' => $rank,
+                            'datatype' => $detectedType,  // Type détecté
+                        ];
+                        break;
+                    }
                 }
             }
         }
 
-        return [null, null];
+        return $types;
     }
 }

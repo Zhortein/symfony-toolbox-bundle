@@ -512,4 +512,16 @@ abstract class AbstractDatatable
             throw new \RuntimeException('Unable to generate a checksum for the datatable.', 0, $e);
         }
     }
+
+    /**
+     * @param array<string, array<string, int|string>> $cachedTypes
+     */
+    protected function setCachedTypes(array $cachedTypes): void
+    {
+        foreach ($cachedTypes as $columnTypeDefinition) {
+            if (is_int($columnTypeDefinition['rank'])) {
+                $this->columns[$columnTypeDefinition['rank']]['datatype'] = (string) $columnTypeDefinition['datatype'];
+            }
+        }
+    }
 }
