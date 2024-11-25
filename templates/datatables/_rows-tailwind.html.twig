@@ -9,8 +9,8 @@
                 {% set tdFirstCss = '' %}
                 {% set tdCss = '' %}
             {% endif %}
-            {% set tdFirstCss = tdFirstCss ~ ' ' ~ column.dataset.css %}
-            {% set tdCss = tdCss ~ ' ' ~ column.dataset.css %}
+            {% set tdFirstCss = tdFirstCss ~ ' ' ~ column.dataset.class %}
+            {% set tdCss = tdCss ~ ' ' ~ column.dataset.class %}
             <td
                     class="{% if loop.index == 1 %}{{ tdFirstCss }}{% else %}{{ tdCss }}{% endif %}"
                     {% for datasetKey,datasetValue in column.dataset %}
@@ -20,7 +20,7 @@
                             {% endfor %}
                         {% endif %}
 
-                        {% if datasetKey != 'css' and datasetKey != 'keep_default_classes' %}
+                        {% if datasetKey != 'class' and datasetKey != 'keep_default_classes' %}
                             {{ datasetKey }}="{{ datasetValue }}"
                         {% endif %}
                     {% endfor %}

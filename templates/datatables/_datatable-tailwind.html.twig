@@ -20,7 +20,7 @@
                         {% set headerCssClasses = 'px-3 py-3.5 text-left text-sm font-semibold text-gray-900' %}
                     {% endif %}
                 {% endif %}
-                {% set headerCssClasses = headerCssClasses ~ ' ' ~ column.header.css %}
+                {% set headerCssClasses = headerCssClasses ~ ' ' ~ column.header.class %}
                 <th
                         scope="col"
                         class="{{ headerCssClasses }}"
@@ -35,7 +35,7 @@
                                 {% endfor %}
                             {% endif %}
 
-                            {% if headerKey != 'css' and headerKey != 'keep_default_classes' %}
+                            {% if headerKey != 'class' and headerKey != 'keep_default_classes' %}
                                 {{ headerKey }}="{{ headerValue }}"
                             {% endif %}
                         {% endfor %}
