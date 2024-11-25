@@ -442,7 +442,7 @@ abstract class AbstractDatatable
                         ->andWhere($column['sqlAlias'].'.'.$column['name'].' LIKE :search'.$searchParamCount)
                         ->setParameter('search'.$searchParamCount, "%$search%");
 
-                    // @todo Handle different datatypes for searching
+                    // @todo Handle different column_types for searching
 
                     ++$searchParamCount;
                 }
