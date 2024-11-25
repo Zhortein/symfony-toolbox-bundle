@@ -24,10 +24,10 @@
                 {% endfor %}
         >
         <tr>
-            {% if datatable.options.options.selectorColumn is defined %}
+            {% if  datatable.options.selectorColumn is defined %}
                 <th>
-                    {% if datatable.options.options.selectorColumn.label is defined %}
-                        {% set selectorLabel = datatable.options.options.selectorColumn.label %}
+                    {% if  datatable.options.selectorColumn.label is defined %}
+                        {% set selectorLabel =  datatable.options.selectorColumn.label %}
                     {% endif %}
                     {% if datatable.translationDomain is not empty %}
                         {{ selectorLabel|trans({}, datatable.translationDomain) }}
@@ -60,10 +60,10 @@
                         {% endfor %}
                 >{% if datatable.translationDomain is not empty and column.header.translate %}{{ column.label|trans({}, datatable.translationDomain) }}{% else %}{{ column.label }}{% endif %}</th>
             {% endfor %}
-            {% if datatable.options.options.actionColumn is defined %}
+            {% if  datatable.options.actionColumn is defined %}
                 <th>
-                    {% if datatable.options.options.actionColumn.label is defined %}
-                        {% set actionLabel = datatable.options.options.actionColumn.label %}
+                    {% if  datatable.options.actionColumn.label is defined %}
+                        {% set actionLabel =  datatable.options.actionColumn.label %}
                     {% endif %}
                     {% if datatable.translationDomain is not empty %}
                         {{ actionLabel|trans({}, datatable.translationDomain) }}

@@ -4,7 +4,7 @@
 
 {% for row in data.data %}
     <tr class="{{ trCss }}">
-        {% if datatable.options.options.selectorColumn is defined %}
+        {% if  datatable.options.selectorColumn is defined %}
             <td class="">
                 <input type="checkbox" name="row_selector" value="{{ row.0.id }}" />
             </td>
@@ -37,9 +37,9 @@
                 {% include column.template with {fieldValue: fieldValue, entityObject: row.0, row: row} %}
             </td>
         {% endfor %}
-        {% if datatable.options.options.actionColumn is defined %}
-            {% if datatable.options.options.actionColumn.template is defined %}
-                {% include datatable.options.options.actionColumn.template with {row: row, entityObject: row.0} %}
+        {% if  datatable.options.actionColumn is defined %}
+            {% if  datatable.options.actionColumn.template is defined %}
+                {% include  datatable.options.actionColumn.template with {row: row, entityObject: row.0} %}
             {% endif %}
         {% endif %}
     </tr>
