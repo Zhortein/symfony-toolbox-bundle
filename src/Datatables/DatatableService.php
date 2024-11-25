@@ -93,7 +93,7 @@ class DatatableService
     private function processRequest(AbstractDatatable $datatable, Request $request): array
     {
         $params = $this->extractParameters($request, $datatable);
-        $queryBuilder = $datatable->buildQueryBuilder();
+        $queryBuilder = $datatable->getQueryBuilder();
 
         if ($params['search']) {
             $datatable->applySearch($params['search']);

@@ -79,7 +79,7 @@ readonly class DatatableManager
     private function buildDatatableTypesForCache(AbstractDatatable $datatable): array
     {
         // Lancer la requête avec LIMIT 1
-        $query = $datatable->buildQueryBuilder()
+        $query = $datatable->getQueryBuilder()
             ->setMaxResults(1)
             ->getQuery();
         $result = $query->getArrayResult();

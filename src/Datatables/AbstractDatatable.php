@@ -433,7 +433,7 @@ abstract class AbstractDatatable
         $searchParamCount = 0;
         if ($this->options['searchable']) {
             // The datatable must be searchable to use search features...
-            $queryBuilder = $this->buildQueryBuilder();
+            $queryBuilder = $this->getQueryBuilder();
             $columns = $this->getColumns();
             foreach ($columns as $column) {
                 if ($column['searchable']) {
@@ -460,10 +460,18 @@ abstract class AbstractDatatable
      */
     public function applyStaticFilters(): QueryBuilder
     {
-        return $this->buildQueryBuilder();
+        return $this->getQueryBuilder();
     }
 
     abstract public function configure(): array;
+
+    public function getQueryBuilder(): QueryBuilder
+    {
+        if (null === $this->queryBuilder) {
+            $this->queryBuilder = $this->buildQueryBuilder();
+        }
+        return $this->queryBuilder;
+    }
 
     public function buildQueryBuilder(): QueryBuilder
     {
@@ -504,7 +512,7 @@ abstract class AbstractDatatable
      */
     public function calculateChecksum(string $datatableName): string
     {
-        $metadata = $this->em->getClassMetadata($this->buildQueryBuilder()->getRootEntities()[0]);
+        $metadata = $this->em->getClassMetadata($this->getQueryBuilder()->getRootEntities()[0]);
 
         // Combine des éléments pour générer un hash unique
         $data = [
