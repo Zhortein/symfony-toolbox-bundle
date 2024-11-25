@@ -94,6 +94,11 @@ abstract class AbstractDatatable
         $this->configure();
     }
 
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->em;
+    }
+
     public function getDisplayFooter(): bool
     {
         return $this->displayFooter;
@@ -458,4 +463,32 @@ abstract class AbstractDatatable
      * @return string The fully qualified class name of the entity
      */
     abstract protected function getEntityClass(): string;
+
+    /**
+     * Calculates a unique checksum for a given datatable.
+     *
+     * @param string $datatableName the name of the datatable
+     *
+     * @return string the calculated checksum
+     *
+     * @throws \RuntimeException if unable to generate a checksum due to a JSON encoding error
+     */
+    public function calculateChecksum(string $datatableName): string
+    {
+        $metadata = $this->em->getClassMetadata($this->buildQueryBuilder()->getRootEntities()[0]);
+
+        // Combine des éléments pour générer un hash unique
+        $data = [
+            'datatableName' => $datatableName,
+            'columns' => $metadata->getFieldNames(),
+            'associations' => $metadata->getAssociationNames(),
+        ];
+
+        try {
+            // Crée un checksum unique
+            return md5(json_encode($data, JSON_THROW_ON_ERROR));
+        } catch (\JsonException $e) {
+            throw new \RuntimeException('Unable to generate a checksum for the datatable.', 0, $e);
+        }
+    }
 }
