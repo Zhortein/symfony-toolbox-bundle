@@ -52,7 +52,7 @@ readonly class DatatableManager
                         }
                     }
 
-                    if (in_array($key, ['defaultPageSize', 'defaultSort', 'searchable', 'sortable', 'options', 'autoColumns'])) {
+                    if (in_array($key, ['defaultPageSize', 'defaultSort', 'searchable', 'sortable', 'options', 'autoColumns', 'translationDomain'])) {
                         $datatable->addOption($key, $value);
                     }
                 }

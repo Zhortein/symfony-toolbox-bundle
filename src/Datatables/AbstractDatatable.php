@@ -25,16 +25,19 @@ abstract class AbstractDatatable
      *      'searchable' => true,
      *      'sortable' => true,
      *      'header' => [
+     *          'translate' => true,
      *          'keep_default_classes' => true,
      *          'css' => 'myCssClasses',
      *          'data' => ['custom-dataname' => 'myValue', ],
      *      ],
      *      'dataset' => [
+     *          'translate' => false,
      *          'keep_default_classes' => true,
      *          'css' => 'myCssClassesForData',
      *          'data' => ['mycustom-dataname' => 'myOtherValue', ],
      *      ],
      *      'footer' => [
+     *          'translate' => false,
      *          'auto' => 'count',
      *          'keep_default_classes' => true,
      *          'css' => 'myCssClassesForFooter',
@@ -227,6 +230,14 @@ abstract class AbstractDatatable
                 if (!isset($column[$key])) {
                     $column[$key] = [];
                 }
+                if (!isset($column[$key]['translate'])) {
+                    if ('header' === $key) {
+                        // By default, when a translation domain is given, only translate header labels...
+                        $column[$key]['translate'] = !empty($this->getTranslationDomain());
+                    } else {
+                        $column[$key]['translate'] = false;
+                    }
+                }
                 if (!isset($column[$key]['keep_default_classes'])) {
                     $column[$key]['keep_default_classes'] = true;
                 }
@@ -299,6 +310,11 @@ abstract class AbstractDatatable
                     }
                 }
                 break;
+            case 'translationDomain':
+                if (!is_string($value) || empty($value)) {
+                    $value = '';
+                }
+                break;
             case 'searchable':
             case 'sortable':
             case 'autoColumns':
@@ -319,6 +335,11 @@ abstract class AbstractDatatable
     public function getDefaultSort(): array
     {
         return $this->getOptions()['defaultSort'];
+    }
+
+    public function getTranslationDomain(): string
+    {
+        return $this->getOptions()['translationDomain'] ?? '';
     }
 
     public function getDefaultPageSize(): int

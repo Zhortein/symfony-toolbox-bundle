@@ -31,11 +31,11 @@
                                 {% endfor %}
                             {% endif %}
 
-                            {% if headerKey != 'class' and headerKey != 'data' and headerKey != 'keep_default_classes' %}
+                            {% if headerKey not in ['class','data','keep_default_classes','translate'] %}
                                 {{ headerKey }}="{{ headerValue }}"
                             {% endif %}
                         {% endfor %}
-                >{{ column.label }}</th>
+                >{% if datatable.translationDomain is not empty and column.header.translate %}{{ column.label|trans({}, datatable.translationDomain) }}{% else %}{{ column.label }}{% endif %}</th>
             {% endfor %}
         </tr>
         </thead>
