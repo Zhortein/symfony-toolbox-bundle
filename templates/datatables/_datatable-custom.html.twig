@@ -13,7 +13,7 @@
         <tr>
             {% for column in datatable.columns %}
                 {% set headerCssClasses = '' %}
-                <th scope="col" class="{{ headerCssClasses }}" data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort" data-zhortein--symfony-toolbox-bundle--datatable-sort-value="{{ column.name }}">{{ column.label }}</th>
+                <th scope="col" class="{{ headerCssClasses }}" data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort" data-field="{{ column.name }}">{{ column.label }}</th>
             {% endfor %}
         </tr>
         </thead>

@@ -18,7 +18,7 @@
                 {% else %}
                     {% set headerCssClasses = 'px-3 py-3.5 text-left text-sm font-semibold text-gray-900' %}
                 {% endif %}
-                <th scope="col" class="{{ headerCssClasses }}" data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort" data-zhortein--symfony-toolbox-bundle--datatable-sort-value="{{ column.name }}">{{ column.label }}</th>
+                <th scope="col" class="{{ headerCssClasses }}" data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort" data-field="{{ column.name }}">{{ column.label }}</th>
             {% endfor %}
         </tr>
         </thead>

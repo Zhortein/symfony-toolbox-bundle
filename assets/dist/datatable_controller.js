@@ -59,7 +59,7 @@ export default class extends Controller {
     }
 
     sort(event) {
-        const column = event.target.dataset.sortField;
+        const column = event.target.dataset.field;
         if (!column) return;
 
         this.state.sort = column;
