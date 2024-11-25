@@ -286,7 +286,7 @@ abstract class AbstractDatatable
             // Default to string in case a column can't be defined
             if (!isset($column['datatype'])) {
                 $column['datatype'] = 'string';
-                $column['template'] = '@ZhorteinSymfonyToolbox/datatables/column_types/_string.html.twig';
+                $column['template'] = '';
             }
 
             // Default to true if not defined @todo Implement autoColumns mode (Read Entity metadata and construct the columns automatically)
@@ -542,12 +542,11 @@ abstract class AbstractDatatable
                 $this->columns[$columnTypeDefinition['rank']]['isEnum'] = (bool) $columnTypeDefinition['isEnum'];
                 $this->columns[$columnTypeDefinition['rank']]['isTranslatableEnum'] = $columnTypeDefinition['isEnum'] && $columnTypeDefinition['isTranslatableEnum'];
 
-                if (!isset($this->columns[$columnTypeDefinition['rank']]['template'])) {
+                if (empty($this->columns[$columnTypeDefinition['rank']]['template'])) {
                     $this->columns[$columnTypeDefinition['rank']]['template'] = match ((string) $columnTypeDefinition['datatype']) {
                         'enum' => '@ZhorteinSymfonyToolbox/datatables/column_types/_enum.html.twig',
                         'enum_translatable' => '@ZhorteinSymfonyToolbox/datatables/column_types/_enum-translatable.html.twig',
                         'array' => '@ZhorteinSymfonyToolbox/datatables/column_types/_array.html.twig',
-                        'string' => '@ZhorteinSymfonyToolbox/datatables/column_types/_string.html.twig',
                         'boolean' => '@ZhorteinSymfonyToolbox/datatables/column_types/_boolean.html.twig',
                         \DateTimeInterface::class, \DateTime::class, \DateTimeImmutable::class => '@ZhorteinSymfonyToolbox/datatables/column_types/_datetime.html.twig',
                         \DateInterval::class => '@ZhorteinSymfonyToolbox/datatables/column_types/_dateinterval.html.twig',
@@ -560,7 +559,7 @@ abstract class AbstractDatatable
                         'resource (closed)' => '@ZhorteinSymfonyToolbox/datatables/column_types/_resource-closed.html.twig',
                         'unknown type' => '@ZhorteinSymfonyToolbox/datatables/column_types/_unknown.html.twig',
                         'NULL' => '@ZhorteinSymfonyToolbox/datatables/column_types/_null.html.twig',
-                        default => '@ZhorteinSymfonyToolbox/datatables/column_types/_default.html.twig',
+                        default => '@ZhorteinSymfonyToolbox/datatables/column_types/_string.html.twig',
                     };
                 }
             }
