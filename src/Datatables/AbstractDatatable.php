@@ -469,10 +469,7 @@ abstract class AbstractDatatable
 
     public function getQueryBuilder(): QueryBuilder
     {
-        if (false === $this->queryBuilderOk) {
-            $this->queryBuilder = $this->buildQueryBuilder();
-        }
-        return $this->queryBuilder;
+        return $this->buildQueryBuilder();
     }
 
     public function buildQueryBuilder(): QueryBuilder
