@@ -34,13 +34,8 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
         }
 
         $iconLibrary = $config['datatables']['icons']['library'] ?? Configuration::ICON_LIBRARY_FONTAWESOME;
-        if ('fontawesome' === $iconLibrary) {
-            $this->addFontAwesomeToImportMap($container);
-        } elseif ('bootstrap' === $iconLibrary) {
-            $this->addBootstrapIconsToImportMap($container);
-        } else {
-            $this->addCustomIconsToImportMap($container, $config['datatables']['icons']['custom_libraries']);
-        }
+        $container->registerForAutoconfiguration(ImportMapManager::class)
+            ->addMethodCall('addImport', [$this->getImportForLibrary($iconLibrary)]);
     }
 
     public function prepend(ContainerBuilder $container): void
@@ -74,26 +69,15 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
         return $frameworkBundle && is_file($frameworkBundle['path'].'/Resources/config/asset_mapper.php');
     }
 
-    private function addFontAwesomeToImportMap(ContainerBuilder $container): void
-    {
-        $container->register('asset_mapper.import_map_manager', ImportMapManager::class)
-            ->addMethodCall('addImport', ['@fortawesome/fontawesome-free']);
-    }
-
-    private function addBootstrapIconsToImportMap(ContainerBuilder $container): void
-    {
-        $container->register('asset_mapper.import_map_manager', ImportMapManager::class)
-            ->addMethodCall('addImport', ['bootstrap-icons']);
-    }
-
     /**
-     * @param ContainerBuilder $container
-     * @param string[] $customLibraries
-     * @return void
+     * Retourne l'import à ajouter pour une bibliothèque donnée.
      */
-    private function addCustomIconsToImportMap(ContainerBuilder $container, array $customLibraries): void
+    private function getImportForLibrary(string $iconLibrary): string
     {
-        $container->register('asset_mapper.import_map_manager', ImportMapManager::class)
-            ->addMethodCall('addImport', $customLibraries);
+        return match ($iconLibrary) {
+            'fontawesome' => '@fortawesome/fontawesome-free',
+            'bootstrap' => 'bootstrap-icons',
+            default => '',
+        };
     }
 }
