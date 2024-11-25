@@ -3,7 +3,6 @@
 namespace Zhortein\SymfonyToolboxBundle\DependencyInjection;
 
 use Symfony\Component\AssetMapper\AssetMapperInterface;
-use Symfony\Component\AssetMapper\ImportMap\ImportMapManager;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
@@ -32,10 +31,6 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
                 ->setArgument(2, $config['datatables'])
             ;
         }
-
-        $iconLibrary = $config['datatables']['icons']['library'] ?? Configuration::ICON_LIBRARY_FONTAWESOME;
-        $container->registerForAutoconfiguration(ImportMapManager::class)
-            ->addMethodCall('addImport', [$this->getImportForLibrary($iconLibrary)]);
     }
 
     public function prepend(ContainerBuilder $container): void
@@ -67,17 +62,5 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
         $frameworkBundle = $container->getParameter('kernel.bundles_metadata')['FrameworkBundle'] ?? null;
 
         return $frameworkBundle && is_file($frameworkBundle['path'].'/Resources/config/asset_mapper.php');
-    }
-
-    /**
-     * Retourne l'import à ajouter pour une bibliothèque donnée.
-     */
-    private function getImportForLibrary(string $iconLibrary): string
-    {
-        return match ($iconLibrary) {
-            'fontawesome' => '@fortawesome/fontawesome-free',
-            'bootstrap' => 'bootstrap-icons',
-            default => '',
-        };
     }
 }

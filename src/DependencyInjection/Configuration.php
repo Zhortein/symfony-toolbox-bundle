@@ -13,9 +13,6 @@ class Configuration implements ConfigurationInterface
     public const string DATATABLE_CSS_MODE_BOOTSTRAP = 'bootstrap';
     public const string DATATABLE_CSS_MODE_TAILWIND = 'tailwind';
     public const string DATATABLE_CSS_MODE_CUSTOM = 'custom';
-    public const string ICON_LIBRARY_FONTAWESOME = 'fontawesome';
-    public const string ICON_LIBRARY_BOOTSTRAP = 'bootstrap';
-    public const string ICON_LIBRARY_CUSTOM = 'custom';
     public const string DEFAULT_DATATABLE_CSS_MODE = self::DATATABLE_CSS_MODE_BOOTSTRAP;
 
     public function getConfigTreeBuilder(): TreeBuilder
@@ -30,19 +27,6 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('datatables')
                 ->addDefaultsIfNotSet()
                     ->children()
-                        ->arrayNode('icons')
-                            ->children()
-                                ->scalarNode('library')
-                                    ->defaultValue(self::ICON_LIBRARY_FONTAWESOME)
-                                    ->validate()
-                                        ->ifNotInArray([self::ICON_LIBRARY_FONTAWESOME, self::ICON_LIBRARY_BOOTSTRAP, self::ICON_LIBRARY_CUSTOM])
-                                        ->thenInvalid('Invalid Icons library %s')
-                                    ->end()
-                                ->end()
-                                ->arrayNode('custom_libraries')
-                                ->end()
-                            ->end()
-                        ->end()
                         ->scalarNode('css_mode')
                             ->defaultValue(self::DEFAULT_DATATABLE_CSS_MODE)
                             ->validate()
