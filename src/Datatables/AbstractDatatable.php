@@ -285,7 +285,7 @@ abstract class AbstractDatatable
             // Default to string in case a column can't be defined
             if (!isset($column['datatype'])) {
                 $column['datatype'] = 'string';
-                $column['template'] = '@ZhorteinSymfonyToolbox/datatable/column_types/_string.html.twig';
+                $column['template'] = '@ZhorteinSymfonyToolbox/datatables/column_types/_string.html.twig';
             }
 
             // Default to true if not defined @todo Implement autoColumns mode (Read Entity metadata and construct the columns automatically)
