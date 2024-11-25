@@ -28,6 +28,8 @@ class AsDatatable
         public bool $searchable = true, // User can perform searches
         public bool $sortable = true, // User can change sorting
         public bool $autoColumns = false, // Construct columns from request then merge column settings (settings erase auto cols detection)
+        public array $actionColumn = [], // Add an "action" column ['label' => 'Actions', 'template' => '']
+        public array $selectorColumn = [], // Add a "selector" column ['label' => '', 'template' => '']
         public string $translationDomain = '', // Define data translation domain for this Datatable, no translations if empty
         public array $options = [], // Additional Options ['table' => ['keep_default_classes' => true, 'class' => '', 'style' => '', 'data' => ['key' => 'value', ]], 'thead' => [], 'tfoot' => [], 'pagination' => []]
     ) {
@@ -51,6 +53,8 @@ class AsDatatable
             'searchable' => $this->searchable,
             'sortable' => $this->sortable,
             'autoColumns' => $this->autoColumns,
+            'actionColumn' => $this->actionColumn,
+            'selectorColumn' => $this->selectorColumn,
             'translationDomain' => $this->translationDomain,
             'options' => $this->options,
         ];

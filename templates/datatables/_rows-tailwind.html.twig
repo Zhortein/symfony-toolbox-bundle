@@ -4,6 +4,11 @@
 
 {% for row in data.data %}
     <tr class="{{ trCss }}">
+        {% if datatable.options.options.selectorColumn is defined %}
+            <td class="">
+                <input type="checkbox" name="row_selector" value="{{ row.0.id }}" />
+            </td>
+        {% endif %}
         {% for column in datatable.columns %}
             {% if not column.header.keep_default_classes %}
                 {% set tdFirstCss = '' %}
@@ -32,5 +37,10 @@
                 {% include column.template with {fieldValue: fieldValue, entityObject: row.0, row: row} %}
             </td>
         {% endfor %}
+        {% if datatable.options.options.actionColumn is defined %}
+            {% if datatable.options.options.actionColumn.template is defined %}
+                {% include datatable.options.options.actionColumn.template with {row: row, entityObject: row.0} %}
+            {% endif %}
+        {% endif %}
     </tr>
 {% endfor %}

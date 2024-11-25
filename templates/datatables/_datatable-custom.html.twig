@@ -24,6 +24,17 @@
                 {% endfor %}
         >
         <tr>
+            {% if datatable.options.options.selectorColumn is defined %}
+                <th>
+                    {% if datatable.options.options.selectorColumn.label is defined %}
+                        {% set selectorLabel = datatable.options.options.selectorColumn.label %}
+                    {% endif %}
+                    {% if datatable.translationDomain is not empty %}
+                        {{ selectorLabel|trans({}, datatable.translationDomain) }}
+                    {% endif %}
+                    {{ selectorLabel }}
+                </th>
+            {% endif %}
             {% for column in datatable.columns %}
                 {% if column.header.keep_default_classes %}
                     {% set headerCssClasses = '' %}
@@ -49,6 +60,17 @@
                         {% endfor %}
                 >{% if datatable.translationDomain is not empty and column.header.translate %}{{ column.label|trans({}, datatable.translationDomain) }}{% else %}{{ column.label }}{% endif %}</th>
             {% endfor %}
+            {% if datatable.options.options.actionColumn is defined %}
+                <th>
+                    {% if datatable.options.options.actionColumn.label is defined %}
+                        {% set actionLabel = datatable.options.options.actionColumn.label %}
+                    {% endif %}
+                    {% if datatable.translationDomain is not empty %}
+                        {{ actionLabel|trans({}, datatable.translationDomain) }}
+                    {% endif %}
+                    {{ actionLabel }}
+                </th>
+            {% endif %}
         </tr>
         </thead>
         <tbody
