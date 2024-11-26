@@ -100,16 +100,21 @@ class DatatableService
         $params = $this->extractParameters($request, $datatable);
         $queryBuilder = $datatable->getQueryBuilder();
 
-        if ($params['search']) {
+        if ($params['search'] && $datatable->isSearchable()) {
             $datatable->applySearch($queryBuilder, $params['search']);
         }
 
-        if ($params['sort'] && !$this->validateSortField($params['sort'], $datatable->getColumns())) {
-            throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['sort']));
-        }
+        if ($datatable->isSortable()) {
+            if ($params['sort'] && !$this->validateSortField($params['sort'], $datatable->getColumns())) {
+                throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['sort']));
+            }
 
-        if ($params['sort'] && $params['order']) {
-            $queryBuilder->orderBy($datatable->getColumnAlias($params['sort']).'.'.$params['sort'], $params['order']);
+            if ($params['sort'] && $params['order']) {
+                $queryBuilder->orderBy(
+                    $datatable->getColumnAlias($params['sort']).'.'.$params['sort'],
+                    $params['order']
+                );
+            }
         }
 
         $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->datatableManager->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR);

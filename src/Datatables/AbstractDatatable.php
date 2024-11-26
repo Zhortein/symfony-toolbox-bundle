@@ -424,6 +424,16 @@ abstract class AbstractDatatable
         return (int) $this->getOptions()['defaultPageSize'];
     }
 
+    public function isSortable(): bool
+    {
+        return (bool) $this->getOptions()['sortable'];
+    }
+
+    public function isSearchable(): bool
+    {
+        return (bool) $this->getOptions()['searchable'];
+    }
+
     /**
      * Applies search criteria to the QueryBuilder based on the provided search string.
      * This method incorporates search functionality only if the datatable is marked as searchable
@@ -482,9 +492,9 @@ abstract class AbstractDatatable
      * Redefine this method to set static filters on the QueryBuilder.
      * All searches, sorts, ... on the Datatable will use those static filters.
      */
-    public function applyStaticFilters(QueryBuilder $queryBuilder): QueryBuilder
+    public function applyStaticFilters(QueryBuilder $queryBuilder): self
     {
-        return $queryBuilder;
+        return $this;
     }
 
     abstract public function configure(): array;
