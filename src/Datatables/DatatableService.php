@@ -116,6 +116,7 @@ class DatatableService
         $pagination = [
             'current' => $params['page'],
             'hasPrevious' => $nbPages > 1 && $params['page'] > 1,
+            'nbPages' => $nbPages,
             'previous' => $nbPages > 1 && $params['page'] > 1 ? $params['page'] - 1 : 1,
             'pages' => range(1, $nbPages),
             'pageSize' => $params['limit'],
