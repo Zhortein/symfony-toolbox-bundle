@@ -56,6 +56,7 @@ class DatatableService
             'limit' => max(1, (int) $request->query->get('limit', $datatable->getOptions()['defaultPageSize'] ?? $this->datatableManager->getGlobalOption('items_per_page', Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE))),
             'sort' => $sortValue,
             'order' => $orderValue,
+            'multiSort' => $request->query->get('multiSort', []),
             'search' => $request->query->get('search', null),
         ];
     }
@@ -105,15 +106,28 @@ class DatatableService
         }
 
         if ($datatable->isSortable()) {
-            if ($params['sort'] && !$this->validateSortField($params['sort'], $datatable->getColumns())) {
-                throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['sort']));
-            }
+            if (count($params['multiSort']) > 0) {
+                foreach ($params['multiSort'] as $sort) {
+                    if ($sort['field'] && !$this->validateSortField($sort['field'], $datatable->getColumns())) {
+                        throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['sort']));
+                    }
 
-            if ($params['sort'] && $params['order']) {
-                $queryBuilder->orderBy(
-                    $datatable->getColumnAlias($params['sort']).'.'.$params['sort'],
-                    $params['order']
-                );
+                    $queryBuilder->addOrderBy(
+                        $datatable->getColumnAlias($sort['field']).'.'.$sort['field'],
+                        $sort['order']
+                    );
+                }
+            } else {
+                if ($params['sort'] && !$this->validateSortField($params['sort'], $datatable->getColumns())) {
+                    throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['sort']));
+                }
+
+                if ($params['sort'] && $params['order']) {
+                    $queryBuilder->orderBy(
+                        $datatable->getColumnAlias($params['sort']).'.'.$params['sort'],
+                        $params['order']
+                    );
+                }
             }
         }
 

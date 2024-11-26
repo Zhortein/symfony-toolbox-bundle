@@ -20,6 +20,7 @@ export default class extends Controller {
             sort: this.sortValue || null,
             order: this.orderValue || 'asc',
             search: this.searchValue || '',
+            multiSort: []
         };
 
         this.updateTable();
@@ -33,6 +34,10 @@ export default class extends Controller {
         url.searchParams.set('sort', this.state.sort);
         url.searchParams.set('order', this.state.order);
         url.searchParams.set('search', this.state.search);
+        this.state.multiSort.forEach((sort, index) => {
+            url.searchParams.set(`multiSort[${index}][field]`, sort.field);
+            url.searchParams.set(`multiSort[${index}][order]`, sort.order);
+        });
 
         try {
             const response = await fetch(url);
@@ -64,11 +69,25 @@ export default class extends Controller {
             const iconContainer = col.querySelector('.datatable-sort-icon');
             if (iconContainer) {
                 const field = col.dataset.field;
+                const sortIndex = this.state.multiSort.findIndex(sort => sort.field === field);
+
+                if (sortIndex >= 0) {
+                    // Colonne triée : affiche l'icône avec l'ordre et la priorité
+                    const sort = this.state.multiSort[sortIndex];
+                    iconContainer.innerHTML = sort.order === 'asc' ? icons.icon_sort_asc : icons.icon_sort_desc;;
+                    iconContainer.dataset.priority = sortIndex + 1;
+                } else {
+                    // Colonne non triée : affiche l'icône neutre
+                    iconContainer.innerHTML = icons.icon_sort_neutral;
+                    delete iconContainer.dataset.priority;
+                }
+
+                /*
                 let iconHtml = icons.icon_sort_neutral; // Icône par défaut
                 if (field === this.state.sort) {
                     iconHtml = this.state.order === 'asc' ? icons.icon_sort_asc : icons.icon_sort_desc;
                 }
-                iconContainer.innerHTML = iconHtml;
+                iconContainer.innerHTML = iconHtml;*/
             }
         });
     }
@@ -77,8 +96,23 @@ export default class extends Controller {
         const column = event.target.dataset.field;
         if (!column) return;
 
-        this.state.sort = column;
-        this.state.order = this.state.order === 'asc' ? 'desc' : 'asc';
+        const field = column;
+        let newOrder = this.state.order === 'asc' ? 'desc' : 'asc';
+
+        if (event.shiftKey) {
+            // Ajoute ou met à jour cette colonne dans l'ordre des tris
+            const existingIndex = this.state.multiSort.findIndex(col => col.field === field);
+            if (existingIndex >= 0) {
+                this.state.multiSort[existingIndex].order = newOrder;
+            } else {
+                this.state.multiSort.push({ field, order: newOrder });
+            }
+        } else {
+            // Mono-colonne
+            this.state.multiSort = [{ field, order: newOrder }];
+            this.state.sort = column;
+            this.state.order = this.state.order === 'asc' ? 'desc' : 'asc';
+        }
 
         this.updateTable();
     }
