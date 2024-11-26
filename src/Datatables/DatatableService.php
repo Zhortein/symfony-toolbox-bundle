@@ -41,15 +41,7 @@ class DatatableService
 
     private function extractParameters(Request $request, AbstractDatatable $datatable): array
     {
-        $defaultSort = $datatable->getDefaultSort();
-        $sortValue = $request->query->get('sort', $defaultSort['column']);
-        if ('null' === $sortValue) {
-            $sortValue = $defaultSort['column'];
-        }
-        $orderValue = strtolower($request->query->get('order', $defaultSort['order']));
-        if (!in_array($orderValue, ['asc', 'desc'], true)) {
-            $orderValue = $defaultSort['order'];
-        }
+        $defaultSort = [$datatable->getDefaultSort()];
 
         $multiSort = [];
         foreach ($request->query->all() as $key => $value) {
@@ -61,9 +53,7 @@ class DatatableService
         return [
             'page' => max(1, (int) $request->query->get('page', 1)),
             'limit' => max(1, (int) $request->query->get('limit', $datatable->getOptions()['defaultPageSize'] ?? $this->datatableManager->getGlobalOption('items_per_page', Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE))),
-            'sort' => $sortValue,
-            'order' => $orderValue,
-            'multiSort' => $multiSort,
+            'multiSort' => count($multiSort) > 0 ? $multiSort : $defaultSort,
             'search' => $request->query->get('search'),
         ];
     }
@@ -112,29 +102,16 @@ class DatatableService
             $datatable->applySearch($queryBuilder, $params['search']);
         }
 
-        if ($datatable->isSortable()) {
-            if (count($params['multiSort']) > 0) {
-                foreach ($params['multiSort'] as $sort) {
-                    if ($sort['field'] && !$this->validateSortField($sort['field'], $datatable->getColumns())) {
-                        throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['sort']));
-                    }
-
-                    $queryBuilder->addOrderBy(
-                        $datatable->getFullyQualifiedColumnFromNameAs($sort['field']),
-                        $sort['order']
-                    );
-                }
-            } else {
-                if ($params['sort'] && !$this->validateSortField($params['sort'], $datatable->getColumns())) {
+        if ($datatable->isSortable() && count($params['multiSort']) > 0) {
+            foreach ($params['multiSort'] as $sort) {
+                if ($sort['field'] && !$this->validateSortField($sort['field'], $datatable->getColumns())) {
                     throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['sort']));
                 }
 
-                if ($params['sort'] && $params['order']) {
-                    $queryBuilder->orderBy(
-                        $datatable->getFullyQualifiedColumnFromNameAs($params['sort']),
-                        $params['order']
-                    );
-                }
+                $queryBuilder->addOrderBy(
+                    $datatable->getFullyQualifiedColumnFromNameAs($sort['field']),
+                    $sort['order']
+                );
             }
         }
 

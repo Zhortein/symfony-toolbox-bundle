@@ -6,8 +6,6 @@ export default class extends Controller {
     static values = {
         id: String,
         page: Number,
-        sort: String,
-        order: String,
         search: String,
         mode: String,
         pagesize: Number,
@@ -17,8 +15,6 @@ export default class extends Controller {
     connect() {
         this.state = {
             page: this.pageValue || 1,
-            sort: this.sortValue || null,
-            order: this.orderValue || 'asc',
             search: this.searchValue || '',
             multiSort: []
         };
@@ -31,8 +27,6 @@ export default class extends Controller {
 
         const url = new URL(this.urlValue, window.location.origin);
         url.searchParams.set('page', this.state.page);
-        url.searchParams.set('sort', this.state.sort);
-        url.searchParams.set('order', this.state.order);
         url.searchParams.set('search', this.state.search);
         this.state.multiSort.forEach((sort, index) => {
             url.searchParams.set(`multiSort[${index}][field]`, sort.field);
@@ -74,20 +68,13 @@ export default class extends Controller {
                 if (sortIndex >= 0) {
                     // Colonne triée : affiche l'icône avec l'ordre et la priorité
                     const sort = this.state.multiSort[sortIndex];
-                    iconContainer.innerHTML = sort.order === 'asc' ? icons.icon_sort_asc : icons.icon_sort_desc;;
+                    iconContainer.innerHTML = sort.order === 'asc' ? icons.icon_sort_asc : icons.icon_sort_desc;
                     iconContainer.dataset.priority = sortIndex + 1;
                 } else {
                     // Colonne non triée : affiche l'icône neutre
                     iconContainer.innerHTML = icons.icon_sort_neutral;
                     delete iconContainer.dataset.priority;
                 }
-
-                /*
-                let iconHtml = icons.icon_sort_neutral; // Icône par défaut
-                if (field === this.state.sort) {
-                    iconHtml = this.state.order === 'asc' ? icons.icon_sort_asc : icons.icon_sort_desc;
-                }
-                iconContainer.innerHTML = iconHtml;*/
             }
         });
     }
@@ -99,7 +86,7 @@ export default class extends Controller {
         const field = column;
         let newOrder = this.state.order === 'asc' ? 'desc' : 'asc';
 
-        if (event.shiftKey) {
+        if (event.shiftKey || event.ctrlKey) {
             // Ajoute ou met à jour cette colonne dans l'ordre des tris
             const existingIndex = this.state.multiSort.findIndex(col => col.field === field);
             if (existingIndex >= 0) {
@@ -110,8 +97,6 @@ export default class extends Controller {
         } else {
             // Mono-colonne
             this.state.multiSort = [{ field, order: newOrder }];
-            this.state.sort = column;
-            this.state.order = this.state.order === 'asc' ? 'desc' : 'asc';
         }
 
         this.updateTable();
