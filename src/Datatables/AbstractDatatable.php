@@ -14,7 +14,6 @@ abstract class AbstractDatatable
     protected ?QueryBuilder $queryBuilder = null;
 
     protected bool $displayFooter = false;
-    protected bool $queryBuilderOk = false;
 
     /**
      * Columns definitions. Each column is represented by an array.
@@ -107,7 +106,7 @@ abstract class AbstractDatatable
 
     public function getMainAlias(): string
     {
-        return $this->mainAlias;
+        return $this->mainAlias ?? 't';
     }
 
     public function setMainAlias(string $mainAlias): self
@@ -425,15 +424,6 @@ abstract class AbstractDatatable
         return (int) $this->getOptions()['defaultPageSize'];
     }
 
-    public function setQueryBuilder(QueryBuilder $queryBuilder): self
-    {
-        $this->queryBuilder = $queryBuilder;
-        $this->validateColumns();
-        $this->queryBuilder = $this->buildQueryBuilder();
-
-        return $this;
-    }
-
     /**
      * Applies search criteria to the QueryBuilder based on the provided search string.
      * This method incorporates search functionality only if the datatable is marked as searchable
@@ -500,29 +490,26 @@ abstract class AbstractDatatable
 
     abstract public function configure(): array;
 
-    public function getQueryBuilder(): QueryBuilder
+    public function setQueryBuilder(): self
     {
-        return $this->buildQueryBuilder();
+        $this->queryBuilder = $this->em->createQueryBuilder()
+            ->select($this->getMainAlias() ?? 't')
+            ->from($this->getEntityClass(), $this->mainAlias)
+        ;
+
+        return $this;
     }
 
-    public function buildQueryBuilder(): QueryBuilder
+    public function getQueryBuilder(): QueryBuilder
     {
+        $this->setQueryBuilder();
         $this->validateColumns();
-
-        if (null === $this->queryBuilder) {
-            $this->queryBuilder = $this->em->createQueryBuilder()
-                ->select('t')
-                ->from($this->getEntityClass(), $this->mainAlias)
-            ;
-        }
 
         // Compose columns selected query. Each column is named with its alias to allow dynamic filtering / sorting...
         foreach ($this->columns as $column) {
             $this->queryBuilder
                 ->addSelect(sprintf('%s.%s AS %s', $column['sqlAlias'], $column['name'], $column['nameAs']));
         }
-
-        $this->queryBuilderOk = true;
 
         return $this->queryBuilder;
     }

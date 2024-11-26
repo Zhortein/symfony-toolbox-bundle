@@ -155,7 +155,7 @@ class DatatableTest extends TestCase
         ]);
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
-        $datatableMock->method('buildQueryBuilder')->willReturn($queryBuilder);
+        $datatableMock->method('getQueryBuilder')->willReturn($queryBuilder);
 
         $paginatorFactory = $this->createMock(PaginatorFactory::class);
 
