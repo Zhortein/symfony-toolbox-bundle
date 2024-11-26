@@ -120,7 +120,7 @@ class DatatableService
                     }
 
                     $queryBuilder->addOrderBy(
-                        $datatable->getColumnAliasFromNameAs($sort['field']).'.'.$sort['field'],
+                        $datatable->getFullyQualifiedColumnFromNameAs($sort['field']),
                         $sort['order']
                     );
                 }
@@ -131,7 +131,7 @@ class DatatableService
 
                 if ($params['sort'] && $params['order']) {
                     $queryBuilder->orderBy(
-                        $datatable->getColumnAliasFromNameAs($params['sort']).'.'.$params['sort'],
+                        $datatable->getFullyQualifiedColumnFromNameAs($params['sort']),
                         $params['order']
                     );
                 }

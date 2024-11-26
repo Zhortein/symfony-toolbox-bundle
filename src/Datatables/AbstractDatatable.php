@@ -207,24 +207,41 @@ abstract class AbstractDatatable
     }
 
     /**
-     * Retrieves the SQL alias for a specific column based on its name.
+     * Retrieves the absolute column name from its alias.
      *
-     * Iterates through the columns to find a match for the provided column name and returns
-     * the corresponding SQL alias. If no matching column is found, the main alias is returned.
+     * @param string $asName          the alias name used to find the corresponding column
+     * @param bool   $withAsStatement whether to include an 'AS' statement in the returned string
      *
-     * @param string $name the name of the column to search for
+     * @return string the fully qualified column name optionally with an 'AS' statement
      *
-     * @return string the SQL alias of the matching column, or the main alias if not found
+     * @throws \InvalidArgumentException if the column with the given alias is not found
      */
-    public function getColumnAliasFromNameAs(string $name): string
+    public function getFullyQualifiedColumnFromNameAs(string $asName, bool $withAsStatement = false): string
     {
-        foreach ($this->getColumns() as $column) {
-            if ($column['nameAs'] === $name) {
-                return $column['sqlAlias'];
-            }
+        $columns = $this->getColumns();
+        $alias = $this->getMainAlias();
+
+        // Recherche prioritaire sur 'nameAs'
+        $column = array_filter($columns, static fn ($column) => $column['nameAs'] === $asName);
+
+        // Si aucune correspondance, cherche par 'name'
+        if (empty($column)) {
+            $column = array_filter($columns, static fn ($column) => $column['name'] === $asName);
         }
 
-        return $this->getMainAlias();
+        // Si aucune colonne n'est trouvée
+        if (empty($column)) {
+            throw new \InvalidArgumentException('Unable to find a column with the name '.$asName);
+        }
+
+        // Utilise le premier résultat trouvé
+        $column = reset($column);
+
+        $sqlAlias = $column['sqlAlias'] ?? $alias;
+        $name = $column['name'];
+
+        // Formate la colonne
+        return sprintf('%s.%s', $sqlAlias, $name).($withAsStatement ? ' AS '.$asName : '');
     }
 
     public function validateTableOptions(): void
@@ -492,9 +509,8 @@ abstract class AbstractDatatable
      * Redefine this method to set static filters on the QueryBuilder.
      * All searches, sorts, ... on the Datatable will use those static filters.
      */
-    public function applyStaticFilters(QueryBuilder $queryBuilder): self
+    public function applyStaticFilters(QueryBuilder $queryBuilder): void
     {
-        return $this;
     }
 
     abstract public function configure(): array;
