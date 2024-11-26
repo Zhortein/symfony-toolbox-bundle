@@ -74,7 +74,7 @@
                         {% set actionLabel = datatable.options.actionColumn.label %}
                     {% endif %}
                     {% if datatable.translationDomain is not empty %}
-                        {{ actionLabel|trans({}, datatable.translationDomain) }}
+                        {% set actionLabel = actionLabel|trans({}, datatable.translationDomain) %}
                     {% endif %}
                     {{ actionLabel }}
                 </th>
