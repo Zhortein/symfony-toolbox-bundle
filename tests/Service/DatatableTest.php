@@ -41,7 +41,7 @@ class DatatableTest extends TestCase
         ]);
 
         $datatableMock = $this->getMockForAbstractClass(AbstractDatatable::class);
-        $datatableMock->setOptions(['defaultPageSize' => 10, 'defaultSort' => ['column' => 'id', 'order' => 'asc']]);
+        $datatableMock->setOptions(['defaultPageSize' => 10, 'defaultSort' => [['field' => 'id', 'sort' => 'asc']]]);
 
         $service = new DatatableService($this->container, $this->twig, $this->paginatorFactory, ['datatables' => ['paginator' => 'custom']]);
         $parameters = $service->getParameters($datatableMock, $request);
@@ -125,7 +125,7 @@ class DatatableTest extends TestCase
         $datatableMock->setColumns([
             ['name' => 'id', 'label' => 'ID', 'searchable' => true, 'sortable' => true],
         ]);
-        $datatableMock->setOptions(['defaultPageSize' => 10, 'defaultSort' => ['column' => 'id', 'order' => 'asc']]);
+        $datatableMock->setOptions(['defaultPageSize' => 10, 'defaultSort' => [['field' => 'id', 'sort' => 'asc']]]);
 
         $service = new DatatableService($this->container, $this->twig, $this->paginatorFactory, []);
         $parameters = $service->getParameters($datatableMock, $request);

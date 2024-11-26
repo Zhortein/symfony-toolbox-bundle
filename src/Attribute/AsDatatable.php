@@ -24,7 +24,7 @@ class AsDatatable
         public string $name,
         public array $columns = [], // Each column: ['name' => '', 'label' => '', 'searchable' => true, 'sortable' => true, 'alias' => 't', 'nameAs' => 'myBeautifulName', 'header' => ['keep_default_classes' => true, 'class' => '', 'style' => '', 'data' => ['key' => 'value', ]], 'dataset' => ['keep_default_classes' => true, 'class' => '', 'style' => '', 'data' => ['key' => 'value', ]], 'footer' => ['keep_default_classes' => true, 'auto' => '...', 'class' => '', 'style' => '', 'data' => ['key' => 'value', ]]]
         public int $defaultPageSize = Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE, // ex: 10
-        public array $defaultSort = [], // ex: ['column' => 'id', 'order' => 'asc']
+        public array $defaultSort = [], // ex: [['field' => 'id', 'sort' => 'asc'], ]
         public bool $searchable = true, // User can perform searches
         public bool $sortable = true, // User can change sorting
         public bool $autoColumns = false, // Construct columns from request then merge column settings (settings erase auto cols detection)

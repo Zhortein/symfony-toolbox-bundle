@@ -41,7 +41,7 @@ class DatatableService
 
     private function extractParameters(Request $request, AbstractDatatable $datatable): array
     {
-        $defaultSort = [$datatable->getDefaultSort()];
+        $defaultSort = $datatable->getDefaultSort();
 
         $multiSort = [];
         foreach ($request->query->all() as $key => $value) {

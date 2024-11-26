@@ -54,10 +54,10 @@ abstract class AbstractDatatable
      * Example :
      * [
      *  'defaultPageSize' => 10,
-     *  'defaultSort' => [
-     *      'column' => 'id',
-     *      'order' => 'asc',
-     *  ],
+     *  'defaultSort' => [[
+     *      'field' => 'id',
+     *      'sort' => 'asc',
+     *  ]],
      *  'searchable' => true,
      *  'sortable' => true,
      *  'autoColumns' => false,
@@ -372,9 +372,9 @@ abstract class AbstractDatatable
         }
         if (!array_key_exists('defaultSort', $this->options)) {
             if (!empty($this->columns)) {
-                $this->options['defaultSort'] = ['column' => $this->columns[0]['name'], 'order' => 'asc'];
+                $this->options['defaultSort'] = [['field' => $this->columns[0]['name'], 'sort' => 'asc']];
             } else {
-                $this->options['defaultSort'] = ['column' => null, 'order' => 'asc'];
+                $this->options['defaultSort'] = [['field' => null, 'sort' => 'asc']];
             }
         }
         if (!array_key_exists('searchable', $this->options)) {
@@ -398,9 +398,28 @@ abstract class AbstractDatatable
             case 'defaultSort':
                 if (!is_array($value) || empty($value)) {
                     if (!empty($this->columns)) {
-                        $value = ['column' => $this->columns[0]['name'], 'order' => 'asc'];
+                        $value = [['field' => $this->columns[0]['name'], 'sort' => 'asc']];
                     } else {
-                        $value = ['column' => null, 'order' => 'asc'];
+                        $value = [['field' => null, 'sort' => 'asc']];
+                    }
+                }
+
+                // Vérifie que chaque élément de $value a la structure attendue
+                foreach ($value as $item) {
+                    if (!is_array($item)) {
+                        throw new \InvalidArgumentException('Each item in the multiSort array must be an array.');
+                    }
+
+                    if (!isset($item['field'], $item['sort'])) {
+                        throw new \InvalidArgumentException('Each item must contain a "field" and a "sort" key.');
+                    }
+
+                    if (!is_string($item['field'])) {
+                        throw new \InvalidArgumentException('The "field" value must be a string.');
+                    }
+
+                    if (!in_array($item['sort'], ['asc', 'desc'], true)) {
+                        throw new \InvalidArgumentException('The "sort" value must be either "asc" or "desc".');
                     }
                 }
                 break;
@@ -424,7 +443,7 @@ abstract class AbstractDatatable
     }
 
     /**
-     * @return array<string, string|null>
+     * @return array<array<string, string|null>>
      */
     public function getDefaultSort(): array
     {
