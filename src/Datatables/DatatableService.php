@@ -105,7 +105,7 @@ class DatatableService
         if ($datatable->isSortable() && count($params['multiSort']) > 0) {
             foreach ($params['multiSort'] as $sort) {
                 if ($sort['field'] && !$this->validateSortField($sort['field'], $datatable->getColumns())) {
-                    throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['sort']));
+                    throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $params['field']));
                 }
 
                 $queryBuilder->addOrderBy(
