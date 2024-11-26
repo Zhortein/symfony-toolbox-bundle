@@ -216,10 +216,10 @@ abstract class AbstractDatatable
      *
      * @return string the SQL alias of the matching column, or the main alias if not found
      */
-    public function getColumnAlias(string $name): string
+    public function getColumnAliasFromNameAs(string $name): string
     {
         foreach ($this->getColumns() as $column) {
-            if ($column['name'] === $name) {
+            if ($column['nameAs'] === $name) {
                 return $column['sqlAlias'];
             }
         }

@@ -120,7 +120,7 @@ class DatatableService
                     }
 
                     $queryBuilder->addOrderBy(
-                        $datatable->getColumnAlias($sort['field']).'.'.$sort['field'],
+                        $datatable->getColumnAliasFromNameAs($sort['field']).'.'.$sort['field'],
                         $sort['order']
                     );
                 }
@@ -131,7 +131,7 @@ class DatatableService
 
                 if ($params['sort'] && $params['order']) {
                     $queryBuilder->orderBy(
-                        $datatable->getColumnAlias($params['sort']).'.'.$params['sort'],
+                        $datatable->getColumnAliasFromNameAs($params['sort']).'.'.$params['sort'],
                         $params['order']
                     );
                 }
@@ -175,7 +175,7 @@ class DatatableService
     private function validateSortField(string $sortField, array $columns): bool
     {
         foreach ($columns as $column) {
-            if ($column['name'] === $sortField && $column['sortable']) {
+            if ($column['nameAs'] === $sortField && $column['sortable']) {
                 return true;
             }
         }

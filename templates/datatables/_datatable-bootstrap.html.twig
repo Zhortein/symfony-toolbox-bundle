@@ -51,7 +51,7 @@
                         class="{{ headerCssClasses }}"
                         {% if datatable.options.sortable and column.sortable %}
                         data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort"
-                        data-field="{{ column.name }}"
+                        data-field="{{ column.nameAs }}"
                         {% endif %}
                         {% for headerKey,headerValue in column.header %}
                             {% if headerKey == 'data' %}
