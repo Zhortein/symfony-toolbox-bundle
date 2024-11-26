@@ -8,7 +8,7 @@
     {% if data.pagination.hasPrevious %}
         <li class="{{ liCss }}">
             <a class="{{ aCss }}" data-page="{{ data.pagination.previous }}" data-action="{{ actionChangePage }}" aria-label="{{ 'datatable.pagination.previous'|trans({}, transDomain) }}">
-                <span aria-hidden="true">&lt;</span>
+                <span aria-hidden="true"{% if not datatable.isIconUxMode %} class="{{ datatable.getIcon('icon_previous') }}"{% endif %}>{% if datatable.isIconUxMode %}{{ ux_icon(datatable.getIcon('icon_previous')) }}{% endif %}</span>
             </a>
         </li>
     {% endif %}
@@ -22,7 +22,7 @@
     {% if data.pagination.hasNext %}
         <li class="{{ liCss }}">
             <a class="{{ aCss }}" data-page="{{ data.pagination.next }}" data-action="{{ actionChangePage }}" aria-label="{{ 'datatable.pagination.next'|trans({}, transDomain) }}">
-                <span aria-hidden="true">&gt;</span>
+                <span aria-hidden="true"{% if not datatable.isIconUxMode %} class="{{ datatable.getIcon('icon_next') }}"{% endif %}>{% if datatable.isIconUxMode %}{{ ux_icon(datatable.getIcon('icon_next')) }}{% endif %}</span>
             </a>
         </li>
     {% endif %}

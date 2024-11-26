@@ -575,4 +575,15 @@ abstract class AbstractDatatable
             }
         }
     }
+
+    public function isIconUxMode(): bool
+    {
+        return $this->getGlobalOptions()['ux_icons'] ?? true;
+    }
+
+    public function getIcon(string $iconName): string
+    {
+        $default = $this->isIconUxMode() ? 'carbon:unknown' : '';
+        return $this->getGlobalOptions()['ux_icons_options'][$iconName] ?? $default;
+    }
 }
