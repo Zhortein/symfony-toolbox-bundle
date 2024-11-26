@@ -26,6 +26,10 @@
                 <source>Last</source>
                 <target>Last</target>
             </trans-unit>
+            <trans-unit id="6" resname="datatable.search">
+                <source>Search</source>
+                <target>Search</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

@@ -52,7 +52,7 @@ readonly class DatatableManager
                                 $column['dataset'] ?? ['keep_default_classes' => true, 'class' => ''],
                                 $column['footer'] ?? ['keep_default_classes' => true, 'class' => '', 'auto' => ''],
                                 $column['nameAs'] ?? '',
-                                $column['dataType'] ?? '',
+                                $column['datatype'] ?? '',
                                 $column['template'] ?? ''
                             );
                         }

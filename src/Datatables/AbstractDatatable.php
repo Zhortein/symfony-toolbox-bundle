@@ -200,7 +200,7 @@ abstract class AbstractDatatable
             'dataset' => $dataset ?? [],
             'footer' => $footer ?? [],
             'nameAs' => $nameAs ?? '',
-            'dataType' => $dataType ?? '',
+            'datatype' => $dataType ?? '',
             'template' => $template ?? '',
         ];
 
@@ -430,6 +430,7 @@ abstract class AbstractDatatable
         $this->queryBuilder = $queryBuilder;
         $this->validateColumns();
         $this->queryBuilder = $this->buildQueryBuilder();
+
         return $this;
     }
 
@@ -447,23 +448,45 @@ abstract class AbstractDatatable
             // The datatable must be searchable to use search features...
             $queryBuilder = $this->getQueryBuilder();
             $columns = $this->getColumns();
+
+            $searchParts = [];
             foreach ($columns as $column) {
+                $searchExpression = '';
                 if ($column['searchable']) {
                     // Only search on "searchable" columns
-                    $queryBuilder
-                        ->andWhere($column['sqlAlias'].'.'.$column['name'].' LIKE :search'.$searchParamCount)
-                        ->setParameter('search'.$searchParamCount, "%$search%");
 
-                    // @todo Handle different column_types for searching
+                    switch ($column['datatype']) {
+                        case 'integer':
+                            $searchExpression .= sprintf('%s.%s = :search%s', $column['sqlAlias'], $column['name'], $searchParamCount);
+                            $queryBuilder
+                                ->setParameter('search'.$searchParamCount, (int) $search);
+                            break;
+                        case 'double':
+                            $searchExpression .= sprintf('%s.%s = :search%s', $column['sqlAlias'], $column['name'], $searchParamCount);
+                            $queryBuilder
+                                ->setParameter('search'.$searchParamCount, (float) $search);
+                            break;
+                        case 'string':
+                            $searchExpression .= sprintf('%s.%s LIKE :search%s', $column['sqlAlias'], $column['name'], $searchParamCount);
+                            $queryBuilder
+                                ->setParameter('search'.$searchParamCount, "%$search%");
+                            break;
+                        default:
+                            break;
+                    }
 
+                    if (!empty($searchExpression)) {
+                        $searchParts[] = $searchExpression;
+                    }
                     ++$searchParamCount;
                 }
             }
+
+            if (count($searchParts) > 0) {
+                $queryBuilder->andWhere('('.implode(' OR ', $searchParts).')');
+            }
         }
         $this->applyStaticFilters();
-        // Exemple : Rechercher sur des colonnes spécifiques.
-        //  $queryBuilder->andWhere('entity.name LIKE :search')
-        //      ->setParameter('search', "%$search%");
     }
 
     /**
@@ -500,6 +523,7 @@ abstract class AbstractDatatable
         }
 
         $this->queryBuilderOk = true;
+
         return $this->queryBuilder;
     }
 
@@ -584,6 +608,7 @@ abstract class AbstractDatatable
     public function getIcon(string $iconName): string
     {
         $default = $this->isIconUxMode() ? 'carbon:unknown' : '';
+
         return $this->getGlobalOptions()['ux_icons_options'][$iconName] ?? $default;
     }
 }
