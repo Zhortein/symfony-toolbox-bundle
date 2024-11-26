@@ -51,13 +51,20 @@ class DatatableService
             $orderValue = $defaultSort['order'];
         }
 
+        $multiSort = [];
+        foreach ($request->query->all() as $key => $value) {
+            if ('multiSort' === $key) {
+                $multiSort = $value;
+            }
+        }
+
         return [
             'page' => max(1, (int) $request->query->get('page', 1)),
             'limit' => max(1, (int) $request->query->get('limit', $datatable->getOptions()['defaultPageSize'] ?? $this->datatableManager->getGlobalOption('items_per_page', Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE))),
             'sort' => $sortValue,
             'order' => $orderValue,
-            'multiSort' => $request->query->get('multiSort', []),
-            'search' => $request->query->get('search', null),
+            'multiSort' => $multiSort,
+            'search' => $request->query->get('search'),
         ];
     }
 

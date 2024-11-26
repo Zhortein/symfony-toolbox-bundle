@@ -76,7 +76,7 @@
                             {% endif %}
                         {% endfor %}
                 >
-                    <span class="datatable-sort-icon" data-order="0"></span>
+                    <span class="datatable-sort-icon" data-priority="0"></span>
                     {% if datatable.translationDomain is not empty and column.header.translate %}{{ column.label|trans({}, datatable.translationDomain) }}{% else %}{{ column.label }}{% endif %}
                 </th>
             {% endfor %}

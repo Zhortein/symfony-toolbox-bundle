@@ -102,9 +102,9 @@ readonly class DatatableManager
                     $detectedType = get_class($value);
                     $isEnum = $value instanceof \BackedEnum;
                     $isTranslatableEnum = method_exists($value, 'label') && method_exists(
-                            $value,
-                            'getTranslationDomain'
-                        );
+                        $value,
+                        'getTranslationDomain'
+                    );
                 }
 
                 foreach ($datatable->getColumns() as $rank => $column) {
