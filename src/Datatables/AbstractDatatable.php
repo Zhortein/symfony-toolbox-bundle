@@ -431,12 +431,11 @@ abstract class AbstractDatatable
      *
      * @param string $search the search string to apply to the query
      */
-    public function applySearch(string $search): void
+    public function applySearch(QueryBuilder $queryBuilder, string $search): void
     {
         $searchParamCount = 0;
         if ($this->options['searchable']) {
             // The datatable must be searchable to use search features...
-            $queryBuilder = $this->getQueryBuilder();
             $columns = $this->getColumns();
 
             $searchParts = [];
@@ -476,16 +475,16 @@ abstract class AbstractDatatable
                 $queryBuilder->andWhere('('.implode(' OR ', $searchParts).')');
             }
         }
-        $this->applyStaticFilters();
+        $this->applyStaticFilters($queryBuilder);
     }
 
     /**
      * Redefine this method to set static filters on the QueryBuilder.
      * All searches, sorts, ... on the Datatable will use those static filters.
      */
-    public function applyStaticFilters(): QueryBuilder
+    public function applyStaticFilters(QueryBuilder $queryBuilder): QueryBuilder
     {
-        return $this->getQueryBuilder();
+        return $queryBuilder;
     }
 
     abstract public function configure(): array;

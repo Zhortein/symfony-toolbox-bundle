@@ -73,7 +73,11 @@ readonly class DatatableManager
             });
 
             // Load column_types in datatable columns
-            $datatable->setCachedTypes($cachedTypes);
+            if (false !== $cachedTypes) {
+                $datatable->setCachedTypes($cachedTypes);
+            } else {
+                throw new \RuntimeException('Unable to build datatable types.');
+            }
         }
 
         return $datatable;
@@ -97,7 +101,10 @@ readonly class DatatableManager
                 if ('object' === $detectedType) {
                     $detectedType = get_class($value);
                     $isEnum = $value instanceof \BackedEnum;
-                    $isTranslatableEnum = method_exists($value, 'label') && method_exists($value, 'getTranslationDomain');
+                    $isTranslatableEnum = method_exists($value, 'label') && method_exists(
+                            $value,
+                            'getTranslationDomain'
+                        );
                 }
 
                 foreach ($datatable->getColumns() as $rank => $column) {
