@@ -96,23 +96,24 @@
         <!-- Initial rows will be populated dynamically -->
         </tbody>
         {% if datatable.displayFooter %}
-        <tfoot
-                class="{% if datatable.options.options.tfoot.keep_default_classes %}{% endif %}{{ datatable.options.options.tfoot.class }}"
-                data-zhortein--symfony-toolbox-bundle--datatable-target="footer"
-                {% for key,value in datatable.options.options.tfoot %}
-                    {% if key == 'data' %}
-                        {% for dataKey,dataValue in datatable.options.options.tfoot.data %}
-                            data-{{ dataKey }}="{{ dataValue }}"
-                        {% endfor %}
-                    {% endif %}
+            <tfoot
+                    class="{% if datatable.options.options.tfoot.keep_default_classes %}{% endif %}{{ datatable.options.options.tfoot.class }}"
+                    data-zhortein--symfony-toolbox-bundle--datatable-target="footer"
+                    {% for key,value in datatable.options.options.tfoot %}
+                        {% if key == 'data' %}
+                            {% for dataKey,dataValue in datatable.options.options.tfoot.data %}
+                                data-{{ dataKey }}="{{ dataValue }}"
+                            {% endfor %}
+                        {% endif %}
 
-                    {% if key not in ['class','data','keep_default_classes','translate'] %}
-                        {{ key }}="{{ value }}"
-                    {% endif %}
-                {% endfor %}
-        >
-        {# @todo Datatable footer : To be implemented #}
-        </tfoot>
+                        {% if key not in ['class','data','keep_default_classes','translate'] %}
+                            {{ key }}="{{ value }}"
+                        {% endif %}
+                    {% endfor %}
+            >
+            {# @todo Datatable footer : To be implemented #}
+            </tfoot>
+        {% endif %}
     </table>
     <nav
             class="{% if datatable.options.options.pagination.keep_default_classes %}datatable-pagination isolate inline-flex -space-x-px rounded-md shadow-sm {% endif %}{{ datatable.options.options.pagination.class }}"
