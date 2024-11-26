@@ -6,7 +6,7 @@
         data-zhortein--symfony-toolbox-bundle--datatable-url-value="{{ path('zhortein_datatable_fetch_data', {'datatableId': datatableId}) }}"
         {{ attributes }} class="">
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error hidden"></div>
-    <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.searchable %} hidden{% endif %}">
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.options.searchable %} hidden{% endif %}">
         <label id="search-button" class="sr-only">{{ 'datatable.search'|trans({}, transDomain) }}</label>
         <input data-action="input->zhortein--symfony-toolbox-bundle--datatable#search" type="text" class="" placeholder="{{ 'datatable.search'|trans({}, transDomain) }}" aria-describedby="search-button">
     </div>
