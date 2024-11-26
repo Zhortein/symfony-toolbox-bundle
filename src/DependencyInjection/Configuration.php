@@ -54,7 +54,7 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('icon_search')->defaultValue('bi:search')->end()
                                 ->scalarNode('icon_true')->defaultValue('bi:check')->end()
                                 ->scalarNode('icon_false')->defaultValue('bi:x')->end()
-                                ->scalarNode('icon_sort_neutral')->defaultValue('bi:sort')->end()
+                                ->scalarNode('icon_sort_neutral')->defaultValue('mdi:sort')->end()
                                 ->scalarNode('icon_sort_asc')->defaultValue('bi:sort-alpha-down')->end()
                                 ->scalarNode('icon_sort_desc')->defaultValue('bi:sort-alpha-up')->end()
                                 ->scalarNode('icon_filter')->defaultValue('mi:filter')->end()

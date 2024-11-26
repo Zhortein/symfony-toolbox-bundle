@@ -12,7 +12,7 @@
     </div>
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="spinner" class="datatable-spinner hidden">{{ 'datatable.loading'|trans({}, transDomain) }}</div>
     <table class="datatable table">
-        <thead
+        <thead data-zhortein--symfony-toolbox-bundle--datatable-target="header"
                 class="{% if datatable.options.options.thead.keep_default_classes %}{% endif %}{{ datatable.options.options.thead.class }}"
                 {% for headerKey,headerValue in datatable.options.options.thead %}
                     {% if headerKey == 'data' %}

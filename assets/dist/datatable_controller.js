@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['table', 'pagination', 'spinner', 'search', 'error', 'footer'];
+    static targets = ['table', 'pagination', 'spinner', 'search', 'error', 'footer', 'header'];
 
     static values = {
         id: String,
@@ -60,7 +60,7 @@ export default class extends Controller {
     }
 
     updateIcons(icons) {
-        this.tableTarget.querySelectorAll('[data-field]').forEach(col => {
+        this.headerTarget.querySelectorAll('[data-field]').forEach(col => {
             const iconContainer = col.querySelector('.datatable-sort-icon');
             if (iconContainer) {
                 const field = col.dataset.field;
