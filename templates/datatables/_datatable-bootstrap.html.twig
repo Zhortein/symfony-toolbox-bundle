@@ -9,7 +9,7 @@
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error d-none"></div>
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.options.searchable %} d-none{% endif %}">
         <div class="input-group mb-3">
-            <span class="input-group-text" id="search-button">{{ ux_icon(datatable.getIcon('icon_search', {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true})) }}</span>
+            <span class="input-group-text" id="search-button">{{ ux_icon(datatable.getIcon('icon_search'), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}</span>
             <input data-action="input->zhortein--symfony-toolbox-bundle--datatable#search" type="text" class="form-control" placeholder="{{ 'datatable.search'|trans({}, transDomain) }}" aria-describedby="search-button">
         </div>
     </div>
@@ -65,7 +65,10 @@
                                 {{ headerKey }}="{{ headerValue }}"
                             {% endif %}
                         {% endfor %}
-                >{% if datatable.translationDomain is not empty and column.header.translate %}{{ column.label|trans({}, datatable.translationDomain) }}{% else %}{{ column.label }}{% endif %}</th>
+                >
+                    <span class="datatable-sort-icon"></span>
+                    {% if datatable.translationDomain is not empty and column.header.translate %}{{ column.label|trans({}, datatable.translationDomain) }}{% else %}{{ column.label }}{% endif %}
+                </th>
             {% endfor %}
             {% if datatable.options.actionColumn is defined and datatable.options.actionColumn is not empty %}
                 <th>

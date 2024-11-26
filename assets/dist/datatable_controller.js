@@ -40,6 +40,7 @@ export default class extends Controller {
                 const json = await response.json();
                 this.updateTableContent(json.rows);
                 this.updatePagination(json.pagination);
+                this.updateIcons(json.icons);
             } else {
                 console.error('Failed to fetch datatable content:', response.statusText);
             }
@@ -58,12 +59,27 @@ export default class extends Controller {
         this.paginationTarget.innerHTML = paginationHtml;
     }
 
+    updateIcons(icons) {
+        this.tableTarget.querySelectorAll('[data-field]').forEach(col => {
+            const iconContainer = col.querySelector('.datatable-sort-icon');
+            if (iconContainer) {
+                const field = col.dataset.field;
+                let iconHtml = icons.icon_sort_neutral; // Icône par défaut
+                if (field === this.state.sort) {
+                    iconHtml = this.state.order === 'asc' ? icons.icon_sort_asc : icons.icon_sort_desc;
+                }
+                iconContainer.innerHTML = iconHtml;
+            }
+        });
+    }
+
     sort(event) {
         const column = event.target.dataset.field;
         if (!column) return;
 
         this.state.sort = column;
         this.state.order = this.state.order === 'asc' ? 'desc' : 'asc';
+
         this.updateTable();
     }
 

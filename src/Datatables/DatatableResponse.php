@@ -8,7 +8,7 @@ readonly class DatatableResponse
         private int $total,
         private int $filtered,
         private array $data,
-        private array $pagination,
+        private array $pagination
     ) {
     }
 
@@ -18,7 +18,7 @@ readonly class DatatableResponse
             'total' => $this->total,
             'filtered' => $this->filtered,
             'data' => $this->data,
-            'pagination' => $this->pagination,
+            'pagination' => $this->pagination
         ];
     }
 }

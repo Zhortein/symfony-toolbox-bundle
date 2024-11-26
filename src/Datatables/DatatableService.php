@@ -87,6 +87,11 @@ class DatatableService
         return new Response(json_encode([
             'rows' => $htmlRows,
             'pagination' => $htmlPagination,
+            'icons' => [
+                'icon_sort_asc' => $this->render('@ZhorteinSymfonyToolbox/datatables/icons/_icon.html.twig', ['icon' => 'icon_sort_asc', 'datatable' => $datatable]),
+                'icon_sort_desc' => $this->render('@ZhorteinSymfonyToolbox/datatables/icons/_icon.html.twig', ['icon' => 'icon_sort_desc', 'datatable' => $datatable]),
+                'icon_sort_neutral' => $this->render('@ZhorteinSymfonyToolbox/datatables/icons/_icon.html.twig', ['icon' => 'icon_sort_neutral', 'datatable' => $datatable]),
+            ],
         ], JSON_THROW_ON_ERROR), Response::HTTP_OK, ['Content-Type' => 'application/json']);
     }
 
