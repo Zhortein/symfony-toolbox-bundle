@@ -17,74 +17,100 @@ abstract class AbstractDatatable
 
     /**
      * Columns definitions. Each column is represented by an array.
-     * Example:
-     * [
-     *  [
-     *      'name' => 'id',
-     *      'label' => 'Identifier',
-     *      'searchable' => true,
-     *      'sortable' => true,
-     *      'header' => [
-     *          'translate' => true,
-     *          'keep_default_classes' => true,
-     *          'class' => 'myCssClasses',
-     *          'data' => ['custom-dataname' => 'myValue', ],
-     *      ],
-     *      'dataset' => [
-     *          'translate' => false,
-     *          'keep_default_classes' => true,
-     *          'class' => 'myCssClassesForData',
-     *          'data' => ['mycustom-dataname' => 'myOtherValue', ],
-     *      ],
-     *      'footer' => [
-     *          'translate' => false,
-     *          'auto' => 'count',
-     *          'keep_default_classes' => true,
-     *          'class' => 'myCssClassesForFooter',
-     *          'data' => ['myfooter-dataname' => 'myFooterValue', ],
-     *      ],
-     *  ], ['name' => 'label', 'label' => 'Name', 'searchable' => true, 'sortable' => true,],].
      *
-     * @var array<int, array<string, string|bool>>
+     * @var array<int, array{
+     *         name: string,
+     *         label: string,
+     *         searchable?: bool,
+     *         sortable?: bool,
+     *         nameAs?: string,
+     *         alias?: string,
+     *         sqlAlias?: string,
+     *         datatype?: string,
+     *         template?: string,
+     *         header?: array{
+     *             translate?: bool,
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         },
+     *         dataset?: array{
+     *             translate?: bool,
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         },
+     *         footer?: array{
+     *             translate?: bool,
+     *             auto?: string,
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         }
+     *     }>
      */
     protected array $columns = [];
 
     /**
      * Datatable options.
-     * Example :
-     * [
-     *  'defaultPageSize' => 10,
-     *  'defaultSort' => [[
-     *      'field' => 'id',
-     *      'order' => 'asc',
-     *  ]],
-     *  'searchable' => true,
-     *  'sortable' => true,
-     *  'autoColumns' => false,
-     *  'options' => [
-     *      'thead' => [
-     *          'keep_default_classes' => true,
-     *          'class' => 'myCssClasses',
-     *          'data' => ['custom-dataname' => 'myValue', ],
-     *      ],
-     *      'tbody' => [
-     *           'keep_default_classes' => true,
-     *           'class' => 'myCssClasses',
-     *           'data' => ['custom-dataname' => 'myValue', ],
-     *       ],
-     *      'tfoot' => [
-     *           'keep_default_classes' => true,
-     *           'class' => 'myCssClasses',
-     *           'data' => ['custom-dataname' => 'myValue', ],
-     *       ],
-     *  ]
-     * ].
      *
-     * @var array<string, string|int|bool|string[]>
+     * @var array{
+     *     defaultPageSize?: int,
+     *     defaultSort?: array<int, array{
+     *         field: string,
+     *         order: 'asc'|'desc'
+     *     }>,
+     *     searchable?: bool,
+     *     sortable?: bool,
+     *     autoColumns?: bool,
+     *     options?: array{
+     *         thead?: array{
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         },
+     *         tbody?: array{
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         },
+     *         tfoot?: array{
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         }
+     *     },
+     *     actionColumn?: array{template: string, label: string},
+     *     selectorColumn?: array{label: string, template?: string},
+     *     translationDomain?: string
+     * }
      */
     protected array $options = [];
 
-    private array $globalOptions = [];
+    /**
+     * Global datatables options.
+     *
+     * @var array{
+     *     css_mode: string,
+     *     items_per_page: int,
+     *     paginator: string,
+     *     ux_icons: bool,
+     *     ux_icons_options: array{
+     *          icon_first: string,
+     *          icon_previous: string,
+     *          icon_next: string,
+     *          icon_last: string,
+     *          icon_search: string,
+     *          icon_true: string,
+     *          icon_false: string,
+     *          icon_sort_neutral: string,
+     *          icon_sort_asc: string,
+     *          icon_sort_desc: string,
+     *          icon_filter: string,
+     *     }
+     * }
+     */
+    private array $globalOptions = Configuration::DEFAULT_CONFIGURATION;
     private string $mainAlias = 't';
 
     protected string $cssMode = Configuration::DEFAULT_DATATABLE_CSS_MODE;
@@ -109,6 +135,15 @@ abstract class AbstractDatatable
         return $this->mainAlias ?? 't';
     }
 
+    /**
+     * Set the main SQL alias.
+     *
+     * @param string $mainAlias the main alias to set
+     *
+     * @return $this
+     *
+     * @throws \InvalidArgumentException if the provided alias is not valid
+     */
     public function setMainAlias(string $mainAlias): self
     {
         if (!StringTools::isValidSqlAlias($mainAlias)) {
@@ -124,6 +159,31 @@ abstract class AbstractDatatable
         return 'zhortein--symfony-toolbox-bundle--datatable';
     }
 
+    /**
+     * Define the global options.
+     *
+     * @param array{
+     *      css_mode: string,
+     *      items_per_page: int,
+     *      paginator: string,
+     *      ux_icons: bool,
+     *      ux_icons_options: array{
+     *           icon_first: string,
+     *           icon_previous: string,
+     *           icon_next: string,
+     *           icon_last: string,
+     *           icon_search: string,
+     *           icon_true: string,
+     *           icon_false: string,
+     *           icon_sort_neutral: string,
+     *           icon_sort_asc: string,
+     *           icon_sort_desc: string,
+     *           icon_filter: string,
+     *      }
+     *  } $globalOptions
+     *
+     * @return $this
+     */
     public function setGlobalOptions(array $globalOptions): self
     {
         $this->globalOptions = $globalOptions;
@@ -131,15 +191,49 @@ abstract class AbstractDatatable
         return $this;
     }
 
+    /**
+     * Retrieves the global options.
+     *
+     * @return array{
+     *      css_mode: string,
+     *      items_per_page: int,
+     *      paginator: string,
+     *      ux_icons: bool,
+     *      ux_icons_options: array{
+     *           icon_first: string,
+     *           icon_previous: string,
+     *           icon_next: string,
+     *           icon_last: string,
+     *           icon_search: string,
+     *           icon_true: string,
+     *           icon_false: string,
+     *           icon_sort_neutral: string,
+     *           icon_sort_asc: string,
+     *           icon_sort_desc: string,
+     *           icon_filter: string,
+     *      }
+     *  } An array representing the global options
+     */
     public function getGlobalOptions(): array
     {
         return $this->globalOptions;
     }
 
+    /**
+     * Set the CSS mode for the configuration.
+     *
+     * @param string $cssMode the CSS mode to be set
+     *
+     * @return $this
+     */
     public function setCssMode(string $cssMode): self
     {
         if (!Configuration::isCssModeValid($cssMode)) {
-            $this->cssMode = $this->globalOptions['css_mode'] ?? Configuration::DEFAULT_DATATABLE_CSS_MODE;
+            if (Configuration::isCssModeValid($this->globalOptions['css_mode'])) {
+                $this->cssMode = $this->globalOptions['css_mode'];
+            } else {
+                $this->cssMode = Configuration::DEFAULT_DATATABLE_CSS_MODE;
+            }
         } else {
             $this->cssMode = $cssMode;
         }
@@ -152,6 +246,42 @@ abstract class AbstractDatatable
         return $this->cssMode;
     }
 
+    /**
+     * Set the columns for the application.
+     *
+     * @param array<int, array{
+     *         name: string,
+     *         label: string,
+     *         searchable?: bool,
+     *         sortable?: bool,
+     *         nameAs?: string,
+     *         alias?: string,
+     *         sqlAlias?: string,
+     *         datatype?: string,
+     *         template?: string,
+     *         header?: array{
+     *             translate?: bool,
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         },
+     *         dataset?: array{
+     *             translate?: bool,
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         },
+     *         footer?: array{
+     *             translate?: bool,
+     *             auto?: string,
+     *             keep_default_classes?: bool,
+     *             class?: string,
+     *             data?: array<string, mixed>
+     *         }
+     *     }> $columns
+     *
+     * @return $this
+     */
     public function setColumns(array $columns): self
     {
         $this->columns = $columns;
@@ -159,6 +289,38 @@ abstract class AbstractDatatable
         return $this;
     }
 
+    /**
+     * @return array<int, array{
+     *        name: string,
+     *        label: string,
+     *        searchable?: bool,
+     *        sortable?: bool,
+     *        nameAs?: string,
+     *        alias?: string,
+     *        sqlAlias?: string,
+     *        datatype?: string,
+     *        template?: string,
+     *        header?: array{
+     *            translate?: bool,
+     *            keep_default_classes?: bool,
+     *            class?: string,
+     *            data?: array<string, mixed>
+     *        },
+     *        dataset?: array{
+     *            translate?: bool,
+     *            keep_default_classes?: bool,
+     *            class?: string,
+     *            data?: array<string, mixed>
+     *        },
+     *        footer?: array{
+     *            translate?: bool,
+     *            auto?: string,
+     *            keep_default_classes?: bool,
+     *            class?: string,
+     *            data?: array<string, mixed>
+     *        }
+     *    }>
+     */
     public function getColumns(): array
     {
         return $this->columns;
@@ -167,14 +329,14 @@ abstract class AbstractDatatable
     /**
      * Adds a new column to the table configuration.
      *
-     * @param string                $name       the name of the column
-     * @param string                $label      the label of the column
-     * @param bool                  $searchable Indicates if the column is searchable. Defaults to true.
-     * @param bool                  $sortable   Indicates if the column is sortable. Defaults to true.
-     * @param ?string               $sqlAlias   optional SQL alias for the column
-     * @param array<string, string> $header     optional header configuration array
-     * @param array<string, string> $dataset    optional dataset configuration array
-     * @param array<string, string> $footer     optional footer configuration array
+     * @param string                                                                                                           $name       the name of the column
+     * @param string                                                                                                           $label      the label of the column
+     * @param bool                                                                                                             $searchable Indicates if the column is searchable. Defaults to true.
+     * @param bool                                                                                                             $sortable   Indicates if the column is sortable. Defaults to true.
+     * @param ?string                                                                                                          $sqlAlias   optional SQL alias for the column
+     * @param array{translate?: bool, keep_default_classes?: bool, class?: string, data?: array<string, mixed>}                $header     optional header configuration array
+     * @param array{translate?: bool, keep_default_classes?: bool, class?: string, data?: array<string, mixed>}                $dataset    optional dataset configuration array
+     * @param array{translate?: bool, auto?: string, keep_default_classes?: bool, class?: string, data?: array<string, mixed>} $footer     optional footer configuration array
      */
     public function addColumn(
         string $name,
@@ -187,7 +349,7 @@ abstract class AbstractDatatable
         ?array $footer = [],
         ?string $nameAs = '',
         ?string $dataType = '',
-        string $template = '',
+        ?string $template = '',
     ): self {
         $this->columns[] = [
             'name' => $name,
@@ -222,7 +384,7 @@ abstract class AbstractDatatable
         $alias = $this->getMainAlias();
 
         // Recherche prioritaire sur 'nameAs'
-        $column = array_filter($columns, static fn ($column) => $column['nameAs'] === $asName);
+        $column = array_filter($columns, static fn ($column) => ($column['nameAs'] ?? '') === $asName);
 
         // Si aucune correspondance, cherche par 'name'
         if (empty($column)) {
@@ -244,6 +406,14 @@ abstract class AbstractDatatable
         return sprintf('%s.%s', $sqlAlias, $name).($withAsStatement ? ' AS '.$asName : '');
     }
 
+    /**
+     * Validates and initializes the table options.
+     *
+     * Ensures that essential keys are present in the options array
+     * with default values, validating sections such as 'thead', 'tbody',
+     * 'tfoot', and 'pagination'. Defaults include 'keep_default_classes'
+     * set to true and 'class' as an empty string if not specified.
+     */
     public function validateTableOptions(): void
     {
         if (!isset($this->options['options']) || !is_array($this->options['options'])) {
@@ -358,6 +528,39 @@ abstract class AbstractDatatable
         $this->setColumns($columns);
     }
 
+    /**
+     * Set the configuration options.
+     *
+     * @param array{
+     *      defaultPageSize?: int,
+     *      defaultSort?: array<int, array{
+     *          field: string,
+     *          order: 'asc'|'desc'
+     *      }>,
+     *      searchable?: bool,
+     *      sortable?: bool,
+     *      autoColumns?: bool,
+     *      options?: array{
+     *          thead?: array{
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          },
+     *          tbody?: array{
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          },
+     *          tfoot?: array{
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          }
+     *      }
+     *  } $options
+     *
+     * @return $this
+     */
     public function setOptions(array $options): self
     {
         $this->options = $options;
@@ -365,6 +568,35 @@ abstract class AbstractDatatable
         return $this;
     }
 
+    /**
+     * @return array{
+     *      defaultPageSize?: int,
+     *      defaultSort?: array<int, array{
+     *          field: string,
+     *          order: 'asc'|'desc'
+     *      }>,
+     *      searchable?: bool,
+     *      sortable?: bool,
+     *      autoColumns?: bool,
+     *      options?: array{
+     *          thead?: array{
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          },
+     *          tbody?: array{
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          },
+     *          tfoot?: array{
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          }
+     *      }
+     *  }
+     */
     public function getOptions(): array
     {
         if (!array_key_exists('defaultPageSize', $this->options)) {
@@ -374,7 +606,7 @@ abstract class AbstractDatatable
             if (!empty($this->columns)) {
                 $this->options['defaultSort'] = [['field' => $this->columns[0]['name'], 'order' => 'asc']];
             } else {
-                $this->options['defaultSort'] = [['field' => null, 'order' => 'asc']];
+                $this->options['defaultSort'] = [['field' => '', 'order' => 'asc']];
             }
         }
         if (!array_key_exists('searchable', $this->options)) {
@@ -387,12 +619,49 @@ abstract class AbstractDatatable
         return $this->options;
     }
 
-    public function addOption(string $name, $value): self
+    /**
+     * Adds an option to the current configuration.
+     *
+     * @param string $name  The name of the option to add.
+     *                      Possible values are 'defaultPageSize', 'defaultSort', 'translationDomain', 'searchable', 'sortable', or 'autoColumns'.
+     * @param mixed  $value The value of the option. The expected type varies based on the option name:
+     *                      - 'defaultPageSize': int
+     *                      - 'defaultSort': array<int, array{
+     *                      field: string,
+     *                      order: 'asc'|'desc'
+     *                      }>
+     *                      - 'translationDomain': string
+     *                      - 'searchable', 'sortable', 'autoColumns': bool
+     *
+     * @return self returns the current instance for method chaining
+     *
+     * @throws \InvalidArgumentException if validation checks fail for 'defaultSort'
+     */
+    public function addOption(string $name, mixed $value): self
     {
         switch ($name) {
+            case 'actionColumn': // an array with 'template' and 'label'
+                if (!is_array($value) || !isset($value['template'], $value['label']) || !is_string($value['template']) || !is_string($value['label'])) {
+                    throw new \InvalidArgumentException('The "actionColumn" option must be an array with "template" and "label" as strings.');
+                }
+                break;
+            case 'selectorColumn': // an array with 'template' and 'label'
+                if (!is_array($value) || !isset($value['label']) || !is_string($value['label'])) {
+                    throw new \InvalidArgumentException('The "selectorColumn" option must be an array with "label" as a string.');
+                }
+                // @todo Enable this test when selectorColumn template will be implemented
+                /*if (isset($value['template']) && !is_string($value['template'])) {
+                    throw new \InvalidArgumentException('The "template" in "selectorColumn" must be a string.');
+                }*/
+                break;
+            case 'options': // an  array<string,string|int|float|bool|null>
+                if (!is_array($value)) {
+                    throw new \InvalidArgumentException('The "options" option must be an array.');
+                }
+                break;
             case 'defaultPageSize':
                 if (!is_int($value)) {
-                    $value = Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
+                    $value = (int) Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
                 }
                 break;
             case 'defaultSort':
@@ -422,6 +691,7 @@ abstract class AbstractDatatable
                         throw new \InvalidArgumentException('The "order" value must be either "asc" or "desc".');
                     }
                 }
+                $value = (array) $value;
                 break;
             case 'translationDomain':
                 if (!is_string($value) || empty($value)) {
@@ -434,20 +704,21 @@ abstract class AbstractDatatable
                 $value = (bool) $value;
                 break;
             default:
-                break;
+                throw new \InvalidArgumentException(sprintf('The option "%s" is not supported.', $name));
         }
 
+        /** @phpstan-ignore-next-line */
         $this->options[$name] = $value;
 
         return $this;
     }
 
     /**
-     * @return array<array<string, string|null>>
+     * @return array<int, array{field: string, order: 'asc'|'desc'}>
      */
     public function getDefaultSort(): array
     {
-        return $this->getOptions()['defaultSort'];
+        return $this->getOptions()['defaultSort'] ?? [['field' => '', 'order' => 'asc']];
     }
 
     public function getTranslationDomain(): string
@@ -457,17 +728,17 @@ abstract class AbstractDatatable
 
     public function getDefaultPageSize(): int
     {
-        return (int) $this->getOptions()['defaultPageSize'];
+        return (int) ($this->getOptions()['defaultPageSize'] ?? Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE);
     }
 
     public function isSortable(): bool
     {
-        return (bool) $this->getOptions()['sortable'];
+        return (bool) ($this->getOptions()['sortable'] ?? true);
     }
 
     public function isSearchable(): bool
     {
-        return (bool) $this->getOptions()['searchable'];
+        return (bool) ($this->getOptions()['searchable'] ?? true);
     }
 
     /**
@@ -480,29 +751,29 @@ abstract class AbstractDatatable
     public function applySearch(QueryBuilder $queryBuilder, string $search): void
     {
         $searchParamCount = 0;
-        if ($this->options['searchable']) {
+        if ($this->isSearchable()) {
             // The datatable must be searchable to use search features...
             $columns = $this->getColumns();
 
             $searchParts = [];
             foreach ($columns as $column) {
                 $searchExpression = '';
-                if ($column['searchable']) {
+                if ($column['searchable'] ?? true) {
                     // Only search on "searchable" columns
 
-                    switch ($column['datatype']) {
+                    switch ($column['datatype'] ?? '') {
                         case 'integer':
-                            $searchExpression .= sprintf('%s.%s = :search%s', $column['sqlAlias'], $column['name'], $searchParamCount);
+                            $searchExpression .= sprintf('%s.%s = :search%s', $column['sqlAlias'] ?? $this->getMainAlias(), $column['name'], $searchParamCount);
                             $queryBuilder
                                 ->setParameter('search'.$searchParamCount, (int) $search);
                             break;
                         case 'double':
-                            $searchExpression .= sprintf('%s.%s = :search%s', $column['sqlAlias'], $column['name'], $searchParamCount);
+                            $searchExpression .= sprintf('%s.%s = :search%s', $column['sqlAlias'] ?? $this->getMainAlias(), $column['name'], $searchParamCount);
                             $queryBuilder
                                 ->setParameter('search'.$searchParamCount, (float) $search);
                             break;
                         case 'string':
-                            $searchExpression .= sprintf('%s.%s LIKE :search%s', $column['sqlAlias'], $column['name'], $searchParamCount);
+                            $searchExpression .= sprintf('%s.%s LIKE :search%s', $column['sqlAlias'] ?? $this->getMainAlias(), $column['name'], $searchParamCount);
                             $queryBuilder
                                 ->setParameter('search'.$searchParamCount, "%$search%");
                             break;
@@ -532,12 +803,12 @@ abstract class AbstractDatatable
     {
     }
 
-    abstract public function configure(): array;
+    abstract public function configure(): self;
 
     public function setQueryBuilder(): self
     {
         $this->queryBuilder = $this->em->createQueryBuilder()
-            ->select($this->getMainAlias() ?? 't')
+            ->select($this->getMainAlias())
             ->from($this->getEntityClass(), $this->mainAlias)
         ;
 
@@ -552,7 +823,11 @@ abstract class AbstractDatatable
         // Compose columns selected query. Each column is named with its alias to allow dynamic filtering / sorting...
         foreach ($this->columns as $column) {
             $this->queryBuilder
-                ->addSelect(sprintf('%s.%s AS %s', $column['sqlAlias'], $column['name'], $column['nameAs']));
+                ?->addSelect(sprintf('%s.%s AS %s', $column['sqlAlias'] ?? $this->getMainAlias(), $column['name'], $column['nameAs'] ?? $column['name']));
+        }
+
+        if (null === $this->queryBuilder) {
+            throw new \RuntimeException('The query builder is not set.');
         }
 
         return $this->queryBuilder;
@@ -597,7 +872,12 @@ abstract class AbstractDatatable
     }
 
     /**
-     * @param array<string, array<string, int|string>> $cachedTypes
+     * @param array<string, array{
+     *       rank: int,
+     *       datatype: string,
+     *       isEnum: bool,
+     *       isTranslatableEnum: bool,
+     *  }> $cachedTypes
      */
     public function setCachedTypes(array $cachedTypes): void
     {

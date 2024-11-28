@@ -12,8 +12,17 @@ abstract class AbstractHolidayProvider
     public function __construct(protected ?HolidayCalculator $holidayCalculator = null)
     {
         if (null === $this->holidayCalculator) {
+            $this->holidayCalculator = $this->getHolidayCalculator();
+        }
+    }
+
+    public function getHolidayCalculator(): HolidayCalculator
+    {
+        if (null === $this->holidayCalculator) {
             $this->holidayCalculator = new HolidayCalculator();
         }
+
+        return $this->holidayCalculator;
     }
 
     public function __toString(): string

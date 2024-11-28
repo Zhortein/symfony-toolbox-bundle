@@ -17,16 +17,16 @@ class BelgiumHolidayProvider extends AbstractHolidayProvider
     public function getHolidays(int $year): array
     {
         $holidays = [
-            $this->holidayCalculator->newYear($year), // Jour de l'an
-            $this->holidayCalculator->labourDay($year), // Fête du travail
+            $this->getHolidayCalculator()->newYear($year), // Jour de l'an
+            $this->getHolidayCalculator()->labourDay($year), // Fête du travail
             new \DateTime("$year-07-21"), // Fête nationale
-            $this->holidayCalculator->assumptionOfMary($year), // Assomption
-            $this->holidayCalculator->allSaintsDay($year), // Toussaint
+            $this->getHolidayCalculator()->assumptionOfMary($year), // Assomption
+            $this->getHolidayCalculator()->allSaintsDay($year), // Toussaint
             new \DateTime("$year-11-11"), // Armistice 1918
-            $this->holidayCalculator->christmasDay($year), // Noël
+            $this->getHolidayCalculator()->christmasDay($year), // Noël
         ];
 
         // Ajouter les jours fériés basés sur Pâques
-        return array_merge($holidays, $this->holidayCalculator->calculateEasterBasedHolidays($year));
+        return array_merge($holidays, $this->getHolidayCalculator()->calculateEasterBasedHolidays($year));
     }
 }

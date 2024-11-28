@@ -22,10 +22,10 @@ class EnglandHolidayProvider extends AbstractHolidayProvider
     public function getHolidays(int $year): array
     {
         return [
-            $this->holidayCalculator->newYear($year), // New Year's Day
+            $this->getHolidayCalculator()->newYear($year), // New Year's Day
             new \DateTime("last Monday of May $year"), // Spring Bank Holiday
             new \DateTime("last Monday of August $year"), // Summer Bank Holiday
-            $this->holidayCalculator->christmasDay($year), // Christmas Day
+            $this->getHolidayCalculator()->christmasDay($year), // Christmas Day
             new \DateTime("$year-12-26"), // Boxing Day
         ];
     }

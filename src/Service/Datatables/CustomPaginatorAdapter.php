@@ -2,21 +2,34 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Service\Datatables;
 
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 
 class CustomPaginatorAdapter implements PaginatorInterface
 {
-    public function paginate(object $queryBuilder, int $page, int $limit): array
+    public function paginate(mixed $target, int $page, int $limit, array $options = []): PaginationInterface
     {
-        $query = $queryBuilder->getQuery()
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
+        if ($target instanceof QueryBuilder) {
+            $query = $target->getQuery();
+            $query->setFirstResult(($page - 1) * $limit);
+            $query->setMaxResults($limit);
 
-        return iterator_to_array(new Paginator($query, true));
-    }
+            $paginator = new Paginator($query);
+            $items = iterator_to_array($paginator->getIterator());
+            $totalItemCount = count($paginator);
+        } elseif (is_array($target)) {
+            $totalItemCount = count($target);
+            $items = array_slice($target, ($page - 1) * $limit, $limit);
+        } else {
+            throw new \InvalidArgumentException('Unsupported target type for pagination.');
+        }
 
-    public function getTotal(object $queryBuilder): int
-    {
-        return count($queryBuilder->getQuery()->getResult());
+        /** @var array<int, mixed> $items */
+        return new CustomPagination(
+            totalItemCount: $totalItemCount,
+            currentPageNumber: $page,
+            itemNumberPerPage: $limit,
+            items: $items
+        );
     }
 }

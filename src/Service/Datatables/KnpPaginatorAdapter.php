@@ -10,13 +10,18 @@ readonly class KnpPaginatorAdapter implements PaginatorInterface
     {
     }
 
-    public function paginate(object $queryBuilder, int $page, int $limit): array
+    public function paginate(mixed $target, int $page, int $limit, array $options = []): PaginationInterface
     {
-        return $this->paginator->paginate($queryBuilder, $page, $limit)->getItems();
-    }
+        $pagination = $this->paginator->paginate($target, $page, $limit, $options);
+        $items = is_array($pagination->getItems())
+            ? $pagination->getItems()
+            : iterator_to_array($pagination->getItems());
 
-    public function getTotal(object $queryBuilder): int
-    {
-        return $this->paginator->paginate($queryBuilder, 1, 1)->getTotalItemCount();
+        return new CustomPagination(
+            totalItemCount: $pagination->getTotalItemCount(),
+            currentPageNumber: $pagination->getCurrentPageNumber(),
+            itemNumberPerPage: $pagination->getItemNumberPerPage(),
+            items: $items
+        );
     }
 }

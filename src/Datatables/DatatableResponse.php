@@ -4,6 +4,19 @@ namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
 readonly class DatatableResponse
 {
+    /**
+     * @param array<int, mixed> $data
+     * @param array{
+     *      current: int,
+     *      hasPrevious: bool,
+     *      nbPages: int,
+     *      previous: int,
+     *      pages: int[],
+     *      pageSize: int,
+     *      hasNext: bool,
+     *      next: int,
+     * } $pagination
+     */
     public function __construct(
         private int $total,
         private int $filtered,
@@ -12,6 +25,23 @@ readonly class DatatableResponse
     ) {
     }
 
+    /**
+     * @return array{
+     *     total: int,
+     *     filtered: int,
+     *     data: array<int, mixed>,
+     *     pagination: array{
+     *       current: int,
+     *       hasPrevious: bool,
+     *       nbPages: int,
+     *       previous: int,
+     *       pages: int[],
+     *       pageSize: int,
+     *       hasNext: bool,
+     *       next: int,
+     *  }
+     * }
+     */
     public function toArray(): array
     {
         return [

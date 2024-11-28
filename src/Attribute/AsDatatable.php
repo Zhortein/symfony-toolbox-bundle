@@ -8,17 +8,50 @@ use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
 class AsDatatable
 {
     /**
-     * Constructor for the Datatable.
+     * Constructor for configuring a datatable.
      *
-     * @param string $name            the name of the datatable
-     * @param array  $columns         configuration for each column
-     * @param int    $defaultPageSize default number of items per page
-     * @param array  $defaultSort     default sorting configuration
-     * @param bool   $searchable      indicates if the search functionality is enabled
-     * @param bool   $sortable        indicates if the sorting functionality is enabled
-     * @param array  $options         additional options for the datatable
+     * @param string $name name of the datatable; must not be empty
+     * @param array<int, array{
+     *          name: string,
+     *          label: string,
+     *          searchable?: bool,
+     *          sortable?: bool,
+     *          nameAs?: string,
+     *          alias?: string,
+     *          sqlAlias?: string,
+     *          datatype?: string,
+     *          template?: string,
+     *          header?: array{
+     *              translate?: bool,
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          },
+     *          dataset?: array{
+     *              translate?: bool,
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          },
+     *          footer?: array{
+     *              translate?: bool,
+     *              auto?: string,
+     *              keep_default_classes?: bool,
+     *              class?: string,
+     *              data?: array<string, mixed>
+     *          }
+     *      }> $columns Configuration for each column, including properties like 'name', 'label', 'searchable', 'sortable', and others
+     * @param int                                                    $defaultPageSize   default number of items per page; uses a predefined constant by default
+     * @param array<int, array<string, string>>                      $defaultSort       default sort configuration, consisting of field and order
+     * @param bool                                                   $searchable        boolean flag indicating if the table supports search functionality
+     * @param bool                                                   $sortable          boolean flag indicating if the table supports sorting functionality
+     * @param bool                                                   $autoColumns       whether columns should be automatically constructed from the request
+     * @param array<string, array{label?: string, template: string}> $actionColumn      configuration for an "action" column, if any; contains 'label' and 'template'
+     * @param array<string, array{label?: string, template: string}> $selectorColumn    configuration for a "selector" column, if any; contains 'label' and 'template'
+     * @param string                                                 $translationDomain translation domain for the datatable; if empty, no translations are applied
+     * @param array<string, mixed>                                   $options           additional configuration options for table, including 'table', 'thead', 'tfoot', and 'pagination'
      *
-     * @throws \InvalidArgumentException if name is empty
+     * @throws \InvalidArgumentException if the $name argument is empty
      */
     public function __construct(
         public string $name,
@@ -41,7 +74,7 @@ class AsDatatable
     /**
      * Converts the datatable configuration to an associative array.
      *
-     * @return array the datatable configuration as an associative array
+     * @return array<string, mixed> the datatable configuration as an associative array
      */
     public function toArray(): array
     {

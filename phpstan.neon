@@ -7,4 +7,5 @@ parameters:
     paths:
         - src
     # Ignorer certaines erreurs fréquentes si besoin
+    treatPhpDocTypesAsCertain: false
     ignoreErrors:

@@ -17,17 +17,17 @@ class FranceHolidayProvider extends AbstractHolidayProvider
     public function getHolidays(int $year): array
     {
         $holidays = [
-            $this->holidayCalculator->newYear($year), // Jour de l'an
-            $this->holidayCalculator->labourDay($year), // Fête du travail
+            $this->getHolidayCalculator()->newYear($year), // Jour de l'an
+            $this->getHolidayCalculator()->labourDay($year), // Fête du travail
             new \DateTime("$year-05-08"), // Victoire 1945
             new \DateTime("$year-07-14"), // Fête nationale
             new \DateTime("$year-08-15"), // Assomption
             new \DateTime("$year-11-01"), // Toussaint
             new \DateTime("$year-11-11"), // Armistice 1918
-            $this->holidayCalculator->christmasDay($year), // Noël
+            $this->getHolidayCalculator()->christmasDay($year), // Noël
         ];
 
         // Ajouter les jours fériés basés sur Pâques
-        return array_merge($holidays, $this->holidayCalculator->calculateEasterBasedHolidays($year));
+        return array_merge($holidays, $this->getHolidayCalculator()->calculateEasterBasedHolidays($year));
     }
 }

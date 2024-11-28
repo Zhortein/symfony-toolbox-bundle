@@ -11,15 +11,15 @@ class SpainHolidayProvider extends AbstractHolidayProvider
     public function getHolidays($year): array
     {
         return array_filter([
-            $this->holidayCalculator->newYear($year),
-            $this->holidayCalculator->epiphany($year),
-            $this->holidayCalculator->labourDay($year),
-            $this->holidayCalculator->christmasDay($year),
-            $this->holidayCalculator->holyThursday($year),
-            $this->holidayCalculator->goodFriday($year),
-            $this->holidayCalculator->allSaintsDay($year),
-            $this->holidayCalculator->assumptionOfMary($year),
-            $this->holidayCalculator->immaculateConception($year),
+            $this->getHolidayCalculator()->newYear($year),
+            $this->getHolidayCalculator()->epiphany($year),
+            $this->getHolidayCalculator()->labourDay($year),
+            $this->getHolidayCalculator()->christmasDay($year),
+            $this->getHolidayCalculator()->holyThursday($year),
+            $this->getHolidayCalculator()->goodFriday($year),
+            $this->getHolidayCalculator()->allSaintsDay($year),
+            $this->getHolidayCalculator()->assumptionOfMary($year),
+            $this->getHolidayCalculator()->immaculateConception($year),
             new \DateTime("$year-10-12"), // National Day
             new \DateTime("$year-12-06"), // Constitution Day
         ]);
