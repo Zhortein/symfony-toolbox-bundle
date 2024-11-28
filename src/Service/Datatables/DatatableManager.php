@@ -95,6 +95,7 @@ readonly class DatatableManager
         if (!is_string($cssMode)) {
             return Configuration::DEFAULT_DATATABLE_CSS_MODE;
         }
+
         return $cssMode;
     }
 

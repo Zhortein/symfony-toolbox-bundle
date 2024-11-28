@@ -24,7 +24,7 @@ class CustomPaginatorAdapter implements PaginatorInterface
             throw new \InvalidArgumentException('Unsupported target type for pagination.');
         }
 
-        /** @var array<int, mixed> $items */
+        /* @var array<int, mixed> $items */
         return new CustomPagination(
             totalItemCount: $totalItemCount,
             currentPageNumber: $page,

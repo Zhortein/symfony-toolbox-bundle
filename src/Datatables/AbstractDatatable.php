@@ -707,7 +707,7 @@ abstract class AbstractDatatable
                 throw new \InvalidArgumentException(sprintf('The option "%s" is not supported.', $name));
         }
 
-        /** @phpstan-ignore-next-line */
+        /* @phpstan-ignore-next-line */
         $this->options[$name] = $value;
 
         return $this;

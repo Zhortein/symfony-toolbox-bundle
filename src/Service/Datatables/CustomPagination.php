@@ -28,7 +28,7 @@ readonly class CustomPagination implements PaginationInterface
     /**
      * Retrieves the number of items displayed per page.
      *
-     * @return int The number of items per page.
+     * @return int the number of items per page
      */
     public function getItemNumberPerPage(): int
     {
@@ -38,7 +38,7 @@ readonly class CustomPagination implements PaginationInterface
     /**
      * Returns the items.
      *
-     * @return array<int, mixed> The list of items.
+     * @return array<int, mixed> the list of items
      */
     public function getItems(): array
     {

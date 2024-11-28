@@ -13,8 +13,6 @@ interface PaginatorInterface
      * @param int                            $page    The current page
      * @param int                            $limit   The number of items per page
      * @param array<string, mixed>           $options Optional settings for the paginator
-     *
-     * @return PaginationInterface
      */
     public function paginate(mixed $target, int $page, int $limit, array $options = []): PaginationInterface;
 }
