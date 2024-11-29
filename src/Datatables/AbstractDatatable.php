@@ -556,7 +556,10 @@ abstract class AbstractDatatable
      *              class?: string,
      *              data?: array<string, mixed>
      *          }
-     *      }
+     *      },
+     *      actionColumn?: array{template: string, label: string},
+     *      selectorColumn?: array{label: string, template?: string},
+     *      translationDomain?: string
      *  } $options
      *
      * @return $this

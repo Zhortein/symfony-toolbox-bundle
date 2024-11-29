@@ -1,6 +1,6 @@
 <?php
 
-namespace Zhortein\SymfonyToolboxBundle\Tests\Service;
+namespace Zhortein\SymfonyToolboxBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
 use Zhortein\SymfonyToolboxBundle\Enum\Day;

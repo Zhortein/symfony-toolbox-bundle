@@ -1,6 +1,6 @@
 <?php
 
-namespace Zhortein\SymfonyToolboxBundle\Tests\Enum;
+namespace Zhortein\SymfonyToolboxBundle\Tests\Unit\Enum;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Contracts\Translation\TranslatorInterface;

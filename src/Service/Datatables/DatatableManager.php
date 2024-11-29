@@ -201,7 +201,7 @@ readonly class DatatableManager
             });
 
             // Load column_types in datatable columns
-            if (false !== $cachedTypes) {
+            if (is_array($cachedTypes)) {
                 $datatable->setCachedTypes($cachedTypes);
             } else {
                 throw new \RuntimeException('Unable to build datatable types.');
