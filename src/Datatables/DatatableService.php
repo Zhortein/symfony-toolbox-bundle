@@ -192,6 +192,7 @@ class DatatableService
         if ($params['search'] && $datatable->isSearchable()) {
             $datatable->applySearch($queryBuilder, $params['search']);
         }
+        $datatable->applyStaticFilters($queryBuilder);
 
         if ($datatable->isSortable() && count($params['multiSort']) > 0) {
             foreach ($params['multiSort'] as $sort) {

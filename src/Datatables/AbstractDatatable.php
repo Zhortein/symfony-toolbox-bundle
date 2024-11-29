@@ -795,7 +795,6 @@ abstract class AbstractDatatable
                 $queryBuilder->andWhere('('.implode(' OR ', $searchParts).')');
             }
         }
-        $this->applyStaticFilters($queryBuilder);
     }
 
     /**
