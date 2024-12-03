@@ -15,10 +15,12 @@ class CustomPaginatorAdapter implements PaginatorInterface
             $query->setMaxResults($limit);
 
             $paginator = new Paginator($query);
+            /** @var array<int, mixed> $items */
             $items = iterator_to_array($paginator->getIterator());
             $totalItemCount = count($paginator);
         } elseif (is_array($target)) {
             $totalItemCount = count($target);
+            /** @var array<int, mixed> $items */
             $items = array_slice($target, ($page - 1) * $limit, $limit);
         } else {
             throw new \InvalidArgumentException('Unsupported target type for pagination.');
