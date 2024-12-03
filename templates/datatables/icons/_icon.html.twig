@@ -1,0 +1,11 @@
+{% if datatable.isIconUxMode %}
+    {% if datatable.cssMode == 'bootstrap' %}
+        {{ ux_icon(datatable.getIcon(icon), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}
+    {% elseif datatable.cssMode == 'tailwind' %}
+        {{ ux_icon(datatable.getIcon(icon), {class: 'size-5', viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
+    {% else %}
+        {{ ux_icon(datatable.getIcon(icon), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}
+    {% endif %}
+{% else %}
+    <i class="{{ datatable.getIcon(icon) }}"></i>
+{% endif %}

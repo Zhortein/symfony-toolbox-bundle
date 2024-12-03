@@ -1,0 +1,42 @@
+{% set actionChangePage = "click->"~datatable.stimulusControllerName~"#changePage" %}
+
+{% set ulCss = 'pagination' %}
+<a data-page="1" {% if data.pagination.hasPrevious %}data-action="{{ actionChangePage }}"{% endif %} class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0{% if not data.pagination.hasPrevious %} bg-gray-300{% endif %}">
+    <span class="sr-only">{{ 'datatable.pagination.first'|trans({}, transDomain) }}</span>
+    {% if not datatable.isIconUxMode %}
+        <span aria-hidden="true" class="{{ datatable.getIcon('icon_first') }}"></span>
+    {% else %}
+        {{ ux_icon(datatable.getIcon('icon_first'), {class: 'size-5', viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
+    {% endif %}
+</a>
+<a data-page="{{ data.pagination.previous }}" {% if data.pagination.hasPrevious %}data-action="{{ actionChangePage }}"{% endif %} class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0{% if not data.pagination.hasPrevious %} bg-gray-300{% endif %}">
+    <span class="sr-only">{{ 'datatable.pagination.previous'|trans({}, transDomain) }}</span>
+    {% if not datatable.isIconUxMode %}
+        <span aria-hidden="true" class="{{ datatable.getIcon('icon_previous') }}"></span>
+    {% else %}
+        {{ ux_icon(datatable.getIcon('icon_previous'), {class: 'size-5', viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
+    {% endif %}
+</a>
+{% for page in data.pagination.pages %}
+    {% if page == data.pagination.current %}
+        <a data-page="{{ page }}" data-action="{{ actionChangePage }}" aria-current="page" class="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">{{ page }}</a>
+    {% else %}
+        <a data-page="{{ page }}" data-action="{{ actionChangePage }}" class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0">{{ page }}</a>
+    {% endif %}
+{% endfor %}
+<a data-page="{{ data.pagination.next }}" {% if data.pagination.hasNext %}data-action="{{ actionChangePage }}"{% endif %} class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0{% if not data.pagination.hasNext %} bg-gray-300{% endif %}">
+    <span class="sr-only">{{ 'datatable.pagination.next'|trans({}, transDomain) }}</span>
+    {% if not datatable.isIconUxMode %}
+        <span aria-hidden="true" class="{{ datatable.getIcon('icon_next') }}"></span>
+    {% else %}
+        {{ ux_icon(datatable.getIcon('icon_next'), {class: 'size-5', viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
+    {% endif %}
+</a>
+<a data-page="{{ data.pagination.nbPages }}" {% if data.pagination.hasNext %}data-action="{{ actionChangePage }}"{% endif %} class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0{% if not data.pagination.hasNext %} bg-gray-300{% endif %}">
+    <span class="sr-only">{{ 'datatable.pagination.last'|trans({}, transDomain) }}</span>
+    {% if not datatable.isIconUxMode %}
+        <span aria-hidden="true" class="{{ datatable.getIcon('icon_last') }}"></span>
+    {% else %}
+        {{ ux_icon(datatable.getIcon('icon_last'), {class: 'size-5', viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
+    {% endif %}
+</a>

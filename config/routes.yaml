@@ -1,0 +1,7 @@
+zhortein_datatable_fetch_data:
+  path: /zhortein/symfony-toolbox/datatable/{datatableId}/data
+  controller: Zhortein\SymfonyToolboxBundle\Controller\DatatableController::fetchData
+  requirements:
+    datatableId: .+
+  options:
+    expose: true

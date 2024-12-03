@@ -14,6 +14,7 @@ Le service `StringTools` fournit divers utilitaires pour manipuler et nettoyer l
 - [Remplacement de caractères spéciaux](#remplacement-de-caractères-spéciaux)
 - [Comptage des mots](#comptage-des-mots)
 - [S'assurer d'avoir une chaîne (pas de null)](#sassurer-davoir-une-chaîne-pas-de-null)
+- [Vérifier si une chaine est un alias SQL valide](#vérifier-si-une-chaine-est-un-alias-sql-valide)
 
 ### Détection de tableaux de chaînes
 
@@ -129,10 +130,17 @@ var_export($array); // Retourne : [0 => "André", 1 => 123, 2 => "Réussi"]
 ### Tronquer une chaîne
 
 Tronque la chaîne à une longueur spécifiée avec des points de suspension si nécessaire.
+Trois méthodes sont proposées pour les projets >= Symfony 7.2.0. En dessous de cette version, toutes les fonctions 
+effectuent une coupure à la longueur stricte.
+- ```truncate()``` : coupe à la longueur stricte demandée
+- ```truncateBefore()``` : coupe après le mot à la longueur demandée
+- ```truncateAfter()``` : coupe avant le mot à la longueur demandée
 
-#### Méthode
+#### Méthodes
 ```php
 public static function truncate(string $text, int $length = 100): string
+public static function truncateBefore(string $text, int $length = 100): string
+public static function truncateAfter(string $text, int $length = 100): string
 ```
 Retourne la chaîne tronquée.
 
@@ -145,7 +153,11 @@ Retourne la chaîne tronquée.
 ```php
 $text = "This is a long sentence that needs truncation.";
 $truncated = StringTools::truncate($text, 20);
-echo $truncated; // Retourne : "This is a long se..."
+echo $truncated; // Retourne : "This is a long sente..."
+$truncated = StringTools::truncateBefore($text, 20);
+echo $truncated; // Retourne : "This is a long..."
+$truncated = StringTools::truncateAfter($text, 20);
+echo $truncated; // Retourne : "This is a long sentence..."
 ```
 
 ### Convertir un texte en booléen
@@ -228,6 +240,32 @@ echo StringTools::getStringOrEmpty(null); // Retourne : ''
 echo StringTools::getStringOrEmpty(123); // Retourne : '123'
 echo StringTools::getStringOrEmpty('Azerty'); // Retourne : 'Azerty'
 echo StringTools::getStringOrEmpty(''); // Retourne : ''
+```
+
+### Vérifier si une chaine est un alias SQL valide
+
+Retourne true si la chaine peut être acceptée pour un alias SQL, false sinon. Si une longueur est spécifiée,
+vérifie également que la chaine ne dépasse pas cette longueur. Une longueur négative ou nulle supprime le test sur la longueur.
+
+#### Méthode
+```php
+public static function isValidSqlAlias(string $alias, int $maxLength = 30): bool
+```
+Retourne true si la chaine peut être acceptée pour un alias SQL, false sinon.
+
+#### Paramètres
+- `string $alias` : La chaîne à tester.
+- `int $maxLength = 30` : La longueur maximale, négatif ou 0 pour ne pas tester la longueur.
+
+#### Exemple
+```php
+echo StringTools::isValidSqlAlias("validAlias"); // true
+echo StringTools::isValidSqlAlias("invalid-alias"); // false
+echo StringTools::isValidSqlAlias("TooLongAliasName12345", 30); // false
+echo StringTools::isValidSqlAlias("AliasWithNoLimit", 0); // true
+echo StringTools::isValidSqlAlias("AnotherSuperLongAliasWithoutLimit", -1); // true
+echo StringTools::isValidSqlAlias("validAlias", 64); // true
+echo StringTools::isValidSqlAlias("TooLongAliasForMyLimit", 10); // false
 ```
 
 ## Notes

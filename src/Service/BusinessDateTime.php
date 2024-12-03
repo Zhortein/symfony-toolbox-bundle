@@ -32,14 +32,15 @@ class BusinessDateTime
         protected readonly HolidayProviderManager $holidayProviderManager,
         protected ?LoggerInterface $logger = null,
         protected ?int $currentYear = null,
-        protected ?string $currentCountry = null, )
-    {
+        protected ?string $currentCountry = null,
+    ) {
         if (null === $this->currentYear) {
             $this->currentYear = (int) date('Y');
         }
         if (null === $this->currentCountry) {
             $this->currentCountry = 'FR';
         }
+        $this->setHolidays($this->currentYear, $this->currentCountry);
     }
 
     public function setLogger(LoggerInterface $logger): void
@@ -258,8 +259,11 @@ class BusinessDateTime
             $this->setHolidays($myDate, $countryCode);
         }
 
-        return in_array($myDate->format('d/m/Y'),
-            array_map(static fn ($holiday) => $holiday->format('d/m/Y'), $this->holidays), true);
+        return in_array(
+            $myDate->format('d/m/Y'),
+            array_map(static fn ($holiday) => $holiday->format('d/m/Y'), $this->holidays),
+            true
+        );
     }
 
     /**

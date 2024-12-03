@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="vendor/autoload.php"
+         colors="true"
+         verbose="true"
+         stopOnFailure="false"
+         failOnWarning="true"
+         failOnRisky="true">
+
+    <testsuites>
+        <testsuite name="SymfonyToolboxBundle">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <!-- Configuration SQLite pour les tests -->
+        <env name="DATABASE_URL" value="sqlite:///:memory:"/>
+        <env name="KERNEL_CLASS" value="Zhortein\SymfonyToolboxBundle\Tests\TestKernel"/>
+    </php>
+
+    <coverage>
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <report>
+            <text outputFile="php://stdout"/>
+            <html outputDirectory="coverage-html"/>
+        </report>
+    </coverage>
+</phpunit>

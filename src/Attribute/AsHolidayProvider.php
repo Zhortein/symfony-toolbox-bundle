@@ -10,5 +10,8 @@ class AsHolidayProvider
      */
     public function __construct(public array $countryCodes)
     {
+        if (empty($countryCodes)) {
+            throw new \InvalidArgumentException('You must specify at least one country code for a Holiday Provider.');
+        }
     }
 }

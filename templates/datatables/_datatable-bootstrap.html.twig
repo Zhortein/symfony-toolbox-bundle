@@ -1,0 +1,142 @@
+<div
+        data-controller="zhortein--symfony-toolbox-bundle--datatable"
+        data-zhortein--symfony-toolbox-bundle--datatable-id-value="{{ datatableId }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-mode-value="{{ datatable.cssMode }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-pagesize-value="{{ datatable.defaultPageSize }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-url-value="{{ path('zhortein_datatable_fetch_data', {'datatableId': datatableId}) }}"
+        {{ attributes }}
+        class="table-responsive">
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error d-none"></div>
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.options.searchable %} d-none{% endif %}">
+        <div class="input-group mb-3">
+            <span class="input-group-text" id="search-button">{{ ux_icon(datatable.getIcon('icon_search'), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}</span>
+            <input data-action="input->zhortein--symfony-toolbox-bundle--datatable#search" type="text" class="form-control" placeholder="{{ 'datatable.search'|trans({}, transDomain) }}" aria-describedby="search-button">
+        </div>
+    </div>
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="spinner" class="datatable-spinner d-none">{{ 'datatable.loading'|trans({}, transDomain) }}</div>
+    <table class="datatable table table-striped table-bordered table-hover">
+        <thead data-zhortein--symfony-toolbox-bundle--datatable-target="header"
+                class="{% if datatable.options.options.thead.keep_default_classes %}{% endif %}{{ datatable.options.options.thead.class }}"
+                {% for headerKey,headerValue in datatable.options.options.thead %}
+                    {% if headerKey == 'data' %}
+                        {% for dataKey,dataValue in datatable.options.options.thead.data %}
+                            data-{{ dataKey }}="{{ dataValue }}"
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if headerKey not in ['class','data','keep_default_classes','translate'] %}
+                        {{ headerKey }}="{{ headerValue }}"
+                    {% endif %}
+                {% endfor %}
+        >
+        <tr>
+            {% if datatable.options.selectorColumn is defined and datatable.options.selectorColumn is not empty %}
+                <th>
+                    {% if datatable.options.selectorColumn.label is defined %}
+                        {% set selectorLabel = datatable.options.selectorColumn.label %}
+                    {% endif %}
+                    {% if datatable.translationDomain is not empty %}
+                        {% set selectorLabel = selectorLabel|trans({}, datatable.translationDomain) %}
+                    {% endif %}
+                    {{ selectorLabel }}
+                </th>
+            {% endif %}
+            {% for column in datatable.columns %}
+                {% if column.header.keep_default_classes %}
+                    {% set headerCssClasses = '' %}
+                {% endif %}
+                {% set headerCssClasses = headerCssClasses ~ ' ' ~ column.header.class %}
+                <th
+                        scope="col"
+                        class="{{ headerCssClasses }}"
+                        {% if datatable.options.sortable and column.sortable %}
+                        data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort"
+                        data-field="{{ column.nameAs }}"
+                        {% endif %}
+                        {% for headerKey,headerValue in column.header %}
+                            {% if headerKey == 'data' %}
+                                {% for dataKey,dataValue in column.header.data %}
+                                    {% if dataKey != 'field' and dataKey != 'action' %}
+                                        data-{{ dataKey }}="{{ dataValue }}"
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if headerKey not in ['class','data','keep_default_classes','translate'] %}
+                                {{ headerKey }}="{{ headerValue }}"
+                            {% endif %}
+                        {% endfor %}
+                >
+                    <span class="datatable-sort-icon" data-priority="0"></span>
+                    {% if datatable.translationDomain is not empty and column.header.translate %}{{ column.label|trans({}, datatable.translationDomain) }}{% else %}{{ column.label }}{% endif %}
+                </th>
+            {% endfor %}
+            {% if datatable.options.actionColumn is defined and datatable.options.actionColumn is not empty %}
+                <th>
+                    {% if datatable.options.actionColumn.label is defined %}
+                        {% set actionLabel = datatable.options.actionColumn.label %}
+                    {% endif %}
+                    {% if datatable.translationDomain is not empty %}
+                    {% set actionLabel = actionLabel|trans({}, datatable.translationDomain) %}
+                    {% endif %}
+                    {{ actionLabel }}
+                </th>
+            {% endif %}
+        </tr>
+        </thead>
+        <tbody
+                class="{% if datatable.options.options.tbody.keep_default_classes %}{% endif %}{{ datatable.options.options.tbody.class }}"
+                data-zhortein--symfony-toolbox-bundle--datatable-target="table"
+                {% for key,value in datatable.options.options.tbody %}
+                    {% if key == 'data' %}
+                        {% for dataKey,dataValue in datatable.options.options.tbody.data %}
+                            data-{{ dataKey }}="{{ dataValue }}"
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if key not in ['class','data','keep_default_classes','translate'] %}
+                        {{ key }}="{{ value }}"
+                    {% endif %}
+                {% endfor %}
+        >
+        <!-- Initial rows will be populated dynamically -->
+        </tbody>
+        {% if datatable.displayFooter %}
+            <tfoot
+                    class="{% if datatable.options.options.tfoot.keep_default_classes %}{% endif %}{{ datatable.options.options.tfoot.class }}"
+                    data-zhortein--symfony-toolbox-bundle--datatable-target="footer"
+                    {% for key,value in datatable.options.options.tfoot %}
+                        {% if key == 'data' %}
+                            {% for dataKey,dataValue in datatable.options.options.tfoot.data %}
+                                data-{{ dataKey }}="{{ dataValue }}"
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if key not in ['class','data','keep_default_classes','translate'] %}
+                            {{ key }}="{{ value }}"
+                        {% endif %}
+                    {% endfor %}
+            >
+                {# @todo Datatable footer : To be implemented #}
+            </tfoot>
+        {% endif %}
+    </table>
+    <nav
+            class="{% if datatable.options.options.pagination.keep_default_classes %}datatable-pagination {% endif %}{{ datatable.options.options.pagination.class }}"
+            aria-label="{{ 'datatable.pagination'|trans({}, transDomain) }}"
+            data-zhortein--symfony-toolbox-bundle--datatable-target="pagination"
+            {% for key,value in datatable.options.options.pagination %}
+                {% if key == 'data' %}
+                    {% for dataKey,dataValue in datatable.options.options.pagination.data %}
+                        data-{{ dataKey }}="{{ dataValue }}"
+                    {% endfor %}
+                {% endif %}
+
+                {% if key not in ['class','data','keep_default_classes','translate'] %}
+                    {{ key }}="{{ value }}"
+                {% endif %}
+            {% endfor %}
+    >
+        <!-- Pagination dynamically handled -->
+    </nav>
+</div>

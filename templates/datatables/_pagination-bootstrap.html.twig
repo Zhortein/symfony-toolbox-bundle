@@ -1,0 +1,51 @@
+{% set actionChangePage = "click->"~datatable.stimulusControllerName~"#changePage" %}
+{% set ulCss = 'pagination' %}
+{% set liCss = 'page-item' %}
+{% set aCss = 'page-link' %}
+{% set activeCss = 'active' %}
+
+<ul class="{{ ulCss }}">
+    <li class="{{ liCss }}{% if not data.pagination.hasPrevious %} disabled{% endif %}">
+        <a class="{{ aCss }}" data-page="1" {% if data.pagination.hasPrevious %}data-action="{{ actionChangePage }}"{% endif %} aria-label="{{ 'datatable.pagination.first'|trans({}, transDomain) }}">
+            {% if not datatable.isIconUxMode %}
+                <span aria-hidden="true" class="{{ datatable.getIcon('icon_first') }}"></span>
+            {% else %}
+                {{ ux_icon(datatable.getIcon('icon_first'), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}
+            {% endif %}
+        </a>
+    </li>
+    <li class="{{ liCss }}{% if not data.pagination.hasPrevious %} disabled{% endif %}">
+        <a class="{{ aCss }}" data-page="{{ data.pagination.previous }}" {% if data.pagination.hasPrevious %}data-action="{{ actionChangePage }}"{% endif %} aria-label="{{ 'datatable.pagination.previous'|trans({}, transDomain) }}">
+            {% if not datatable.isIconUxMode %}
+                <span aria-hidden="true" class="{{ datatable.getIcon('icon_previous') }}"></span>
+            {% else %}
+                {{ ux_icon(datatable.getIcon('icon_previous'), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}
+            {% endif %}
+        </a>
+    </li>
+    {% for page in data.pagination.pages %}
+        <li class="{{ liCss }}">
+            <a class="{{ aCss }}{% if page == data.pagination.current %} {{ activeCss }}{% endif %}" data-page="{{ page }}" data-action="{{ actionChangePage }}">
+                {{ page }}
+            </a>
+        </li>
+    {% endfor %}
+    <li class="{{ liCss }}{% if not data.pagination.hasNext %} disabled{% endif %}">
+        <a class="{{ aCss }}" data-page="{{ data.pagination.next }}" {% if data.pagination.hasNext %}data-action="{{ actionChangePage }}"{% endif %} aria-label="{{ 'datatable.pagination.next'|trans({}, transDomain) }}">
+            {% if not datatable.isIconUxMode %}
+                <span aria-hidden="true" class="{{ datatable.getIcon('icon_next') }}"></span>
+            {% else %}
+                {{ ux_icon(datatable.getIcon('icon_next'), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}
+            {% endif %}
+        </a>
+    </li>
+    <li class="{{ liCss }}{% if not data.pagination.hasNext %} disabled{% endif %}">
+        <a class="{{ aCss }}" data-page="{{ data.pagination.nbPages }}" {% if data.pagination.hasNext %}data-action="{{ actionChangePage }}"{% endif %} aria-label="{{ 'datatable.pagination.last'|trans({}, transDomain) }}">
+            {% if not datatable.isIconUxMode %}
+                <span aria-hidden="true" class="{{ datatable.getIcon('icon_last') }}"></span>
+            {% else %}
+                {{ ux_icon(datatable.getIcon('icon_last'), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}
+            {% endif %}
+        </a>
+    </li>
+</ul>

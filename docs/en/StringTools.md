@@ -126,10 +126,17 @@ var_export($array); // Returns: [0 => "André", 1 => 123, 2 => "Réussi"]
 ### Truncate a string
 
 Truncates the string to a specified length, adding ellipses if necessary.
+Three methods are available for projects using Symfony >= 7.2.0. Behind this version, all 
+methods will truncate strictly at the given size.
+- ```truncate()``` : truncate at the given size
+- ```truncateBefore()``` : truncate before the word at the given size
+- ```truncateAfter()``` : truncate after the word at the given size
 
-#### Method
+#### Méthodes
 ```php
 public static function truncate(string $text, int $length = 100): string
+public static function truncateBefore(string $text, int $length = 100): string
+public static function truncateAfter(string $text, int $length = 100): string
 ```
 Returns the truncated string.
 
@@ -142,7 +149,11 @@ Returns the truncated string.
 ```php
 $text = "This is a long sentence that needs truncation.";
 $truncated = StringTools::truncate($text, 20);
-echo $truncated; // Returns: "This is a long se..."
+echo $truncated; // Returns: "This is a long sente..."
+$truncated = StringTools::truncateBefore($text, 20);
+echo $truncated; // Retourne : "This is a long..."
+$truncated = StringTools::truncateAfter($text, 20);
+echo $truncated; // Retourne : "This is a long sentence..."
 ```
 
 ### Convert text to boolean
@@ -225,6 +236,32 @@ echo StringTools::getStringOrEmpty(null); // Returns: ''
 echo StringTools::getStringOrEmpty(123); // Returns: '123'
 echo StringTools::getStringOrEmpty('Azerty'); // Returns: 'Azerty'
 echo StringTools::getStringOrEmpty(''); // Returns: ''
+```
+
+### Check if a string is a valid SQL alias
+
+Returns true if the string is a valid SQL alias, false otherwise. If a length is specified,
+check also if the string doesn't exceed the given length. Any length negative or 0 disable the length test.
+
+#### Method
+```php
+public static function isValidSqlAlias(string $alias, int $maxLength = 30): bool
+```
+Returns true if the string is a valid SQL alias, false otherwise
+
+#### Parameters
+- `string $alias` : String to test.
+- `int $maxLength = 30` : The maximum length, négative or 0 for disabling length test.
+
+#### Exemple
+```php
+echo StringTools::isValidSqlAlias("validAlias"); // true
+echo StringTools::isValidSqlAlias("invalid-alias"); // false
+echo StringTools::isValidSqlAlias("TooLongAliasName12345", 30); // false
+echo StringTools::isValidSqlAlias("AliasWithNoLimit", 0); // true
+echo StringTools::isValidSqlAlias("AnotherSuperLongAliasWithoutLimit", -1); // true
+echo StringTools::isValidSqlAlias("validAlias", 64); // true
+echo StringTools::isValidSqlAlias("TooLongAliasForMyLimit", 10); // false
 ```
 
 ## Notes
