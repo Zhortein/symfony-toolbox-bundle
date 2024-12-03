@@ -1,11 +1,11 @@
 {
   "name": "zhortein/symfony-toolbox-bundle",
   "type": "symfony-bundle",
-  "keywords": ["symfony", "bundle", "tool", "tools", "toolbox", "utils", "misc"],
+  "keywords": ["symfony", "symfony-ux", "bundle", "tool", "tools", "toolbox", "utils", "misc"],
   "description": "This bundle is dedicated to Symfony applications and provide useful tools for your app.",
   "homepage": "https://www.david-renard.fr",
   "license": "GPL-3.0-or-later",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "authors": [
     {
       "name": "David Renard",
@@ -17,9 +17,14 @@
   "require": {
     "php": ">=8.3",
     "doctrine/dbal": "^3|^4",
+    "doctrine/orm": "^3.3",
+    "knplabs/knp-paginator-bundle": "^6.6",
+    "symfony/asset-mapper": "^7.1",
     "symfony/framework-bundle": "^7.1",
     "symfony/http-client": "^7.1",
     "symfony/translation": "^7.1",
+    "symfony/twig-bundle": "^7.1",
+    "symfony/ux-icons": "^2.21",
     "symfony/validator": "^7.1"
   },
   "require-dev": {

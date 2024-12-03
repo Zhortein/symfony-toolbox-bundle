@@ -1,0 +1,48 @@
+{% set trCss = 'hover:bg-gray-100' %}
+{% set tdFirstCss = 'whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0' %}
+{% set tdCss = 'whitespace-nowrap px-3 py-4 text-sm text-gray-500' %}
+
+{% for row in data.data %}
+    <tr class="{{ trCss }}">
+        {% if datatable.options.selectorColumn is defined and datatable.options.selectorColumn is not empty %}
+            <td class="">
+                <input type="checkbox" name="row_selector" value="{{ row.0.id }}" />
+            </td>
+        {% endif %}
+        {% for column in datatable.columns %}
+            {% if not column.header.keep_default_classes %}
+                {% set tdFirstCss = '' %}
+                {% set tdCss = '' %}
+            {% endif %}
+            {% set tdFirstCss = tdFirstCss ~ ' ' ~ column.dataset.class %}
+            {% set tdCss = tdCss ~ ' ' ~ column.dataset.class %}
+            <td
+                    class="{% if loop.index == 1 %}{{ tdFirstCss }}{% else %}{{ tdCss }}{% endif %}"
+                    {% for datasetKey,datasetValue in column.dataset %}
+                        {% if datasetKey == 'data' %}
+                            {% for dataKey,dataValue in column.dataset.data %}
+                                data-{{ dataKey }}="{{ dataValue }}"
+                            {% endfor %}
+                        {% endif %}
+
+                        {% if datasetKey not in ['class','data','keep_default_classes','translate'] %}
+                            {{ datasetKey }}="{{ datasetValue }}"
+                        {% endif %}
+                    {% endfor %}
+            >
+                {% set fieldValue = attribute(row, column.nameAs) %}
+                {% if datatable.translationDomain is not empty and column.dataset.translate %}
+                    {% set fieldValue = fieldValue|trans({}, datatable.translationDomain) %}
+                {% endif %}
+                {% include column.template with {fieldValue: fieldValue, entityObject: row.0, row: row} %}
+            </td>
+        {% endfor %}
+        {% if datatable.options.actionColumn is defined and datatable.options.actionColumn is not empty %}
+            <td class="">
+                {% if datatable.options.actionColumn.template is defined %}
+                    {% include datatable.options.actionColumn.template with {row: row, entityObject: row.0} %}
+                {% endif %}
+            </td>
+        {% endif %}
+    </tr>
+{% endfor %}

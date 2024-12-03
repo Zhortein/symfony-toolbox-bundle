@@ -1,0 +1,33 @@
+{% set actionChangePage = "click->"~datatable.stimulusControllerName~"#changePage" %}
+
+{% set ulCss = 'pagination' %}
+{% set liCss = 'page-item' %}
+{% set aCss = 'page-link' %}
+{% set activeCss = 'active' %}
+
+<ul class="{{ ulCss }}">
+    {% if data.pagination.hasPrevious %}
+        <li class="{{ liCss }}{% if not data.pagination.hasPrevious %} disabled{% endif %}">
+            <button class="{{ aCss }}" data-page="1" {% if data.pagination.hasPrevious %}data-action="{{ actionChangePage }}"{% endif %}>{{ 'datatable.pagination.first'|trans({}, transDomain) }}</button>
+        </li>
+        <li class="{{ liCss }}{% if not data.pagination.hasPrevious %} disabled{% endif %}">
+            <button class="{{ aCss }}" data-page="{{ data.pagination.previous }}" {% if data.pagination.hasPrevious %}data-action="{{ actionChangePage }}"{% endif %}>{{ 'datatable.pagination.previous'|trans({}, transDomain) }}</button>
+        </li>
+    {% endif %}
+    {% for page in data.pagination.pages %}
+        <li class="{{ liCss }}">
+            <button class="{{ aCss }}{% if page == data.pagination.current %} {{ activeCss }}{% endif %}" data-page="{{ page }}" data-action="{{ actionChangePage }}">
+                {{ page }}
+            </button>
+        </li>
+    {% endfor %}
+    {% if data.pagination.hasNext %}
+        <li class="{{ liCss }}{% if not data.pagination.hasNext %} disabled{% endif %}">
+            <button class="{{ aCss }}" data-page="{{ data.pagination.next }}" {% if data.pagination.hasNext %}data-action="{{ actionChangePage }}"{% endif %}>{{ 'datatable.pagination.next'|trans({}, transDomain) }}</button>
+        </li>
+        <li class="{{ liCss }}{% if not data.pagination.hasNext %} disabled{% endif %}">
+            <button class="{{ aCss }}" data-page="{{ data.pagination.nbPages }}" {% if data.pagination.hasNext %}data-action="{{ actionChangePage }}"{% endif %}>{{ 'datatable.pagination.last'|trans({}, transDomain) }}</button>
+        </li>
+    {% endif %}
+</ul>
+

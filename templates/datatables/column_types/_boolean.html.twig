@@ -1,0 +1,5 @@
+{% if fieldValue is not empty %}
+    {{ ux_icon('fa:check', {height: '16px', width: '16px', 'aria-hidden': true, color: 'green'}) }}
+{% else %}
+    {{ ux_icon('fa:times', {height: '16px', width: '16px', 'aria-hidden': true, color: 'red'}) }}
+{% endif %}

@@ -3,7 +3,10 @@
 namespace Zhortein\SymfonyToolboxBundle\Service;
 
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use Symfony\Component\String\TruncateMode;
 use Symfony\Component\String\UnicodeString;
+
+use function Symfony\Component\String\u;
 
 class StringTools
 {
@@ -66,9 +69,43 @@ class StringTools
     /**
      * Tronque la chaîne à une longueur spécifiée avec des points de suspension si nécessaire.
      */
-    public static function truncate(string $text, int $length = 100, ?string $ellipsys = '…'): string
+    public static function truncate(string $text, int $length = 100, ?string $ellipsis = '…'): string
     {
-        return strlen($text) > $length ? substr($text, 0, $length - 3).$ellipsys : $text;
+        if (SymfonyVersion::isSymfony72OrHigher()) {
+            $truncated = u($text)->truncate($length);
+
+            return strlen($text) > $length ? $truncated->toString().$ellipsis : $truncated->toString();
+        }
+
+        return strlen($text) > $length ? substr($text, 0, $length).$ellipsis : $text;
+    }
+
+    /**
+     * Tronque le texte avant le mot sans couper les mots, en ajoutant éventuellement une ellipse si le texte est plus long que la longueur spécifiée.
+     */
+    public static function truncateBefore(string $text, int $length = 100, ?string $ellipsis = '…'): string
+    {
+        if (SymfonyVersion::isSymfony72OrHigher()) {
+            $truncated = u($text)->truncate($length, cut: TruncateMode::WordBefore);
+
+            return strlen($text) > $length ? $truncated->toString().$ellipsis : $truncated->toString();
+        }
+
+        return self::truncate($text, $length, $ellipsis);
+    }
+
+    /**
+     * Troncature du texte après un certain nombre de caractères, en conservant les mots entiers si possible.
+     */
+    public static function truncateAfter(string $text, int $length = 100, ?string $ellipsis = '…'): string
+    {
+        if (SymfonyVersion::isSymfony72OrHigher()) {
+            $truncated = u($text)->truncate($length, cut: TruncateMode::WordAfter);
+
+            return strlen($text) > $length ? $truncated->toString().$ellipsis : $truncated->toString();
+        }
+
+        return self::truncate($text, $length, $ellipsis);
     }
 
     /**
@@ -112,5 +149,33 @@ class StringTools
     public static function getStringOrEmpty(int|float|bool|string|null $input): string
     {
         return (string) ($input ?? '');
+    }
+
+    /**
+     * Vérifie si une chaîne est un alias SQL valide.
+     *
+     * Un alias valide :
+     * - Commence par une lettre (majuscule ou minuscule).
+     * - Contient uniquement des lettres (sans accents), chiffres et underscores.
+     * - Optionnellement, respecte une longueur maximale.
+     *
+     * @param string $alias     la chaîne à vérifier
+     * @param int    $maxLength Longueur maximale autorisée (par défaut 30). Pas de limite si <= 0.
+     *
+     * @return bool true si l'alias est valide, sinon False
+     */
+    public static function isValidSqlAlias(string $alias, int $maxLength = 30): bool
+    {
+        // Vérifie le format général de l'alias
+        if (!preg_match('/^[a-zA-Z][a-zA-Z0-9_]*$/', $alias)) {
+            return false;
+        }
+
+        // Vérifie la longueur si une limite est définie
+        if ($maxLength > 0 && strlen($alias) > $maxLength) {
+            return false;
+        }
+
+        return true;
     }
 }

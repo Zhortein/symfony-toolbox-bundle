@@ -5,20 +5,34 @@ namespace Zhortein\SymfonyToolboxBundle\DependencyInjection;
 use Doctrine\DBAL\Types\Type;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+use Zhortein\SymfonyToolboxBundle\Attribute\AsDatatable;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
-use Zhortein\SymfonyToolboxBundle\Service\AbstractHolidayProvider;
+use Zhortein\SymfonyToolboxBundle\Service\Cache\CacheManager;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
 
 class SymfonyToolboxCompilerPass implements CompilerPassInterface
 {
     /**
-     * @var array<string, AbstractHolidayProvider>
+     * @var array<string, Reference>
      */
     private array $holidayProviders = [];
 
+    /**
+     * @var array<string, Reference>
+     */
+    private array $datatables = [];
+
+    /**
+     * @var array<string, mixed>
+     */
+    private array $datatableOptions = [];
+
     public function process(ContainerBuilder $container): void
     {
+        $haveHolidayProviders = false;
         foreach ($container->getDefinitions() as $definition) {
             $class = $definition->getClass();
 
@@ -27,35 +41,74 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
             }
 
             $reflClass = new \ReflectionClass($class);
-            $this->detectHolidayProvider($reflClass);
+            // Some detected features like Datatables excludes other Toolbox attributes so we optimize by bypassing other detections.
+            if (!$this->detectDatatables($reflClass)) {
+                if ($this->detectHolidayProvider($reflClass)) {
+                    $haveHolidayProviders = true;
+                }
+            }
         }
 
-        $this->registerHolidayProviders($container);
+        if ($haveHolidayProviders) {
+            $this->registerHolidayProviders($container);
+        }
+        $this->registerDatatables($container);
         $this->detectActionEnum($container);
         $this->registerDBALTypes($container);
     }
 
     /**
+     * Detect Datatables via attribute #[AsDatatable].
+     *
      * @param \ReflectionClass<object> $class
      */
-    private function detectHolidayProvider(\ReflectionClass $class): void
+    private function detectDatatables(\ReflectionClass $class): bool
     {
-        $attribute = $class->getAttributes(AsHolidayProvider::class);
-
+        $attribute = $class->getAttributes(AsDatatable::class);
         if ($attribute) {
             $instance = $attribute[0]->newInstance();
-            try {
-                $holidayProviderInstance = $class->newInstance();
-                if (!$holidayProviderInstance instanceof AbstractHolidayProvider) {
-                    return;
-                }
-            } catch (\ReflectionException) {
-                return;
-            }
-            foreach ($instance->countryCodes as $countryCode) {
-                $this->holidayProviders[$countryCode] = $holidayProviderInstance;
-            }
+            $serviceId = $class->getName();
+            $this->datatables[$instance->name] = new Reference($serviceId);
+            $this->datatableOptions[$instance->name] = $instance->toArray();
+
+            return true;
         }
+
+        return false;
+    }
+
+    private function registerDatatables(ContainerBuilder $container): void
+    {
+        if ($container->hasDefinition(DatatableManager::class)) {
+            $container->getDefinition(DatatableManager::class)
+                ->setArgument(0, $this->datatables)
+                ->setArgument(1, $this->datatableOptions)
+                ->setArgument(3, new Reference(CacheManager::class))
+            ;
+        }
+    }
+
+    /**
+     * Detect Holiday Providers via attribute #[AsHolidayProvider].
+     *
+     * @param \ReflectionClass<object> $class
+     */
+    private function detectHolidayProvider(\ReflectionClass $class): bool
+    {
+        $attribute = $class->getAttributes(AsHolidayProvider::class);
+        if (!$attribute) {
+            return false;
+        }
+
+        $instance = $attribute[0]->newInstance();
+        $countryCodes = $instance->countryCodes;
+
+        $serviceId = $class->getName();
+        foreach ($countryCodes as $countryCode) {
+            $this->holidayProviders[strtoupper($countryCode)] = new Reference($serviceId);
+        }
+
+        return !empty($countryCodes);
     }
 
     private function registerHolidayProviders(ContainerBuilder $container): void

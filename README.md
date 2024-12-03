@@ -21,6 +21,7 @@ This Symfony bundle provides a set of utility services, enums, classes, and tool
 - [Measure Converters](./docs/en/MeasureConverter.md): display human-readable file sizes, convert between km/miles, kg/pounds, etc.
 - [Server Metrics](./docs/en/ServerMetric.md): retrieve various server metrics
 - [String Manipulation Tools](./docs/en/StringTools.md): sanitize strings and filenames, remove diacritics, count words, truncate text, and more.
+- [Datatables](./docs/en/Datatables.md): generate datatables
 
 ### Installation
 
@@ -103,6 +104,7 @@ Ce bundle Symfony fournit un ensemble de services utilitaires, d'enums, de class
 - [Convertisseurs de mesures](./docs/fr/MeasureConverter.md) : affichage de la taille de fichiers en format lisible, conversion entre km et miles, kg et livres, etc.
 - [Métriques serveur](./docs/fr/ServerMetric.md) : récupération de diverses métriques serveur
 - [Outils de manipulation de chaînes](./docs/fr/StringTools.md) : assainissement des chaînes et des noms de fichiers, suppression des diacritiques, comptage de mots, troncature de texte, etc.
+- [Datatables](./docs/fr/Datatables.md) : générer des datatables
 
 ### Installation
 
