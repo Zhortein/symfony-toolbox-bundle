@@ -4,6 +4,7 @@ namespace Zhortein\SymfonyToolboxBundle\Tests\Unit\Service;
 
 use PHPUnit\Framework\TestCase;
 use Zhortein\SymfonyToolboxBundle\Service\StringTools;
+use Zhortein\SymfonyToolboxBundle\Service\SymfonyVersion;
 
 class StringToolsTest extends TestCase
 {
@@ -42,8 +43,19 @@ class StringToolsTest extends TestCase
 
     public function testTruncate(): void
     {
-        $this->assertSame('hello wor…', StringTools::truncate('hello world example', 12));
+        $this->assertSame('hello world …', StringTools::truncate('hello world example', 12));
+
+        if (SymfonyVersion::isSymfony72OrHigher()) {
+            $this->assertSame('hello…', StringTools::truncateBefore('hello world example', 10));
+            $this->assertSame('hello world…', StringTools::truncateAfter('hello world example', 12));
+        } else {
+            $this->assertSame('hello world …', StringTools::truncateBefore('hello world example', 12));
+            $this->assertSame('hello world …', StringTools::truncateAfter('hello world example', 12));
+        }
+
+        $this->assertSame('short', StringTools::truncateBefore('short', 10));
         $this->assertSame('short', StringTools::truncate('short', 10));
+        $this->assertSame('short', StringTools::truncateAfter('short', 10));
     }
 
     public function testText2Boolean(): void

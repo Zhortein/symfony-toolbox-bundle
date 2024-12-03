@@ -130,10 +130,17 @@ var_export($array); // Retourne : [0 => "André", 1 => 123, 2 => "Réussi"]
 ### Tronquer une chaîne
 
 Tronque la chaîne à une longueur spécifiée avec des points de suspension si nécessaire.
+Trois méthodes sont proposées pour les projets >= Symfony 7.2.0. En dessous de cette version, toutes les fonctions 
+effectuent une coupure à la longueur stricte.
+- ```truncate()``` : coupe à la longueur stricte demandée
+- ```truncateBefore()``` : coupe après le mot à la longueur demandée
+- ```truncateAfter()``` : coupe avant le mot à la longueur demandée
 
-#### Méthode
+#### Méthodes
 ```php
 public static function truncate(string $text, int $length = 100): string
+public static function truncateBefore(string $text, int $length = 100): string
+public static function truncateAfter(string $text, int $length = 100): string
 ```
 Retourne la chaîne tronquée.
 
@@ -146,7 +153,11 @@ Retourne la chaîne tronquée.
 ```php
 $text = "This is a long sentence that needs truncation.";
 $truncated = StringTools::truncate($text, 20);
-echo $truncated; // Retourne : "This is a long se..."
+echo $truncated; // Retourne : "This is a long sente..."
+$truncated = StringTools::truncateBefore($text, 20);
+echo $truncated; // Retourne : "This is a long..."
+$truncated = StringTools::truncateAfter($text, 20);
+echo $truncated; // Retourne : "This is a long sentence..."
 ```
 
 ### Convertir un texte en booléen
