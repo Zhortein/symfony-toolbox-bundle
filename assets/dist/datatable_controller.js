@@ -84,19 +84,22 @@ export default class extends Controller {
         if (!column) return;
 
         const field = column;
-        let newOrder = this.state.order === 'asc' ? 'desc' : 'asc';
 
         if (event.shiftKey || event.ctrlKey) {
             // Ajoute ou met à jour cette colonne dans l'ordre des tris
             const existingIndex = this.state.multiSort.findIndex(col => col.field === field);
             if (existingIndex >= 0) {
-                this.state.multiSort[existingIndex].order = newOrder;
+                this.state.multiSort[existingIndex].order = this.state.multiSort[existingIndex].order === 'asc' ? 'desc' : 'asc';
             } else {
-                this.state.multiSort.push({ field, order: newOrder });
+                this.state.multiSort.push({ field, order: 'asc' });
             }
         } else {
             // Mono-colonne
-            this.state.multiSort = [{ field, order: newOrder }];
+            if (this.state.multiSort[0] && this.state.multiSort[0].order && this.state.multiSort[0].field === field) {
+                this.state.multiSort = [{field, order: this.state.multiSort[0].order === 'asc' ? 'desc' : 'asc'}];
+            } else {
+                this.state.multiSort = [{field, order: 'asc'}];
+            }
         }
 
         this.updateTable();
