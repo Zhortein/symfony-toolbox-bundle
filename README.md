@@ -31,7 +31,20 @@ of the Composer documentation.
 
 #### Applications that use Symfony Flex
 
-Open a command console, enter your project directory and execute:
+Just add the following in your composer.json file to have access to automatic Flex recipes:
+```json
+"extra": {
+    "symfony": {
+        "allow-contrib": true,
+        "endpoint": [
+            "https://raw.githubusercontent.com/Zhortein/recipes-zhortein/flex/main/index.json",
+            "flex://defaults"
+        ]
+    }
+}
+```
+
+Then, open a command console, enter your project directory and execute:
 
 ```console
 composer require zhortein/symfony-toolbox-bundle
@@ -39,7 +52,44 @@ composer require zhortein/symfony-toolbox-bundle
 
 #### Applications that don't use Symfony Flex
 
-##### Step 1: Download the Bundle
+##### Step 1: Create needed files
+
+Two files are "needed":
+- ```config/packages/zhortein_symfony_toolbox.yaml```: configuration file for the bundle features
+- ```config/routes/zhortein_symfony_toolbox.yaml```: configuration file for the bundle features using routing (datatables...)
+The bundle, if not detected, will attempt to create the second file automatically.
+
+You can create the following files by yourself:
+
+```yaml
+# config/packages/zhortein_symfony_toolbox.yaml
+zhortein_symfony_toolbox:
+  datatables:
+    css_mode: 'bootstrap'
+    items_per_page: 10
+    paginator: 'custom'
+    ux_icons: true
+    ux_icons_options:
+      icon_first: 'bi:chevron-double-left'
+      icon_previous: 'bi:chevron-left'
+      icon_next: 'bi:chevron-right'
+      icon_last: 'bi:chevron-double-right'
+      icon_search: 'bi:search'
+      icon_true: 'bi:check'
+      icon_false: 'bi:x'
+      icon_sort_neutral: 'mdi:sort'
+      icon_sort_asc: 'bi:sort-alpha-down'
+      icon_sort_desc: 'bi:sort-alpha-up'
+      icon_filter: 'mi:filter'
+```
+
+```yaml
+# config/routes/zhortein_symfony_toolbox.yaml
+zhortein_symfony_toolbox:
+  resource: '@ZhorteinSymfonyToolboxBundle/config/routes.yaml'
+```
+
+##### Step 2: Download the Bundle
 
 Open a command console, enter your project directory and execute the
 following command to download the latest stable version of this bundle:
@@ -48,7 +98,7 @@ following command to download the latest stable version of this bundle:
 composer require zhortein/symfony-toolbox-bundle
 ```
 
-##### Step 2: Enable the Bundle
+##### Step 3: Enable the Bundle
 
 Then, enable the bundle by adding it to the list of registered bundles
 in the `config/bundles.php` file of your project:
@@ -114,7 +164,20 @@ de la documentation de Composer.
 
 #### Applications qui utilisent Symfony Flex
 
-Ouvrez une console de commande, accédez au répertoire de votre projet, et exécutez :
+Ajoutez simplement ce qui suit dans votre fichier ```composer.json``` :
+```json
+"extra": {
+    "symfony": {
+        "allow-contrib": true,
+        "endpoint": [
+            "https://raw.githubusercontent.com/Zhortein/recipes-zhortein/flex/main/index.json",
+            "flex://defaults"
+        ]
+    }
+}
+```
+
+Puis, uuvrez une console de commande, accédez au répertoire de votre projet, et exécutez :
 
 ```console
 composer require zhortein/symfony-toolbox-bundle
@@ -122,7 +185,44 @@ composer require zhortein/symfony-toolbox-bundle
 
 #### Applications qui n'utilisent pas Symfony Flex
 
-##### Etape 1: Téléchargez le bundle
+##### Etape 1: Création des fichiers requis
+
+Deux fichiers sont "requis":
+- ```config/packages/zhortein_symfony_toolbox.yaml```: le fichier de configuration des fonctionnalités du bundle
+- ```config/routes/zhortein_symfony_toolbox.yaml```: le fichier de configuration des routes pour les fonctionnalités du bundle qui utilisent le routage (datatables)
+Si non détecté, le bundle tentera de créer automatiquement le second fichier.
+
+Vous devez donc créer les fichiers suivant par vous-même :
+
+```yaml
+# config/packages/zhortein_symfony_toolbox.yaml
+zhortein_symfony_toolbox:
+  datatables:
+    css_mode: 'bootstrap'
+    items_per_page: 10
+    paginator: 'custom'
+    ux_icons: true
+    ux_icons_options:
+      icon_first: 'bi:chevron-double-left'
+      icon_previous: 'bi:chevron-left'
+      icon_next: 'bi:chevron-right'
+      icon_last: 'bi:chevron-double-right'
+      icon_search: 'bi:search'
+      icon_true: 'bi:check'
+      icon_false: 'bi:x'
+      icon_sort_neutral: 'mdi:sort'
+      icon_sort_asc: 'bi:sort-alpha-down'
+      icon_sort_desc: 'bi:sort-alpha-up'
+      icon_filter: 'mi:filter'
+```
+
+```yaml
+# config/routes/zhortein_symfony_toolbox.yaml
+zhortein_symfony_toolbox:
+  resource: '@ZhorteinSymfonyToolboxBundle/config/routes.yaml'
+```
+
+##### Etape 2: Téléchargez le bundle
 
 Ouvrez une console de commande, accédez au répertoire de votre projet, et exécutez la
 commande suivante pour télécharger la dernière version stable du bundle :
@@ -131,7 +231,7 @@ commande suivante pour télécharger la dernière version stable du bundle :
 composer require zhortein/symfony-toolbox-bundle
 ```
 
-##### Etape 2: Activez le Bundle
+##### Etape 3: Activez le Bundle
 
 Ensuite, activez le bundle en l'ajoutant dans la liste des bundles connus 
 dans le fichier `config/bundles.php` de votre projet :
