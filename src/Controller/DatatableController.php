@@ -35,4 +35,15 @@ class DatatableController extends AbstractController
 
         return $this->datatableService->render($datatable, $request);
     }
+
+    public function exportCsv(string $datatableId, Request $request): Response
+    {
+        $datatable = $this->datatableService->findDatatableById($datatableId);
+
+        if (!$datatable) {
+            throw $this->createNotFoundException(sprintf('Datatable with ID "%s" not found.', $datatableId));
+        }
+
+        return $this->datatableService->exportCsv($datatable, $request, $datatableId);
+    }
 }

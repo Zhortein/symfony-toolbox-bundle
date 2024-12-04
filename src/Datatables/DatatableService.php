@@ -2,8 +2,10 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
+use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -187,25 +189,7 @@ class DatatableService
     private function processRequest(AbstractDatatable $datatable, Request $request): array
     {
         $params = $this->extractParameters($request, $datatable);
-        $queryBuilder = $datatable->getQueryBuilder();
-
-        if ($params['search'] && $datatable->isSearchable()) {
-            $datatable->applySearch($queryBuilder, $params['search']);
-        }
-        $datatable->applyStaticFilters($queryBuilder);
-
-        if ($datatable->isSortable() && count($params['multiSort']) > 0) {
-            foreach ($params['multiSort'] as $sort) {
-                if ($sort['field'] && !$this->validateSortField($sort['field'], $datatable->getColumns())) {
-                    throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $sort['field']));
-                }
-
-                $queryBuilder->addOrderBy(
-                    $datatable->getFullyQualifiedColumnFromNameAs($sort['field']),
-                    $sort['order']
-                );
-            }
-        }
+        $queryBuilder = $this->handleRequest($request, $datatable);
 
         $paginatorMode = $datatable->getOptions()['paginator'] ?? $this->datatableManager->getGlobalOption('paginator', Configuration::DEFAULT_DATATABLE_PAGINATOR);
         $this->paginator = is_string($paginatorMode) ? $this->paginatorFactory->createPaginator($paginatorMode) : $this->getPaginator();
@@ -287,5 +271,80 @@ class DatatableService
         }
 
         return false;
+    }
+
+    public function exportCsv(AbstractDatatable $datatable, Request $request, string $datatableName): Response
+    {
+        $queryBuilder = $this->handleRequest($request, $datatable);
+
+        $filename = sprintf('%s_export_%s.csv', $datatableName, date('Y-m-d_H-i-s'));
+
+        $response = new StreamedResponse(function () use ($datatable, $queryBuilder) {
+            $handle = fopen('php://output', 'wb');
+            if (false === $handle) {
+                throw new \RuntimeException('Could not open output stream.');
+            }
+            $columns = array_column($datatable->getColumns(), 'label');
+            fputcsv($handle, $columns);
+
+            $results = $queryBuilder->getQuery()->getResult();
+            if (is_array($results)) {
+                /** @var array<int|string, bool|float|int|string|null> $row */
+                foreach ($results as $row) {
+                    if (!is_array($row)) {
+                        continue;
+                    }
+                    fputcsv($handle, $this->extractRowData($row, $datatable));
+                }
+            }
+
+            fclose($handle);
+        });
+
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+
+        return $response;
+    }
+
+    /**
+     * @param array<int|string, bool|float|int|string|null> $row
+     *
+     * @return array<int|string, bool|float|int|string|null>
+     */
+    private function extractRowData(array $row, AbstractDatatable $datatable): array
+    {
+        $data = [];
+        foreach ($datatable->getColumns() as $column) {
+            $data[] = $row[$column['nameAs'] ?? $column['name']] ?? '';
+        }
+
+        return $data;
+    }
+
+    private function handleRequest(Request $request, AbstractDatatable $datatable): QueryBuilder
+    {
+        $params = $this->extractParameters($request, $datatable);
+        $queryBuilder = $datatable->getQueryBuilder();
+
+        if ($params['search'] && $datatable->isSearchable()) {
+            $datatable->applySearch($queryBuilder, $params['search']);
+        }
+        $datatable->applyStaticFilters($queryBuilder);
+
+        if ($datatable->isSortable() && count($params['multiSort']) > 0) {
+            foreach ($params['multiSort'] as $sort) {
+                if ($sort['field'] && !$this->validateSortField($sort['field'], $datatable->getColumns())) {
+                    throw new \InvalidArgumentException(sprintf('Invalid sort field "%s".', $sort['field']));
+                }
+
+                $queryBuilder->addOrderBy(
+                    $datatable->getFullyQualifiedColumnFromNameAs($sort['field']),
+                    $sort['order']
+                );
+            }
+        }
+
+        return $queryBuilder;
     }
 }
