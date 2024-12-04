@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Filesystem\Filesystem;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 
 class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtensionInterface
@@ -42,7 +43,7 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
          *           icon_sort_desc: string,
          *           icon_filter: string,
          *      }
-         *  }
+         *  } $config
          */
         $datatableConfig = $config['datatables'] ?? [];
         $container->setParameter('zhortein_symfony_toolbox.datatables', $datatableConfig);
@@ -51,6 +52,21 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
             $container->getDefinition(DatatableManager::class)
                 ->setArgument(2, $config['datatables'])
             ;
+        }
+
+        $this->handleBundleRoutes($container);
+    }
+
+    protected function handleBundleRoutes(ContainerBuilder $container): void
+    {
+        $filesystem = new Filesystem();
+        $filePath = $container->getParameter('kernel.project_dir') . '/config/routes/zhortein_symfony_toolbox.yaml';
+
+        if (!$filesystem->exists($filePath)) {
+            $filesystem->dumpFile($filePath, <<<YAML
+zhortein_symfony_toolbox:
+    resource: '@ZhorteinSymfonyToolboxBundle/config/routes.yaml'
+YAML);
         }
     }
 
