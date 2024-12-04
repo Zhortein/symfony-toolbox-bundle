@@ -26,24 +26,26 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
 
         /**
          * @var array{
-         *      css_mode: string,
-         *      items_per_page: int,
-         *      paginator: string,
-         *      ux_icons: bool,
-         *      ux_icons_options: array{
-         *           icon_first: string,
-         *           icon_previous: string,
-         *           icon_next: string,
-         *           icon_last: string,
-         *           icon_search: string,
-         *           icon_true: string,
-         *           icon_false: string,
-         *           icon_sort_neutral: string,
-         *           icon_sort_asc: string,
-         *           icon_sort_desc: string,
-         *           icon_filter: string,
-         *      }
-         *  } $config
+         *     datatables: array{
+         *             css_mode: string,
+         *             items_per_page: int,
+         *             paginator: string,
+         *             ux_icons: bool,
+         *             ux_icons_options: array{
+         *             icon_first: string,
+         *             icon_previous: string,
+         *             icon_next: string,
+         *             icon_last: string,
+         *             icon_search: string,
+         *             icon_true: string,
+         *             icon_false: string,
+         *             icon_sort_neutral: string,
+         *             icon_sort_asc: string,
+         *             icon_sort_desc: string,
+         *             icon_filter: string,
+         *       }
+         *  }
+         * } $config
          */
         $datatableConfig = $config['datatables'] ?? [];
         $container->setParameter('zhortein_symfony_toolbox.datatables', $datatableConfig);
@@ -60,7 +62,9 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
     protected function handleBundleRoutes(ContainerBuilder $container): void
     {
         $filesystem = new Filesystem();
-        $filePath = $container->getParameter('kernel.project_dir') . '/config/routes/zhortein_symfony_toolbox.yaml';
+        /** @var string|null $projectPath */
+        $projectPath = $container->getParameter('kernel.project_dir');
+        $filePath = $projectPath.'/config/routes/zhortein_symfony_toolbox.yaml';
 
         if (!$filesystem->exists($filePath)) {
             $filesystem->dumpFile($filePath, <<<YAML
