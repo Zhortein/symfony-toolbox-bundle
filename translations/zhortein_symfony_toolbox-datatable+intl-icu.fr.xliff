@@ -30,6 +30,22 @@
                 <source>Search</source>
                 <target>Rechercher</target>
             </trans-unit>
+            <trans-unit id="7" resname="datatable.export">
+                <source>Export</source>
+                <target>Export</target>
+            </trans-unit>
+            <trans-unit id="8" resname="datatable.export.csv">
+                <source>CSV</source>
+                <target>CSV</target>
+            </trans-unit>
+            <trans-unit id="9" resname="datatable.export.excel">
+                <source>Excel</source>
+                <target>Excel</target>
+            </trans-unit>
+            <trans-unit id="10" resname="datatable.export.pdf">
+                <source>PDF</source>
+                <target>PDF</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

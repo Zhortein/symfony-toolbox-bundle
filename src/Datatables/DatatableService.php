@@ -5,13 +5,15 @@ namespace Zhortein\SymfonyToolboxBundle\Datatables;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\ExportCsvService;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\ExportExcelService;
+use Zhortein\SymfonyToolboxBundle\Service\Datatables\ExportPdfService;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorInterface;
 
@@ -275,72 +277,15 @@ class DatatableService
 
     public function export(AbstractDatatable $datatable, Request $request, string $datatableName, string $type): Response
     {
-        return match ($type) {
-            'csv' => $this->exportCsv($datatable, $request, $datatableName),
-            'excel' => $this->exportExcel($datatable, $request, $datatableName),
-            'pdf' => $this->exportPdf($datatable, $request, $datatableName),
+        $queryBuilder = $this->handleRequest($request, $datatable);
+        $exportService = match ($type) {
+            'csv' => new ExportCsvService($queryBuilder),
+            'excel' => new ExportExcelService($queryBuilder),
+            'pdf' => new ExportPdfService($queryBuilder),
             default => throw new \InvalidArgumentException(sprintf('Invalid export type "%s".', $type)),
         };
-    }
 
-    public function exportExcel(AbstractDatatable $datatable, Request $request, string $datatableName): Response
-    {
-        throw new \RuntimeException('Not implemented yet.');
-    }
-
-    public function exportPdf(AbstractDatatable $datatable, Request $request, string $datatableName): Response
-    {
-        throw new \RuntimeException('Not implemented yet.');
-    }
-
-    public function exportCsv(AbstractDatatable $datatable, Request $request, string $datatableName): Response
-    {
-        $queryBuilder = $this->handleRequest($request, $datatable);
-        $separator = ';';
-
-        $filename = sprintf('%s_export_%s.csv', $datatableName, date('Y-m-d_H-i-s'));
-
-        $response = new StreamedResponse(function () use ($datatable, $queryBuilder, $separator) {
-            $handle = fopen('php://output', 'wb');
-            if (false === $handle) {
-                throw new \RuntimeException('Could not open output stream.');
-            }
-            $columns = array_column($datatable->getColumns(), 'label');
-            fputcsv($handle, $columns, $separator);
-
-            $results = $queryBuilder->getQuery()->getResult();
-            if (is_array($results)) {
-                /** @var array<int|string, bool|float|int|string|null> $row */
-                foreach ($results as $row) {
-                    if (!is_array($row)) {
-                        continue;
-                    }
-                    fputcsv($handle, $this->extractRowData($row, $datatable));
-                }
-            }
-
-            fclose($handle);
-        });
-
-        $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
-
-        return $response;
-    }
-
-    /**
-     * @param array<int|string, bool|float|int|string|null> $row
-     *
-     * @return array<int|string, bool|float|int|string|null>
-     */
-    private function extractRowData(array $row, AbstractDatatable $datatable): array
-    {
-        $data = [];
-        foreach ($datatable->getColumns() as $column) {
-            $data[] = $row[$column['nameAs'] ?? $column['name']] ?? '';
-        }
-
-        return $data;
+        return $exportService->export($datatable, $request, $datatableName);
     }
 
     private function handleRequest(Request $request, AbstractDatatable $datatable): QueryBuilder
