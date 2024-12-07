@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 use Sensiolabs\GotenbergBundle\GotenbergPdfInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -27,12 +28,18 @@ class DatatableService
         private readonly Environment $twig,
         private readonly PaginatorFactory $paginatorFactory,
         private readonly GotenbergPdfInterface $gotenbergPdf,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
     public function getGotenbergPdf(): GotenbergPdfInterface
     {
         return $this->gotenbergPdf;
+    }
+
+    public function getTranslator(): TranslatorInterface
+    {
+        return $this->translator;
     }
 
     public function findDatatableById(string $id): ?AbstractDatatable
@@ -286,9 +293,9 @@ class DatatableService
     {
         $queryBuilder = $this->handleRequest($request, $datatable);
         $exportService = match ($type) {
-            'csv' => new ExportCsvService($queryBuilder),
-            'excel' => new ExportExcelService($queryBuilder),
-            'pdf' => (new ExportPdfService($queryBuilder))->setGotenbergClient($this->gotenbergPdf),
+            'csv' => new ExportCsvService($queryBuilder, $this->translator),
+            'excel' => new ExportExcelService($queryBuilder, $this->translator),
+            'pdf' => (new ExportPdfService($queryBuilder, $this->translator))->setGotenbergClient($this->gotenbergPdf),
             default => throw new \InvalidArgumentException(sprintf('Unsupported export type "%s".', $type)),
         };
 

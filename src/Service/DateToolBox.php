@@ -80,11 +80,11 @@ class DateToolBox
             if (!empty($excelDate)) {
                 try {
                     $date = Date::excelToDateTimeObject($excelDate, self::getTimeZone());
-                } catch (\Exception $e) {
+                } catch (\Exception) {
                     try {
                         $formattedDate = str_replace('/', '-', (string) $excelDate);
                         $date = new \DateTime($formattedDate, self::getTimeZone());
-                    } catch (\Exception $e) {
+                    } catch (\Exception) {
                         $date = null;
                     }
                 }

@@ -5,12 +5,15 @@ namespace Zhortein\SymfonyToolboxBundle\Service\Datatables;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 
 abstract class ExportService
 {
-    public function __construct(protected QueryBuilder $queryBuilder)
-    {
+    public function __construct(
+        protected QueryBuilder $queryBuilder,
+        protected TranslatorInterface $translator,
+    ) {
     }
 
     abstract public function export(AbstractDatatable $datatable, Request $request, string $datatableName): Response;
@@ -25,6 +28,15 @@ abstract class ExportService
      */
     protected function getHeaders(AbstractDatatable $datatable): array
     {
+        if (!empty($datatable->getTranslationDomain())) {
+            $headers = [];
+            foreach ($datatable->getColumns() as $column) {
+                $headers[] = $this->translator->trans($column['label'], [], $datatable->getTranslationDomain());
+            }
+
+            return $headers;
+        }
+
         return array_column($datatable->getColumns(), 'label');
     }
 

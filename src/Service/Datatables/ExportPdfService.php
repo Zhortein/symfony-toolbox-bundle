@@ -27,15 +27,10 @@ class ExportPdfService extends ExportService
             ->html()
             ->content('@ZhorteinSymfonyToolbox/datatables/export-pdf.html.twig', [
                 'headers' => $this->getHeaders($datatable),
-                'data' => function () use ($datatable, $results) {
-                    if (is_array($results)) {
-                        return array_map(function ($result) use ($datatable) {
-                            /* @phpstan-ignore-next-line */
-                            return $this->extractRowData($result, $datatable);
-                        }, $results);
-                    }
-                    return [];
-                },
+                'data' => is_array($results) ? array_map(function ($result) use ($datatable) {
+                    /* @phpstan-ignore-next-line */
+                    return $this->extractRowData($result, $datatable);
+                }, $results) : [],
             ])
             ->landscape()
             ->paperStandardSize(PaperSize::A4) // This is an enum listing the most commonly known formats.

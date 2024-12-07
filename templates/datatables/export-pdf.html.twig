@@ -32,8 +32,8 @@
     <tbody>
     {% for row in data %}
         <tr>
-            {% for column in columns %}
-                <td>{{ row[column.nameAs] }}</td>
+            {% for value in row %}
+                <td>{{ value }}</td>
             {% endfor %}
         </tr>
     {% endfor %}
