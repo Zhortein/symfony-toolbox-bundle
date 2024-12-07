@@ -13,7 +13,21 @@
                 data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportCsv"
                 data-zhortein--symfony-toolbox-bundle--datatable-target="export"
         >
-            {{ 'CSV'|trans({}, transDomain) }}
+            {{ 'datatable.export.csv'|trans({}, transDomain) }}
+        </button>
+        <button
+                class="button-action button-action-export"
+                data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportExcel"
+                data-zhortein--symfony-toolbox-bundle--datatable-target="export"
+        >
+            {{ 'datatable.export.excel'|trans({}, transDomain) }}
+        </button>
+        <button
+                class="button-action button-action-export"
+                data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportPdf"
+                data-zhortein--symfony-toolbox-bundle--datatable-target="export"
+        >
+            {{ 'datatable.export.pdf'|trans({}, transDomain) }}
         </button>
     </div>
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.options.searchable %} hidden{% endif %}">
