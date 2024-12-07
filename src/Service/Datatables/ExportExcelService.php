@@ -12,7 +12,7 @@ class ExportExcelService extends ExportService
 {
     public function export(AbstractDatatable $datatable, Request $request, string $datatableName): Response
     {
-        $filename = sprintf('%s_export_%s.csv', $datatableName, date('Y-m-d_H-i-s'));
+        $filename = sprintf('%s_export_%s.xlsx', $datatableName, date('Y-m-d_H-i-s'));
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 

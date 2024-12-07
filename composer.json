@@ -20,6 +20,7 @@
     "doctrine/orm": "^3.3",
     "knplabs/knp-paginator-bundle": "^6.6",
     "phpoffice/phpspreadsheet": "^3.5",
+    "sensiolabs/gotenberg-bundle": "^0.2.0",
     "symfony/asset-mapper": "^7.1",
     "symfony/framework-bundle": "^7.1",
     "symfony/http-client": "^7.1",
