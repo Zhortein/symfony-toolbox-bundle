@@ -6,7 +6,7 @@ zhortein_datatable_fetch_data:
   options:
     expose: true
 zhortein_datatable_export_csv:
-  path: /datatable/{datatableId}/export/csv
+  path: /zhortein/symfony-toolbox/datatable/{datatableId}/export/csv
   controller: Zhortein\SymfonyToolboxBundle\Controller\DatatableController::exportCsv
   requirements:
     datatableId: .+

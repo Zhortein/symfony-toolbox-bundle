@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    static targets = ['table', 'pagination', 'spinner', 'search', 'error', 'footer', 'header'];
+    static targets = ['table', 'pagination', 'spinner', 'search', 'error', 'footer', 'header', 'actions'];
 
     static values = {
         id: String,
@@ -144,4 +144,20 @@ export default class extends Controller {
 
         return 'hidden';
     }
+
+    exportCsv() {
+        const url = new URL(this.urlValue.replace('fetch_data', 'export_csv'), window.location.origin);
+
+        // Ajouter les paramètres de tri, de recherche et de page
+        url.searchParams.set('page', this.state.page);
+        url.searchParams.set('search', this.state.search);
+        this.state.multiSort.forEach((sort, index) => {
+            url.searchParams.set(`multiSort[${index}][field]`, sort.field);
+            url.searchParams.set(`multiSort[${index}][order]`, sort.order);
+        });
+
+        // Rediriger l'utilisateur vers la route d'export CSV
+        window.location.href = url.toString();
+    }
+
 }

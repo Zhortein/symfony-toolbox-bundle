@@ -18,6 +18,7 @@ readonly class DatatableManager
      *      }>,
      *      searchable?: bool,
      *      sortable?: bool,
+     *      exportable?: bool,
      *      autoColumns?: bool,
      *      options?: array{
      *          thead?: array{
@@ -180,7 +181,7 @@ readonly class DatatableManager
                         }
                     }
 
-                    if (in_array($key, ['actionColumn', 'selectorColumn', 'defaultPageSize', 'defaultSort', 'searchable', 'sortable', 'options', 'autoColumns', 'translationDomain'])) {
+                    if (in_array($key, ['actionColumn', 'selectorColumn', 'defaultPageSize', 'defaultSort', 'searchable', 'sortable', 'exportable', 'options', 'autoColumns', 'translationDomain'])) {
                         $datatable->addOption($key, $value);
                     }
                 }

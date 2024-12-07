@@ -7,6 +7,15 @@
         {{ attributes }}
         class="table-responsive">
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error d-none"></div>
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="actions" class="datatable-actions{% if not datatable.options.exportable %} d-none{% endif %}">
+        <button
+                class="btn btn-primary btn-sm"
+                data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportCsv"
+                data-zhortein--symfony-toolbox-bundle--datatable-target="export"
+        >
+            {{ 'CSV'|trans({}, transDomain) }}
+        </button>
+    </div>
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.options.searchable %} d-none{% endif %}">
         <div class="input-group mb-3">
             <span class="input-group-text" id="search-button">{{ ux_icon(datatable.getIcon('icon_search'), {height: '16px', width: '16px', class: 'w-16 h-16', viewbox: '0 0 16 16', 'aria-hidden': true}) }}</span>

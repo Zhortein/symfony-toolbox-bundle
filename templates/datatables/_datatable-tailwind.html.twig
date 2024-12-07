@@ -7,6 +7,14 @@
         {{ attributes }}
         class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error hidden"></div>
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="actions" class="datatable-actions{% if not datatable.options.exportable %} hidden{% endif %}">
+        <button
+                class="rounded bg-white px-2 py-1 text-xs font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+                data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportCsv"
+                data-zhortein--symfony-toolbox-bundle--datatable-target="export"
+        >
+            {{ 'CSV'|trans({}, transDomain) }}
+        </button></div>
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.options.searchable %} hidden{% endif %}">
         <div>
             <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>

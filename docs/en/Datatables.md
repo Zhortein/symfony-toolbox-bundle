@@ -139,6 +139,7 @@ use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
     defaultSort: [['field' => 'id', 'order' => 'asc']],
     searchable: true,
     sortable: true,
+    exportable: true,
     actionColumn: ['label' => 'Actions', 'template' => 'thing/datatable/actions.html.twig'],
     selectorColumn: ['label' => '#'],
     translationDomain: 'messages',
@@ -211,6 +212,7 @@ The options offered directly in the PHP attribute are:
         * ```order```: “asc” for ascending, “desc” for descending
     * ```searchable```: true if the table allows searches, false otherwise
     * ```sortable```: true if the table offers sorting, false otherwise
+    * ```exportable```: true if the table offers exports, false otherwise
     * ```actionColumn```: allows you to add a column of actions by specifying the keys in a table:
         * ```label```: the label of the actions column, which will be translated if translationDomain is defined
         * ```template```: the Twig template allowing the rendering of the column content. In this template the variables are available:

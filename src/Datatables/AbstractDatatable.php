@@ -62,6 +62,7 @@ abstract class AbstractDatatable
      *     }>,
      *     searchable?: bool,
      *     sortable?: bool,
+     *     exportable?: bool,
      *     autoColumns?: bool,
      *     options?: array{
      *         thead?: array{
@@ -539,6 +540,7 @@ abstract class AbstractDatatable
      *      }>,
      *      searchable?: bool,
      *      sortable?: bool,
+     *      exportable?: bool,
      *      autoColumns?: bool,
      *      options?: array{
      *          thead?: array{
@@ -580,6 +582,7 @@ abstract class AbstractDatatable
      *      }>,
      *      searchable?: bool,
      *      sortable?: bool,
+     *      exportable?: bool,
      *      autoColumns?: bool,
      *      options?: array{
      *          thead?: array{
@@ -615,6 +618,9 @@ abstract class AbstractDatatable
         if (!array_key_exists('searchable', $this->options)) {
             $this->options['searchable'] = true;
         }
+        if (!array_key_exists('exportable', $this->options)) {
+            $this->options['exportable'] = true;
+        }
         if (!array_key_exists('sortable', $this->options)) {
             $this->options['sortable'] = true;
         }
@@ -626,7 +632,7 @@ abstract class AbstractDatatable
      * Adds an option to the current configuration.
      *
      * @param string $name  The name of the option to add.
-     *                      Possible values are 'defaultPageSize', 'defaultSort', 'translationDomain', 'searchable', 'sortable', or 'autoColumns'.
+     *                      Possible values are 'defaultPageSize', 'defaultSort', 'translationDomain', 'searchable', 'sortable', 'exportable', or 'autoColumns'.
      * @param mixed  $value The value of the option. The expected type varies based on the option name:
      *                      - 'defaultPageSize': int
      *                      - 'defaultSort': array<int, array{
@@ -634,7 +640,7 @@ abstract class AbstractDatatable
      *                      order: 'asc'|'desc'
      *                      }>
      *                      - 'translationDomain': string
-     *                      - 'searchable', 'sortable', 'autoColumns': bool
+     *                      - 'searchable', 'sortable', 'exportable', 'autoColumns': bool
      *
      * @return self returns the current instance for method chaining
      *
@@ -703,6 +709,7 @@ abstract class AbstractDatatable
                 break;
             case 'searchable':
             case 'sortable':
+            case 'exportable':
             case 'autoColumns':
                 $value = (bool) $value;
                 break;
@@ -732,6 +739,11 @@ abstract class AbstractDatatable
     public function getDefaultPageSize(): int
     {
         return (int) ($this->getOptions()['defaultPageSize'] ?? Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE);
+    }
+
+    public function isExportable(): bool
+    {
+        return (bool) ($this->getOptions()['exportable'] ?? true);
     }
 
     public function isSortable(): bool

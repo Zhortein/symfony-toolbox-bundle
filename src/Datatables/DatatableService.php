@@ -273,19 +273,19 @@ class DatatableService
         return false;
     }
 
-    public function exportCsv(AbstractDatatable $datatable, Request $request, string $datatableName): Response
+    public function exportCsv(AbstractDatatable $datatable, Request $request, string $datatableName, string $separator = ';'): Response
     {
         $queryBuilder = $this->handleRequest($request, $datatable);
 
         $filename = sprintf('%s_export_%s.csv', $datatableName, date('Y-m-d_H-i-s'));
 
-        $response = new StreamedResponse(function () use ($datatable, $queryBuilder) {
+        $response = new StreamedResponse(function () use ($datatable, $queryBuilder, $separator) {
             $handle = fopen('php://output', 'wb');
             if (false === $handle) {
                 throw new \RuntimeException('Could not open output stream.');
             }
             $columns = array_column($datatable->getColumns(), 'label');
-            fputcsv($handle, $columns);
+            fputcsv($handle, $columns, $separator);
 
             $results = $queryBuilder->getQuery()->getResult();
             if (is_array($results)) {

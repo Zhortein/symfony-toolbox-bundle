@@ -6,6 +6,15 @@
         data-zhortein--symfony-toolbox-bundle--datatable-url-value="{{ path('zhortein_datatable_fetch_data', {'datatableId': datatableId}) }}"
         {{ attributes }} class="">
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error hidden"></div>
+    <div data-zhortein--symfony-toolbox-bundle--datatable-target="actions" class="datatable-actions{% if not datatable.options.exportable %} hidden{% endif %}">
+        <button
+                class="button-action button-action-export"
+                data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportCsv"
+                data-zhortein--symfony-toolbox-bundle--datatable-target="export"
+        >
+            {{ 'CSV'|trans({}, transDomain) }}
+        </button>
+    </div>
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.options.searchable %} hidden{% endif %}">
         <label id="search-button" class="sr-only">{{ 'datatable.search'|trans({}, transDomain) }}</label>
         <input data-action="input->zhortein--symfony-toolbox-bundle--datatable#search" type="text" class="" placeholder="{{ 'datatable.search'|trans({}, transDomain) }}" aria-describedby="search-button">
