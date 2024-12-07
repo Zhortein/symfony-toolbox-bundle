@@ -10,6 +10,7 @@ export default class extends Controller {
         mode: String,
         pagesize: Number,
         url: String,
+        download: String,
     };
 
     connect() {
@@ -146,10 +147,40 @@ export default class extends Controller {
     }
 
     exportCsv() {
-        const url = new URL(this.urlValue.replace('fetch_data', 'export_csv'), window.location.origin);
+        const url = new URL(this.downloadValue, window.location.origin);
 
         // Ajouter les paramètres de tri, de recherche et de page
-        url.searchParams.set('page', this.state.page);
+        url.searchParams.set('type', 'csv');
+        url.searchParams.set('search', this.state.search);
+        this.state.multiSort.forEach((sort, index) => {
+            url.searchParams.set(`multiSort[${index}][field]`, sort.field);
+            url.searchParams.set(`multiSort[${index}][order]`, sort.order);
+        });
+
+        // Rediriger l'utilisateur vers la route d'export CSV
+        window.location.href = url.toString();
+    }
+
+    exportExcel() {
+        const url = new URL(this.downloadValue, window.location.origin);
+
+        // Ajouter les paramètres de tri, de recherche et de page
+        url.searchParams.set('type', 'excel');
+        url.searchParams.set('search', this.state.search);
+        this.state.multiSort.forEach((sort, index) => {
+            url.searchParams.set(`multiSort[${index}][field]`, sort.field);
+            url.searchParams.set(`multiSort[${index}][order]`, sort.order);
+        });
+
+        // Rediriger l'utilisateur vers la route d'export CSV
+        window.location.href = url.toString();
+    }
+
+    exportPdf() {
+        const url = new URL(this.downloadValue, window.location.origin);
+
+        // Ajouter les paramètres de tri, de recherche et de page
+        url.searchParams.set('type', 'pdf');
         url.searchParams.set('search', this.state.search);
         this.state.multiSort.forEach((sort, index) => {
             url.searchParams.set(`multiSort[${index}][field]`, sort.field);

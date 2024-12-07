@@ -273,9 +273,30 @@ class DatatableService
         return false;
     }
 
-    public function exportCsv(AbstractDatatable $datatable, Request $request, string $datatableName, string $separator = ';'): Response
+    public function export(AbstractDatatable $datatable, Request $request, string $datatableName, string $type): Response
+    {
+        return match ($type) {
+            'csv' => $this->exportCsv($datatable, $request, $datatableName),
+            'excel' => $this->exportExcel($datatable, $request, $datatableName),
+            'pdf' => $this->exportPdf($datatable, $request, $datatableName),
+            default => throw new \InvalidArgumentException(sprintf('Invalid export type "%s".', $type)),
+        };
+    }
+
+    public function exportExcel(AbstractDatatable $datatable, Request $request, string $datatableName): Response
+    {
+        throw new \RuntimeException('Not implemented yet.');
+    }
+
+    public function exportPdf(AbstractDatatable $datatable, Request $request, string $datatableName): Response
+    {
+        throw new \RuntimeException('Not implemented yet.');
+    }
+
+    public function exportCsv(AbstractDatatable $datatable, Request $request, string $datatableName): Response
     {
         $queryBuilder = $this->handleRequest($request, $datatable);
+        $separator = ';';
 
         $filename = sprintf('%s_export_%s.csv', $datatableName, date('Y-m-d_H-i-s'));
 

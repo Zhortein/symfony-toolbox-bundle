@@ -36,7 +36,7 @@ class DatatableController extends AbstractController
         return $this->datatableService->render($datatable, $request);
     }
 
-    public function exportCsv(string $datatableId, Request $request): Response
+    public function export(string $datatableId, Request $request): Response
     {
         $datatable = $this->datatableService->findDatatableById($datatableId);
 
@@ -44,6 +44,9 @@ class DatatableController extends AbstractController
             throw $this->createNotFoundException(sprintf('Datatable with ID "%s" not found.', $datatableId));
         }
 
-        return $this->datatableService->exportCsv($datatable, $request, $datatableId);
+        // Get the export type from the Request
+        $exportType = $request->query->getString('type', 'csv');
+
+        return $this->datatableService->export($datatable, $request, $datatableId, $exportType);
     }
 }

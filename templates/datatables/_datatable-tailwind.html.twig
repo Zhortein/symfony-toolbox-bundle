@@ -4,6 +4,7 @@
         data-zhortein--symfony-toolbox-bundle--datatable-mode-value="{{ datatable.cssMode }}"
         data-zhortein--symfony-toolbox-bundle--datatable-pagesize-value="{{ datatable.defaultPageSize }}"
         data-zhortein--symfony-toolbox-bundle--datatable-url-value="{{ path('zhortein_datatable_fetch_data', {'datatableId': datatableId}) }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-download-value="{{ path('zhortein_datatable_export', {'datatableId': datatableId}) }}"
         {{ attributes }}
         class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
     <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error hidden"></div>
