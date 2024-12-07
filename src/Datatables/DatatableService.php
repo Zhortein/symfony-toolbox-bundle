@@ -282,7 +282,7 @@ class DatatableService
             'csv' => new ExportCsvService($queryBuilder),
             'excel' => new ExportExcelService($queryBuilder),
             'pdf' => new ExportPdfService($queryBuilder),
-            default => throw new \InvalidArgumentException(sprintf('Invalid export type "%s".', $type)),
+            default => throw new \InvalidArgumentException(sprintf('Unsupported export type "%s".', $type)),
         };
 
         return $exportService->export($datatable, $request, $datatableName);
