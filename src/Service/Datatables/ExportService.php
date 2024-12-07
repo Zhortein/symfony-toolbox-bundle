@@ -15,6 +15,19 @@ abstract class ExportService
 
     abstract public function export(AbstractDatatable $datatable, Request $request, string $datatableName): Response;
 
+    protected function getFilename(string $datatableName, string $extension): string
+    {
+        return sprintf('%s_export_%s.%s', $datatableName, date('Y-m-d_H-i-s'), $extension);
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getHeaders(AbstractDatatable $datatable): array
+    {
+        return array_column($datatable->getColumns(), 'label');
+    }
+
     /**
      * @param array<int|string, bool|float|int|string|null> $row
      *

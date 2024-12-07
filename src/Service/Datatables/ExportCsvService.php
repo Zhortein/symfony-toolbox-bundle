@@ -14,14 +14,12 @@ class ExportCsvService extends ExportService
         $queryBuilder = $this->queryBuilder;
         $separator = ';' === $request->query->get('separator', ';') ? ';' : ',';
 
-        $filename = sprintf('%s_export_%s.csv', $datatableName, date('Y-m-d_H-i-s'));
-
         $response = new StreamedResponse(function () use ($datatable, $queryBuilder, $separator) {
             $handle = fopen('php://output', 'wb');
             if (false === $handle) {
                 throw new \RuntimeException('Could not open output stream.');
             }
-            $columns = array_column($datatable->getColumns(), 'label');
+            $columns = $this->getHeaders($datatable);
             fputcsv($handle, $columns, $separator);
 
             $results = $queryBuilder->getQuery()->getResult();
@@ -39,7 +37,7 @@ class ExportCsvService extends ExportService
         });
 
         $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="'.$filename.'"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$this->getFilename($datatableName, 'csv').'"');
 
         return $response;
     }

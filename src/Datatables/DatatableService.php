@@ -3,6 +3,7 @@
 namespace Zhortein\SymfonyToolboxBundle\Datatables;
 
 use Doctrine\ORM\QueryBuilder;
+use Sensiolabs\GotenbergBundle\GotenbergPdfInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Twig\Environment;
@@ -25,7 +26,13 @@ class DatatableService
         private readonly DatatableManager $datatableManager,
         private readonly Environment $twig,
         private readonly PaginatorFactory $paginatorFactory,
+        private readonly GotenbergPdfInterface $gotenbergPdf,
     ) {
+    }
+
+    public function getGotenbergPdf(): GotenbergPdfInterface
+    {
+        return $this->gotenbergPdf;
     }
 
     public function findDatatableById(string $id): ?AbstractDatatable
@@ -281,7 +288,7 @@ class DatatableService
         $exportService = match ($type) {
             'csv' => new ExportCsvService($queryBuilder),
             'excel' => new ExportExcelService($queryBuilder),
-            'pdf' => new ExportPdfService($queryBuilder),
+            'pdf' => (new ExportPdfService($queryBuilder))->setGotenbergClient($this->gotenbergPdf),
             default => throw new \InvalidArgumentException(sprintf('Unsupported export type "%s".', $type)),
         };
 

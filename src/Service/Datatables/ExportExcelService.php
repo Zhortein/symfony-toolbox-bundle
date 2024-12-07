@@ -12,12 +12,11 @@ class ExportExcelService extends ExportService
 {
     public function export(AbstractDatatable $datatable, Request $request, string $datatableName): Response
     {
-        $filename = sprintf('%s_export_%s.xlsx', $datatableName, date('Y-m-d_H-i-s'));
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
         // Write header row
-        $columns = array_column($datatable->getColumns(), 'label');
+        $columns = $this->getHeaders($datatable);
         $sheet->fromArray($columns, null, 'A1');
 
         // Write data rows
@@ -46,7 +45,7 @@ class ExportExcelService extends ExportService
             200,
             [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+                'Content-Disposition' => 'attachment; filename="'.$this->getFilename($datatableName, 'xlsx').'"',
             ]
         );
     }
