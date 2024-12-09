@@ -13,7 +13,12 @@ final class ExportOptionsDTO
     }
 
     /**
-     * @param array<string, bool> $data
+     * @param array{
+     *      enabled_by_default?: bool,
+     *      export_csv?: bool,
+     *      export_pdf?: bool,
+     *      export_excel?: bool,
+     *  } $data
      */
     public static function fromArray(array $data): self
     {
@@ -23,5 +28,23 @@ final class ExportOptionsDTO
             exportPdf: $data['export_pdf'] ?? false,
             exportExcel: $data['export_excel'] ?? true,
         );
+    }
+
+    /**
+     * @return array{
+     *     enabled_by_default: bool,
+     *     export_csv: bool,
+     *     export_pdf: bool,
+     *     export_excel: bool,
+     * }
+     */
+    public function toArray(): array
+    {
+        return [
+            'enabled_by_default' => $this->enabledByDefault,
+            'export_csv' => $this->exportCsv,
+            'export_pdf' => $this->exportPdf,
+            'export_excel' => $this->exportExcel,
+        ];
     }
 }

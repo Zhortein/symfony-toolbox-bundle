@@ -57,4 +57,46 @@ final class GlobalOptionsDTO
             uxIconsOptions: IconsOptionsDTO::fromArray($data['ux_icons_options'] ?? [])
         );
     }
+
+    /**
+     * @return array{
+     *        css_mode: string,
+     *        items_per_page: int,
+     *        paginator: string,
+     *        export: array{
+     *             enabled_by_default: bool,
+     *             export_csv: bool,
+     *             export_pdf: bool,
+     *             export_excel: bool,
+     *        },
+     *        ux_icons: bool,
+     *        ux_icons_options: array{
+     *             icon_first: string,
+     *             icon_previous: string,
+     *             icon_next: string,
+     *             icon_last: string,
+     *             icon_search: string,
+     *             icon_true: string,
+     *             icon_false: string,
+     *             icon_sort_neutral: string,
+     *             icon_sort_asc: string,
+     *             icon_sort_desc: string,
+     *             icon_filter: string,
+     *             icon_export_csv: string,
+     *             icon_export_pdf: string,
+     *             icon_export_excel: string,
+     *        }
+     *    }
+     */
+    public function toArray(): array
+    {
+        return [
+            'css_mode' => $this->cssMode,
+            'items_per_page' => $this->itemsPerPage,
+            'paginator' => $this->paginator,
+            'export' => $this->export->toArray(),
+            'ux_icons' => $this->uxIcons,
+            'ux_icons_options' => $this->uxIconsOptions->toArray(),
+        ];
+    }
 }

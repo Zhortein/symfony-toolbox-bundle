@@ -23,7 +23,22 @@ final class IconsOptionsDTO
     }
 
     /**
-     * @param array<string, string> $data
+     * @param array{
+     *              icon_first: string,
+     *              icon_previous: string,
+     *              icon_next: string,
+     *              icon_last: string,
+     *              icon_search: string,
+     *              icon_true: string,
+     *              icon_false: string,
+     *              icon_sort_neutral: string,
+     *              icon_sort_asc: string,
+     *              icon_sort_desc: string,
+     *              icon_filter: string,
+     *              icon_export_csv: string,
+     *              icon_export_pdf: string,
+     *              icon_export_excel: string,
+     *         } $data
      */
     public static function fromArray(array $data): self
     {
@@ -64,5 +79,43 @@ final class IconsOptionsDTO
             'icon_export_excel' => $this->iconExportExcel,
             default => $uxIconMode ? 'carbon:unknown' : '',
         };
+    }
+
+    /**
+     * @return array{
+     *              icon_first: string,
+     *              icon_previous: string,
+     *              icon_next: string,
+     *              icon_last: string,
+     *              icon_search: string,
+     *              icon_true: string,
+     *              icon_false: string,
+     *              icon_sort_neutral: string,
+     *              icon_sort_asc: string,
+     *              icon_sort_desc: string,
+     *              icon_filter: string,
+     *              icon_export_csv: string,
+     *              icon_export_pdf: string,
+     *              icon_export_excel: string,
+     *         }
+     */
+    public function toArray(): array
+    {
+        return [
+            'icon_first' => $this->iconFirst,
+            'icon_previous' => $this->iconPrevious,
+            'icon_next' => $this->iconNext,
+            'icon_last' => $this->iconLast,
+            'icon_search' => $this->iconSearch,
+            'icon_true' => $this->iconTrue,
+            'icon_false' => $this->iconFalse,
+            'icon_sort_neutral' => $this->iconSortNeutral,
+            'icon_sort_asc' => $this->iconSortAsc,
+            'icon_sort_desc' => $this->iconSortDesc,
+            'icon_filter' => $this->iconFilter,
+            'icon_export_csv' => $this->iconExportCsv,
+            'icon_export_pdf' => $this->iconExportPdf,
+            'icon_export_excel' => $this->iconExportExcel,
+        ];
     }
 }

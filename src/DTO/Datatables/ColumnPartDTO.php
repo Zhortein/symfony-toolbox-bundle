@@ -24,7 +24,7 @@ class ColumnPartDTO
     {
         return [
             'translate' => $this->translate,
-            'keepDefaultClasses' => $this->keepDefaultClasses,
+            'keep_default_classes' => $this->keepDefaultClasses,
             'class' => $this->class,
             'data' => $this->data->toArray(),
         ];

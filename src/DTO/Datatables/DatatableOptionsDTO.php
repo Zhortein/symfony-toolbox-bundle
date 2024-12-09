@@ -101,4 +101,78 @@ class DatatableOptionsDTO
             translationDomain: $data['translationDomain'] ?? 'messages'
         );
     }
+
+    /**
+     * @return array{
+     *      name: string,
+     *      defaultPageSize: int,
+     *      defaultSort: array<int, array{
+     *           field: string,
+     *           order: string
+     *      }>,
+     *      searchable: bool,
+     *      sortable: bool,
+     *      exportable: bool,
+     *      exportCsv: bool,
+     *      exportPdf: bool,
+     *      exportExcel: bool,
+     *      autoColumns: bool,
+     *      translationDomain: string,
+     *      actionColumn?: array{
+     *          label?: string,
+     *          template?: string
+     *      },
+     *      selectorColumn?: array{
+     *          label?: string,
+     *          template?: string
+     *      },
+     *      options: array{
+     *       thead?: array{
+     *         translate?: bool,
+     *         keep_default_classes?: bool,
+     *         class?: string,
+     *         data?: array<string, string|int|float|bool|null>,
+     *     },
+     *       tbody?: array{
+     *         translate?: bool,
+     *         keep_default_classes?: bool,
+     *         class?: string,
+     *         data?: array<string, string|int|float|bool|null>,
+     *     },
+     *       tfoot?: array{
+     *         translate?: bool,
+     *         keep_default_classes?: bool,
+     *         class?: string,
+     *         data?: array<string, string|int|float|bool|null>,
+     *     },
+     *   }
+     *  }
+     */
+    public function toArray(): array
+    {
+        $array = [
+            'name' => $this->name,
+            'defaultPageSize' => $this->defaultPageSize,
+            'defaultSort' => array_map(static fn (SortOptionDTO $sort) => $sort->toArray(), $this->defaultSort),
+            'searchable' => $this->searchable,
+            'sortable' => $this->sortable,
+            'exportable' => $this->exportable,
+            'exportCsv' => $this->exportCsv,
+            'exportPdf' => $this->exportPdf,
+            'exportExcel' => $this->exportExcel,
+            'autoColumns' => $this->autoColumns,
+            'translationDomain' => $this->translationDomain,
+            'options' => $this->options->toArray(),
+        ];
+
+        if (null !== $this->actionColumn) {
+            $array['actionColumn'] = $this->actionColumn->toArray();
+        }
+
+        if (null !== $this->selectorColumn) {
+            $array['selectorColumn'] = $this->selectorColumn->toArray();
+        }
+
+        return $array;
+    }
 }

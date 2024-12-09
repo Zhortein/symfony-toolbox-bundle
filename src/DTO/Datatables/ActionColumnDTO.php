@@ -23,4 +23,18 @@ class ActionColumnDTO
             label: isset($data['label']) && is_string($data['label']) ? $data['label'] : ''
         );
     }
+
+    /**
+     * @return array{
+     *       template: string,
+     *       label: string
+     *   }
+     */
+    public function toArray(): array
+    {
+        return [
+            'template' => $this->template,
+            'label' => $this->label,
+        ];
+    }
 }
