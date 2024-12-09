@@ -20,7 +20,7 @@
 
     {# Gérer les data-* attributes #}
     {% if attributes.data is defined %}
-        {% for dataKey, dataValue in attributes.data|filter(dataKey => dataKey not in ignored_data_keys) %}
+        {% for dataKey, dataValue in attributes.data %}
             {% if key not in ignored_data_keys %}data-{{ dataKey }}="{{ dataValue }}"{% endif %}
         {% endfor %}
     {% endif %}
