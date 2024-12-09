@@ -1,10 +1,10 @@
 {% macro render_attributes(attributes, defaultClasses) %}
-    {% set ignored_keys = ['class', 'data', 'keep_default_classes', 'translate'] %}
+    {% set ignored_keys = ['class', 'data', 'keepDefaultClasses', 'translate'] %}
     {% set ignored_data_keys = ['field', 'action'] %}
 
     {# Gérer la classe à l'intérieur de la macro #}
     {% set classes = '' %}
-    {% if attributes.keep_default_classes %}
+    {% if attributes.keepDefaultClasses %}
         {% set classes = defaultClasses ~ ' ' %}
     {% endif %}
     {% set classes = classes ~ attributes.class %}

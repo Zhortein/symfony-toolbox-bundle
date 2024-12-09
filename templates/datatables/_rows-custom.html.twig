@@ -10,7 +10,7 @@
             </td>
         {% endif %}
         {% for column in datatable.columns %}
-            {% if not column.header.keep_default_classes %}
+            {% if not column.header.keepDefaultClasses %}
                 {% set tdFirstCss = '' %}
                 {% set tdCss = '' %}
             {% endif %}
@@ -25,7 +25,7 @@
                             {% endfor %}
                         {% endif %}
 
-                        {% if datasetKey not in ['class','data','keep_default_classes','translate'] %}
+                        {% if datasetKey not in ['class','data','keepDefaultClasses','translate'] %}
                             {{ datasetKey }}="{{ datasetValue }}"
                         {% endif %}
                     {% endfor %}
