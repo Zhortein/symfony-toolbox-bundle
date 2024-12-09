@@ -15,7 +15,7 @@
         {% if labelClass is not empty %}
             <label for="search-button" class="{{ labelClass }}">{{ labelText }}</label>
         {% endif %}
-        <div class="{{ searchClasses.inputWrapper }}">
+        {% if searchClasses.inputWrapper is not empty %}<div class="{{ searchClasses.inputWrapper }}">{% endif %}
             {% if iconContainerClass is not empty %}
                 {% if iconContainerType == 'div' %}
                     <div class="{{ iconContainerClass }}" id="search-button">
@@ -36,6 +36,6 @@
                     placeholder="{{ labelText }}"
                     aria-describedby="search-button"
             >
-        </div>
+        {% if searchClasses.inputWrapper is not empty %}</div>{% endif %}
     </div>
 </div>
