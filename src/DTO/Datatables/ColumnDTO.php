@@ -35,7 +35,7 @@ class ColumnDTO
         }
 
         if (empty($this->sqlAlias ?? '') || !StringTools::isValidSqlAlias($this->sqlAlias)) {
-            $this->sqlAlias = $this->mainAlias;
+            $this->sqlAlias = $this->alias ?? $this->mainAlias;
         }
 
         if (empty($this->nameAs ?? '') || !StringTools::isValidSqlAlias($this->nameAs)) {
@@ -98,7 +98,7 @@ class ColumnDTO
             sortable: $data['sortable'] ?? true,
             nameAs: $data['nameAs'] ?? $data['name'],
             alias: $data['alias'] ?? $mainAlias,
-            sqlAlias: $data['sqlAlias'] ?? $mainAlias,
+            sqlAlias: $data['sqlAlias'] ?? ($data['alias'] ?? $mainAlias),
             datatype: $data['datatype'] ?? 'string',
             template: $data['template'] ?? '',
             header: ColumnHeaderDTO::fromArray($data['header'] ?? []),
