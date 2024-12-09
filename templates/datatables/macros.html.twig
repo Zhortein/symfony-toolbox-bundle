@@ -14,14 +14,14 @@
     {% endif %}
 
     {# Gérer les autres attributs classiques #}
-    {% for key, value in attributes|filter(key => key not in ignored_keys and key != 'class') %}
-        {{ key }}="{{ value }}"
+    {% for key, value in attributes %}
+        {% if key not in ignored_keys %}{{ key }}="{{ value }}"{% endif %}
     {% endfor %}
 
     {# Gérer les data-* attributes #}
     {% if attributes.data is defined %}
         {% for dataKey, dataValue in attributes.data|filter(dataKey => dataKey not in ignored_data_keys) %}
-            data-{{ dataKey }}="{{ dataValue }}"
+            {% if key not in ignored_data_keys %}data-{{ dataKey }}="{{ dataValue }}"{% endif %}
         {% endfor %}
     {% endif %}
 {% endmacro %}

@@ -1,14 +1,14 @@
+{% import '@ZhorteinSymfonyToolbox/datatables/macros.html.twig' as toolbox %}
 <tr>
     {% if datatable.hasSelectorColumn %}
         <th>{{ toolbox.get_label(datatable.options.selectorColumn, transDomain) }}</th>
     {% endif %}
 
-    {% if not column.header.keepDefaultClasses %}
-        {% set headerFirstCssClasses = '' %}
-        {% set headerOthersCssClasses = '' %}
-    {% endif %}
-
     {% for column in datatable.columns %}
+        {% if not datatable.options.header.keepDefaultClasses %}
+                {% set headerFirstCssClasses = '' %}
+                {% set headerOthersCssClasses = '' %}
+        {% endif %}
         {% if loop.index == 1 %}
             {% set headerCssClasses = headerFirstCssClasses ~ ' ' ~ column.header.class %}
         {% else %}
@@ -17,7 +17,7 @@
         <th
                 scope="col"
                 {{ toolbox.render_attributes(column.header, headerCssClasses|trim) }}
-                {% if datatable.isSortable() and column.isSortable() %}
+                {% if datatable.isSortable() and column.sortable %}
                     data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort"
                     data-field="{{ column.nameAs }}"
                 {% endif %}

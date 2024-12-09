@@ -25,7 +25,7 @@
     {# Tableau principal #}
     <table class="{{ tableClass }}">
         <thead data-zhortein--symfony-toolbox-bundle--datatable-target="header" {{ toolbox.render_attributes(datatable.options.options.thead, tableTheadClass) }}>
-        {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-thead.html.twig' %}
+        {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-thead.html.twig' with {toolbox: toolbox} %}
         </thead>
         <tbody {{ toolbox.render_attributes(datatable.options.options.tbody, tableTbodyClass) }}>
         {# Les lignes seront chargées dynamiquement #}

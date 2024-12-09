@@ -8,6 +8,7 @@ class TableOptionsDTO
         public ColumnPartDTO $thead = new ColumnPartDTO(),
         public ColumnPartDTO $tbody = new ColumnPartDTO(),
         public ColumnPartDTO $tfoot = new ColumnPartDTO(),
+        public ColumnPartDTO $pagination = new ColumnPartDTO(),
     ) {
     }
 
@@ -31,6 +32,12 @@ class TableOptionsDTO
      *        class?: string,
      *        data?: array<string, string|int|float|bool|null>,
      *    },
+     *      pagination: array{
+     *        translate?: bool,
+     *        keep_default_classes?: bool,
+     *        class?: string,
+     *        data?: array<string, string|int|float|bool|null>,
+     *    },
      *  }
      */
     public function toArray(): array
@@ -39,6 +46,7 @@ class TableOptionsDTO
             'thead' => $this->thead->toArray(),
             'tbody' => $this->tbody->toArray(),
             'tfoot' => $this->tfoot->toArray(),
+            'pagination' => $this->pagination->toArray(),
         ];
     }
 
@@ -62,6 +70,12 @@ class TableOptionsDTO
      *       class?: string,
      *       data?: array<string, string|int|float|bool|null>,
      *   },
+     *     pagination?: array{
+     *       translate?: bool,
+     *       keep_default_classes?: bool,
+     *       class?: string,
+     *       data?: array<string, string|int|float|bool|null>,
+     *   },
      * } $data
      */
     public static function fromArray(array $data): self
@@ -69,7 +83,8 @@ class TableOptionsDTO
         return new self(
             thead: isset($data['thead']) ? ColumnPartDTO::fromArray($data['thead']) : new ColumnPartDTO(),
             tbody: isset($data['tbody']) ? ColumnPartDTO::fromArray($data['tbody']) : new ColumnPartDTO(),
-            tfoot: isset($data['tfoot']) ? ColumnPartDTO::fromArray($data['tfoot']) : new ColumnPartDTO()
+            tfoot: isset($data['tfoot']) ? ColumnPartDTO::fromArray($data['tfoot']) : new ColumnPartDTO(),
+            pagination: isset($data['pagination']) ? ColumnPartDTO::fromArray($data['pagination']) : new ColumnPartDTO()
         );
     }
 }
