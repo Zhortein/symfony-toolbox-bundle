@@ -20,11 +20,11 @@
                 {% if iconContainerType == 'div' %}
                     <div class="{{ iconContainerClass }}" id="search-button">
                 {% else %}
-                    <span class="{{ iconContainerClass }}" id="search-button">
+                    <label class="{{ iconContainerClass }}" id="search-button">
                 {% endif %}
                     {{ ux_icon(datatable.getIcon('icon_search'), {height: '16px', width: '16px', class: iconClass, viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
                 {% if iconContainerType != 'div' %}
-                    </span>
+                    </label>
                 {% else %}
                     </div>
                 {% endif %}
