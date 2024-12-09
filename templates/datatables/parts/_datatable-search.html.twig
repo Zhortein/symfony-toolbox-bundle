@@ -17,7 +17,7 @@
         <div class="{{ searchClasses.inputWrapper }}">
             {% if iconContainerClass is not empty %}
                 <div class="{{ iconContainerClass }}" id="search-button">
-                    {{ ux_icon(datatable.getIcon('icon_search'), {class: iconClass, viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
+                    {{ ux_icon(datatable.getIcon('icon_search'), {height: '16px', width: '16px', class: iconClass, viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
                 </div>
             {% endif %}
             <input
