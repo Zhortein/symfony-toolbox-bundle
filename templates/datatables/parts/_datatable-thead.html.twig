@@ -5,7 +5,7 @@
     {% endif %}
 
     {% for column in datatable.columns %}
-        {% if not datatable.options.header.keepDefaultClasses %}
+        {% if not column.header.keepDefaultClasses %}
                 {% set headerFirstCssClasses = '' %}
                 {% set headerOthersCssClasses = '' %}
         {% endif %}
