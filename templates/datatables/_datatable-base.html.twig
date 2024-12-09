@@ -38,5 +38,7 @@
     </table>
 
     {# Pagination #}
-    <nav {{ toolbox.render_attributes(datatable.options.options.pagination, paginationClass) }}></nav>
+    <nav data-zhortein--symfony-toolbox-bundle--datatable-target="pagination"
+         aria-label="{{ 'datatable.pagination'|trans({}, transDomain) }}"
+         {{ toolbox.render_attributes(datatable.options.options.pagination, paginationClass) }}></nav>
 </div>
