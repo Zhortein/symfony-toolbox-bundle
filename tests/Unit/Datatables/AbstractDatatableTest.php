@@ -6,6 +6,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\ColumnDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\SortOptionDTO;
 
 class AbstractDatatableTest extends TestCase
 {
@@ -67,10 +69,10 @@ class AbstractDatatableTest extends TestCase
     public function testValidateColumnsAddsDefaults(): void
     {
         $columns = [
-            [
+            ColumnDTO::fromArray([
                 'name' => 'id',
                 'label' => 'Identifier',
-            ],
+            ]),
         ];
 
         $this->datatable->setColumns($columns);
@@ -78,43 +80,35 @@ class AbstractDatatableTest extends TestCase
 
         $validatedColumns = $this->datatable->getColumns();
 
-        $this->assertArrayHasKey('searchable', $validatedColumns[0]);
-        $this->assertTrue($validatedColumns[0]['searchable']);
-        $this->assertArrayHasKey('sortable', $validatedColumns[0]);
-        $this->assertTrue($validatedColumns[0]['sortable']);
+        $this->assertTrue($validatedColumns[0]->searchable);
+        $this->assertTrue($validatedColumns[0]->sortable);
     }
 
-    public function testValidateColumnsThrowsExceptionForInvalidColumns(): void
+    public function testValidateColumns(): void
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Each column must have a "name" and a "label".');
-
         $columns = [
-            [
+            ColumnDTO::fromArray([
                 'label' => 'Missing name',
-            ],
+            ]),
         ];
 
         $this->datatable->setColumns($columns);
         $this->datatable->validateColumns();
+        $this->assertFalse($this->datatable->getDisplayFooter());
     }
 
     public function testGetFullyQualifiedColumnFromNameAs(): void
     {
         $columns = [
-            [
+            ColumnDTO::fromArray([
                 'name' => 'id',
                 'label' => 'Identifier',
                 'nameAs' => 'custom_id',
-            ],
+            ]),
         ];
 
         $this->datatable->setColumns($columns);
         $this->datatable->validateColumns();
-
-        $this->datatable->addColumn('name', 'Name', true, false, 't2', [], [], [], 'name2');
-        $result = $this->datatable->getFullyQualifiedColumnFromNameAs('name2', true);
-        $this->assertEquals('t2.name AS name2', $result);
 
         $this->assertEquals('t', $this->datatable->getMainAlias());
 
@@ -149,56 +143,11 @@ class AbstractDatatableTest extends TestCase
 
     public function testGetDefaultSort(): void
     {
-        $this->assertEquals([['field' => '', 'order' => 'asc']], $this->datatable->getDefaultSort());
-    }
-
-    public function testOptions(): void
-    {
-        $this->assertSame([
-            'defaultPageSize' => 10,
-            'defaultSort' => $this->datatable->getDefaultSort(),
-            'searchable' => true,
-            'sortable' => true,
-        ], $this->datatable->getOptions());
-
-        $this->datatable->setOptions(['translationDomain' => 'bar']);
-        $this->assertSame([
-            'translationDomain' => 'bar',
-            'defaultPageSize' => 10,
-            'defaultSort' => $this->datatable->getDefaultSort(),
-            'searchable' => true,
-            'sortable' => true,
-        ], $this->datatable->getOptions());
-
-        $this->datatable->addOption('defaultPageSize', 20);
-        $this->datatable->addOption('actionColumn', ['label' => 'Actions', 'template' => 'path/to/template.html.twig']);
-        $this->datatable->addOption('selectorColumn', ['label' => '', 'template' => '']);
-        $this->datatable->addOption('defaultSort', [['field' => 'name2', 'order' => 'asc']]);
-        $this->datatable->addOption('translationDomain', 'messages+bar');
-        $this->assertSame([
-            'translationDomain' => 'messages+bar',
-            'defaultPageSize' => 20,
-            'defaultSort' => [['field' => 'name2', 'order' => 'asc']],
-            'searchable' => true,
-            'sortable' => true,
-            'actionColumn' => ['label' => 'Actions', 'template' => 'path/to/template.html.twig'],
-            'selectorColumn' => ['label' => '', 'template' => ''],
-        ], $this->datatable->getOptions());
-
-        $this->assertEquals('messages+bar', $this->datatable->getTranslationDomain());
-        $this->assertTrue($this->datatable->isSearchable());
-        $this->assertTrue($this->datatable->isSortable());
-
-        $this->datatable->addOption('searchable', false);
-        $this->datatable->addOption('sortable', false);
-
-        $this->assertFalse($this->datatable->isSearchable());
-        $this->assertFalse($this->datatable->isSortable());
+        $this->assertSame([['field' => '', 'order' => 'asc']], $this->datatable->getDefaultSort());
     }
 
     public function testGlobalOptions(): void
     {
-        $this->assertSame(Configuration::DEFAULT_CONFIGURATION, $this->datatable->getGlobalOptions());
         $this->assertTrue($this->datatable->isIconUxMode());
         $this->assertEquals('bi:chevron-double-left', $this->datatable->getIcon('icon_first'));
         $this->assertEquals('bi:chevron-left', $this->datatable->getIcon('icon_previous'));

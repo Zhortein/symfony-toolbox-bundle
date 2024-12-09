@@ -19,7 +19,7 @@ class ExportPdfService extends ExportService
         return $this;
     }
 
-    public function export(AbstractDatatable $datatable, Request $request, string $datatableName): Response
+    public function export(AbstractDatatable $datatable, Request $request): Response
     {
         $results = $this->queryBuilder->getQuery()->getResult();
 

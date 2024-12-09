@@ -20,6 +20,11 @@ zhortein_symfony_toolbox:
     css_mode: 'bootstrap'
     items_per_page: 10
     paginator: 'custom'
+    export:
+      enabled_by_default: true
+      export_csv: true
+      export_pdf: false
+      export_excel: true
     ux_icons: true
     ux_icons_options:
       icon_first: 'bi:chevron-double-left'
@@ -33,6 +38,9 @@ zhortein_symfony_toolbox:
       icon_sort_asc: 'bi:sort-alpha-down'
       icon_sort_desc: 'bi:sort-alpha-up'
       icon_filter: 'mi:filter'
+      icon_export_csv: 'bi:filetype-csv'
+      icon_export_pdf: 'bi:filetype-pdf'
+      icon_export_excel: 'bi:filetype-xlsx'
 ```
 
 ## CSS Mode
@@ -69,6 +77,12 @@ The  ```ux_icons``` boolean in the configuration toggles between:
 * ```true```: Uses Symfony UX Icons.
 * ```false```: Allows you to specify custom CSS classes.
 
+The ```export``` key allow you to set the default behaviours for export features on your datatables:
+- ```enabled_by_default```: true to enable by default export feature on datatables, false to disable by default (you still can enable it in the AsDatatable attribute for your datatable)
+- ```export_csv```: true to enable CSV export by default
+- ```export_pdf```: true to enable PDF export by default
+- ```export_excel```: true to enable Excel export by default
+
 The ```ux_icons_options``` keys allow you to specify the icons to use:
 - ```icon_first: 'bi:chevron-double-left'```: Pagination icon for "First Page."
 - ```icon_previous: 'bi:chevron-left'```: Pagination icon for "Previous Page."
@@ -81,6 +95,9 @@ The ```ux_icons_options``` keys allow you to specify the icons to use:
 - ```icon_sort_asc: 'bi:sort-alpha-down'```: Icon for active ascending sort.
 - ```icon_sort_desc: 'bi:sort-alpha-up'```: Icon for active descending sort.
 - ```icon_filter: 'mi:filter'```: Icon representing filters.
+- ```icon_export_csv: 'bi:filetype-csv'```: Icon representing CSV export.
+- ```icon_export_pdf: 'bi:filetype-pdf'```: Icon representing PDF export.
+- ```icon_export_excel: 'bi:filetype-xlsx'```: Icon representing Excel Export.
 
 Visit the [official Symfony UX Icons documentation](https://ux.symfony.com/icons) for a full list of available icons.
 

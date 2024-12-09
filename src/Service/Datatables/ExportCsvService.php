@@ -9,7 +9,7 @@ use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 
 class ExportCsvService extends ExportService
 {
-    public function export(AbstractDatatable $datatable, Request $request, string $datatableName): Response
+    public function export(AbstractDatatable $datatable, Request $request): Response
     {
         $queryBuilder = $this->queryBuilder;
         $separator = ';' === $request->query->get('separator', ';') ? ';' : ',';
@@ -37,7 +37,7 @@ class ExportCsvService extends ExportService
         });
 
         $response->headers->set('Content-Type', 'text/csv');
-        $response->headers->set('Content-Disposition', 'attachment; filename="'.$this->getFilename($datatableName, 'csv').'"');
+        $response->headers->set('Content-Disposition', 'attachment; filename="'.$this->getFilename($datatable->getDatatableName(), 'csv').'"');
 
         return $response;
     }

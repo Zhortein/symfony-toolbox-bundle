@@ -47,6 +47,6 @@ class DatatableController extends AbstractController
         // Get the export type from the Request
         $exportType = $request->query->getString('type', 'csv');
 
-        return $this->datatableService->export($datatable, $request, $datatableId, $exportType);
+        return $this->datatableService->export($datatable, $request, $exportType);
     }
 }

@@ -23,6 +23,11 @@ zhortein_symfony_toolbox:
     css_mode: 'bootstrap'
     items_per_page: 10
     paginator: 'custom'
+    export:
+      enabled_by_default: true
+      export_csv: true
+      export_pdf: false
+      export_excel: true
     ux_icons: true
     ux_icons_options:
       icon_first: 'bi:chevron-double-left'
@@ -36,6 +41,9 @@ zhortein_symfony_toolbox:
       icon_sort_asc: 'bi:sort-alpha-down'
       icon_sort_desc: 'bi:sort-alpha-up'
       icon_filter: 'mi:filter'
+      icon_export_csv: 'bi:filetype-csv'
+      icon_export_pdf: 'bi:filetype-pdf'
+      icon_export_excel: 'bi:filetype-xlsx'
 ```
 
 ### Le mode "CSS"
@@ -73,6 +81,12 @@ Par défaut, ce sont des icônes de symfony/ux-icons qui sont prises en compte.
 Le booléen ```ux_icons``` dans la configuration vous permet de basculer entre le mode 
 symfony/ux-icons (true) et le mode classes CSS (false).
 
+LEs entrées dans la clé ```export``` vous permettent de choisir le comportement par défaut pour les fonctionnalités d'export :
+- ```enabled_by_default```: true pour activer par défaut les exports sur les datatables, false sinon (vous pourrez toujours choisir d'activer les export dans l'attribut PHP AsDatatable de chaque datatable)
+- ```export_csv```: true pour activer par défaut l'export CSV
+- ```export_pdf```: true pour activer par défaut l'export PDF
+- ```export_excel```: true pour activer par défaut l'export Excel
+
 Les entrées dans la clé ```ux_icons_options``` vous permettent de préciser les icônes à utiliser :
 - ```icon_first: 'bi:chevron-double-left'```: Icône de pagination pour indiquer le retour au premier élément
 - ```icon_previous: 'bi:chevron-left'```: Icône de pagination pour indiquer le retour à l'élément précédent
@@ -85,6 +99,9 @@ Les entrées dans la clé ```ux_icons_options``` vous permettent de préciser le
 - ```icon_sort_asc: 'bi:sort-alpha-down'```: Icône pour symboliser un tri actif croissant
 - ```icon_sort_desc: 'bi:sort-alpha-up'```: Icône pour symboliser un tri actif décroissant
 - ```icon_filter: 'mi:filter'```: Icône symbolisant les filtres de recherche
+- ```icon_export_csv: 'bi:filetype-csv'```: Icône symbolisant l'export CSV.
+- ```icon_export_pdf: 'bi:filetype-pdf'```: Icône symbolisant l'export PDF.
+- ```icon_export_excel: 'bi:filetype-xlsx'```: Icône symbolisant l'export Excel.
 
 Vous pouvez retrouver l'intégralité des icônes disponibles pour symfony/ux_icons dans 
 la [documentation officielle](https://ux.symfony.com/icons).

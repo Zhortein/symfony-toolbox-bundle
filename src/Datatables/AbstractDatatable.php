@@ -5,10 +5,16 @@ namespace Zhortein\SymfonyToolboxBundle\Datatables;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\ColumnCachedTypeDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\ColumnDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\DatatableOptionsDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\GlobalOptionsDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\SortOptionDTO;
 use Zhortein\SymfonyToolboxBundle\Service\StringTools;
 
 abstract class AbstractDatatable
 {
+    public const string DEFAULT_MAIN_ALIAS = 't';
     public const string DEFAULT_TRANSLATION_DOMAIN = 'zhortein_symfony_toolbox-datatable';
 
     protected ?QueryBuilder $queryBuilder = null;
@@ -16,109 +22,20 @@ abstract class AbstractDatatable
     protected bool $displayFooter = false;
 
     /**
-     * Columns definitions. Each column is represented by an array.
-     *
-     * @var array<int, array{
-     *         name: string,
-     *         label: string,
-     *         searchable?: bool,
-     *         sortable?: bool,
-     *         nameAs?: string,
-     *         alias?: string,
-     *         sqlAlias?: string,
-     *         datatype?: string,
-     *         template?: string,
-     *         header?: array{
-     *             translate?: bool,
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         },
-     *         dataset?: array{
-     *             translate?: bool,
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         },
-     *         footer?: array{
-     *             translate?: bool,
-     *             auto?: string,
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         }
-     *     }>
+     * @var ColumnDTO[]
      */
     protected array $columns = [];
-
-    /**
-     * Datatable options.
-     *
-     * @var array{
-     *     defaultPageSize?: int,
-     *     defaultSort?: array<int, array{
-     *         field: string,
-     *         order: 'asc'|'desc'
-     *     }>,
-     *     searchable?: bool,
-     *     sortable?: bool,
-     *     exportable?: bool,
-     *     autoColumns?: bool,
-     *     options?: array{
-     *         thead?: array{
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         },
-     *         tbody?: array{
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         },
-     *         tfoot?: array{
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         }
-     *     },
-     *     actionColumn?: array{template: string, label: string},
-     *     selectorColumn?: array{label: string, template?: string},
-     *     translationDomain?: string
-     * }
-     */
-    protected array $options = [];
-
-    /**
-     * Global datatables options.
-     *
-     * @var array{
-     *     css_mode: string,
-     *     items_per_page: int,
-     *     paginator: string,
-     *     ux_icons: bool,
-     *     ux_icons_options: array{
-     *          icon_first: string,
-     *          icon_previous: string,
-     *          icon_next: string,
-     *          icon_last: string,
-     *          icon_search: string,
-     *          icon_true: string,
-     *          icon_false: string,
-     *          icon_sort_neutral: string,
-     *          icon_sort_asc: string,
-     *          icon_sort_desc: string,
-     *          icon_filter: string,
-     *     }
-     * }
-     */
-    private array $globalOptions = Configuration::DEFAULT_CONFIGURATION;
-    private string $mainAlias = 't';
+    protected DatatableOptionsDTO $options;
+    private GlobalOptionsDTO $globalOptions;
+    private string $mainAlias = self::DEFAULT_MAIN_ALIAS;
 
     protected string $cssMode = Configuration::DEFAULT_DATATABLE_CSS_MODE;
 
     public function __construct(protected EntityManagerInterface $em)
     {
         $this->configure();
+        $this->options = new DatatableOptionsDTO();
+        $this->globalOptions = new GlobalOptionsDTO();
     }
 
     public function getEntityManager(): EntityManagerInterface
@@ -160,62 +77,14 @@ abstract class AbstractDatatable
         return 'zhortein--symfony-toolbox-bundle--datatable';
     }
 
-    /**
-     * Define the global options.
-     *
-     * @param array{
-     *      css_mode: string,
-     *      items_per_page: int,
-     *      paginator: string,
-     *      ux_icons: bool,
-     *      ux_icons_options: array{
-     *           icon_first: string,
-     *           icon_previous: string,
-     *           icon_next: string,
-     *           icon_last: string,
-     *           icon_search: string,
-     *           icon_true: string,
-     *           icon_false: string,
-     *           icon_sort_neutral: string,
-     *           icon_sort_asc: string,
-     *           icon_sort_desc: string,
-     *           icon_filter: string,
-     *      }
-     *  } $globalOptions
-     *
-     * @return $this
-     */
-    public function setGlobalOptions(array $globalOptions): self
+    public function setGlobalOptions(GlobalOptionsDTO $globalOptions): self
     {
         $this->globalOptions = $globalOptions;
 
         return $this;
     }
 
-    /**
-     * Retrieves the global options.
-     *
-     * @return array{
-     *      css_mode: string,
-     *      items_per_page: int,
-     *      paginator: string,
-     *      ux_icons: bool,
-     *      ux_icons_options: array{
-     *           icon_first: string,
-     *           icon_previous: string,
-     *           icon_next: string,
-     *           icon_last: string,
-     *           icon_search: string,
-     *           icon_true: string,
-     *           icon_false: string,
-     *           icon_sort_neutral: string,
-     *           icon_sort_asc: string,
-     *           icon_sort_desc: string,
-     *           icon_filter: string,
-     *      }
-     *  } An array representing the global options
-     */
-    public function getGlobalOptions(): array
+    public function getGlobalOptions(): GlobalOptionsDTO
     {
         return $this->globalOptions;
     }
@@ -230,8 +99,8 @@ abstract class AbstractDatatable
     public function setCssMode(string $cssMode): self
     {
         if (!Configuration::isCssModeValid($cssMode)) {
-            if (Configuration::isCssModeValid($this->globalOptions['css_mode'])) {
-                $this->cssMode = $this->globalOptions['css_mode'];
+            if (Configuration::isCssModeValid($this->globalOptions->cssMode)) {
+                $this->cssMode = $this->globalOptions->cssMode;
             } else {
                 $this->cssMode = Configuration::DEFAULT_DATATABLE_CSS_MODE;
             }
@@ -250,36 +119,7 @@ abstract class AbstractDatatable
     /**
      * Set the columns for the application.
      *
-     * @param array<int, array{
-     *         name: string,
-     *         label: string,
-     *         searchable?: bool,
-     *         sortable?: bool,
-     *         nameAs?: string,
-     *         alias?: string,
-     *         sqlAlias?: string,
-     *         datatype?: string,
-     *         template?: string,
-     *         header?: array{
-     *             translate?: bool,
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         },
-     *         dataset?: array{
-     *             translate?: bool,
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         },
-     *         footer?: array{
-     *             translate?: bool,
-     *             auto?: string,
-     *             keep_default_classes?: bool,
-     *             class?: string,
-     *             data?: array<string, mixed>
-     *         }
-     *     }> $columns
+     * @param ColumnDTO[] $columns
      *
      * @return $this
      */
@@ -291,82 +131,11 @@ abstract class AbstractDatatable
     }
 
     /**
-     * @return array<int, array{
-     *        name: string,
-     *        label: string,
-     *        searchable?: bool,
-     *        sortable?: bool,
-     *        nameAs?: string,
-     *        alias?: string,
-     *        sqlAlias?: string,
-     *        datatype?: string,
-     *        template?: string,
-     *        header?: array{
-     *            translate?: bool,
-     *            keep_default_classes?: bool,
-     *            class?: string,
-     *            data?: array<string, mixed>
-     *        },
-     *        dataset?: array{
-     *            translate?: bool,
-     *            keep_default_classes?: bool,
-     *            class?: string,
-     *            data?: array<string, mixed>
-     *        },
-     *        footer?: array{
-     *            translate?: bool,
-     *            auto?: string,
-     *            keep_default_classes?: bool,
-     *            class?: string,
-     *            data?: array<string, mixed>
-     *        }
-     *    }>
+     * @return ColumnDTO[]
      */
     public function getColumns(): array
     {
         return $this->columns;
-    }
-
-    /**
-     * Adds a new column to the table configuration.
-     *
-     * @param string                                                                                                           $name       the name of the column
-     * @param string                                                                                                           $label      the label of the column
-     * @param bool                                                                                                             $searchable Indicates if the column is searchable. Defaults to true.
-     * @param bool                                                                                                             $sortable   Indicates if the column is sortable. Defaults to true.
-     * @param ?string                                                                                                          $sqlAlias   optional SQL alias for the column
-     * @param array{translate?: bool, keep_default_classes?: bool, class?: string, data?: array<string, mixed>}                $header     optional header configuration array
-     * @param array{translate?: bool, keep_default_classes?: bool, class?: string, data?: array<string, mixed>}                $dataset    optional dataset configuration array
-     * @param array{translate?: bool, auto?: string, keep_default_classes?: bool, class?: string, data?: array<string, mixed>} $footer     optional footer configuration array
-     */
-    public function addColumn(
-        string $name,
-        string $label,
-        bool $searchable = true,
-        bool $sortable = true,
-        ?string $sqlAlias = null,
-        ?array $header = [],
-        ?array $dataset = [],
-        ?array $footer = [],
-        ?string $nameAs = '',
-        ?string $dataType = '',
-        ?string $template = '',
-    ): self {
-        $this->columns[] = [
-            'name' => $name,
-            'label' => $label,
-            'searchable' => $searchable,
-            'sortable' => $sortable,
-            'sqlAlias' => $sqlAlias ?? $this->getMainAlias(),
-            'header' => $header ?? [],
-            'dataset' => $dataset ?? [],
-            'footer' => $footer ?? [],
-            'nameAs' => $nameAs ?? '',
-            'datatype' => $dataType ?? '',
-            'template' => $template ?? '',
-        ];
-
-        return $this;
     }
 
     /**
@@ -385,11 +154,11 @@ abstract class AbstractDatatable
         $alias = $this->getMainAlias();
 
         // Recherche prioritaire sur 'nameAs'
-        $column = array_filter($columns, static fn ($column) => ($column['nameAs'] ?? '') === $asName);
+        $column = array_filter($columns, static fn ($column) => ($column->nameAs ?? '') === $asName);
 
         // Si aucune correspondance, cherche par 'name'
         if (empty($column)) {
-            $column = array_filter($columns, static fn ($column) => $column['name'] === $asName);
+            $column = array_filter($columns, static fn ($column) => $column->name === $asName);
         }
 
         // Si aucune colonne n'est trouvée
@@ -400,360 +169,112 @@ abstract class AbstractDatatable
         // Utilise le premier résultat trouvé
         $column = reset($column);
 
-        $sqlAlias = $column['sqlAlias'] ?? $alias;
-        $name = $column['name'];
+        $sqlAlias = $column->sqlAlias ?? $alias;
+        $name = $column->name;
 
         // Formate la colonne
         return sprintf('%s.%s', $sqlAlias, $name).($withAsStatement ? ' AS '.$asName : '');
     }
 
-    /**
-     * Validates and initializes the table options.
-     *
-     * Ensures that essential keys are present in the options array
-     * with default values, validating sections such as 'thead', 'tbody',
-     * 'tfoot', and 'pagination'. Defaults include 'keep_default_classes'
-     * set to true and 'class' as an empty string if not specified.
-     */
-    public function validateTableOptions(): void
-    {
-        if (!isset($this->options['options']) || !is_array($this->options['options'])) {
-            $this->options['options'] = [];
-        }
-
-        foreach (['thead', 'tbody', 'tfoot', 'pagination'] as $key) {
-            if (!isset($this->options['options'][$key])) {
-                $this->options['options'][$key] = [];
-            }
-
-            if (is_array($this->options['options'][$key])) {
-                if (!isset($this->options['options'][$key]['keep_default_classes'])) {
-                    $this->options['options'][$key]['keep_default_classes'] = true;
-                }
-
-                if (!isset($this->options['options'][$key]['class'])) {
-                    $this->options['options'][$key]['class'] = '';
-                }
-            }
-        }
-    }
-
-    /**
-     * Validates the columns of the table configuration and complete missing values with defaults.
-     *
-     * Ensures each column has a "name" and a "label". Sets default values for
-     * "searchable" and "sortable" attributes if they are not defined.
-     *
-     * @throws \InvalidArgumentException if a column does not have the required "name" and "label"
-     */
     public function validateColumns(): void
     {
         $this->displayFooter = false;
-        $columns = $this->getColumns();
-
-        foreach ($columns as &$column) {
-            // Check that each column have at least a name and a label
-            if (!isset($column['name'], $column['label'])) {
-                throw new \InvalidArgumentException('Each column must have a "name" and a "label".');
-            }
-
-            // All column will be automatically aliased unless an explicit alias is given (and valid)
-            if (empty($column['nameAs'] ?? '') || !StringTools::isValidSqlAlias($column['nameAs'])) {
-                if (!isset($column['sqlAlias']) || $column['sqlAlias'] === $this->getMainAlias()) {
-                    $column['nameAs'] = $column['name'];
-                } else {
-                    $column['nameAs'] = $column['sqlAlias'].'_'.$column['name'];
-                }
-            }
-
-            // Default to true if not defined
-            if (!isset($column['searchable'])) {
-                $column['searchable'] = true;
-            }
-
-            // Default to true if not defined
-            if (!isset($column['sortable'])) {
-                $column['sortable'] = true;
-            }
-
-            // Default to string in case a column can't be defined
-            if (empty($column['datatype'] ?? '')) {
-                $column['datatype'] = 'string';
-            }
-
-            // Default to an empty template, real default will be applied after column_type detection
-            if (!isset($column['template'])) {
-                $column['template'] = '';
-            }
-
-            // Default to true if not defined @todo Implement autoColumns mode (Read Entity metadata and construct the columns automatically)
-            if (!isset($column['autoColumns'])) {
-                $column['autoColumns'] = false;
-            }
-
-            foreach (['header', 'dataset', 'footer'] as $key) {
-                if (!isset($column[$key])) {
-                    $column[$key] = [];
-                }
-                if (!isset($column[$key]['translate'])) {
-                    if ('header' === $key) {
-                        // By default, when a translation domain is given, only translate header labels...
-                        $column[$key]['translate'] = !empty($this->getTranslationDomain());
-                    } else {
-                        $column[$key]['translate'] = false;
-                    }
-                }
-                if (!isset($column[$key]['keep_default_classes'])) {
-                    $column[$key]['keep_default_classes'] = true;
-                }
-                if (!isset($column[$key]['css'])) {
-                    $column[$key]['css'] = '';
-                }
-
-                if ('footer' === $key) {
-                    if (!isset($column[$key]['auto'])) {
-                        $column[$key]['auto'] = '';
-                    }
-                    // @todo Datatable auto-footer types should be constants + handled for each type + if empty don't display the footer line
-                    if (!in_array($column[$key]['auto'], ['count', 'sum', 'avg', 'min', 'max'], true)) {
-                        $column[$key]['auto'] = '';
-                    }
-
-                    if (!empty($column[$key]['auto'])) {
-                        $this->displayFooter = true;
-                    }
-                }
+        foreach ($this->columns as $column) {
+            if (!empty($column->footer->auto)) {
+                $this->displayFooter = true;
             }
         }
-
-        $this->setColumns($columns);
     }
 
-    /**
-     * Set the configuration options.
-     *
-     * @param array{
-     *      defaultPageSize?: int,
-     *      defaultSort?: array<int, array{
-     *          field: string,
-     *          order: 'asc'|'desc'
-     *      }>,
-     *      searchable?: bool,
-     *      sortable?: bool,
-     *      exportable?: bool,
-     *      autoColumns?: bool,
-     *      options?: array{
-     *          thead?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          },
-     *          tbody?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          },
-     *          tfoot?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          }
-     *      },
-     *      actionColumn?: array{template: string, label: string},
-     *      selectorColumn?: array{label: string, template?: string},
-     *      translationDomain?: string
-     *  } $options
-     *
-     * @return $this
-     */
-    public function setOptions(array $options): self
+    public function setOptions(DatatableOptionsDTO $options): self
     {
         $this->options = $options;
 
         return $this;
     }
 
-    /**
-     * @return array{
-     *      defaultPageSize?: int,
-     *      defaultSort?: array<int, array{
-     *          field: string,
-     *          order: 'asc'|'desc'
-     *      }>,
-     *      searchable?: bool,
-     *      sortable?: bool,
-     *      exportable?: bool,
-     *      autoColumns?: bool,
-     *      options?: array{
-     *          thead?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          },
-     *          tbody?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          },
-     *          tfoot?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          }
-     *      }
-     *  }
-     */
-    public function getOptions(): array
+    public function getOptions(): DatatableOptionsDTO
     {
-        if (!array_key_exists('defaultPageSize', $this->options)) {
-            $this->options['defaultPageSize'] = $this->globalOptions['items_per_page'] ?? Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
+        if ($this->options->defaultPageSize <= 1) {
+            $this->options->defaultPageSize = Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
         }
-        if (!array_key_exists('defaultSort', $this->options)) {
+
+        if (empty($this->options->defaultSort)) {
             if (!empty($this->columns)) {
-                $this->options['defaultSort'] = [['field' => $this->columns[0]['name'], 'order' => 'asc']];
+                $this->options->defaultSort = [new SortOptionDTO(field: $this->columns[0]->name, order: 'asc')];
             } else {
-                $this->options['defaultSort'] = [['field' => '', 'order' => 'asc']];
+                $this->options->defaultSort = [new SortOptionDTO(field: '', order: 'asc')];
             }
-        }
-        if (!array_key_exists('searchable', $this->options)) {
-            $this->options['searchable'] = true;
-        }
-        if (!array_key_exists('exportable', $this->options)) {
-            $this->options['exportable'] = true;
-        }
-        if (!array_key_exists('sortable', $this->options)) {
-            $this->options['sortable'] = true;
         }
 
         return $this->options;
     }
 
     /**
-     * Adds an option to the current configuration.
-     *
-     * @param string $name  The name of the option to add.
-     *                      Possible values are 'defaultPageSize', 'defaultSort', 'translationDomain', 'searchable', 'sortable', 'exportable', or 'autoColumns'.
-     * @param mixed  $value The value of the option. The expected type varies based on the option name:
-     *                      - 'defaultPageSize': int
-     *                      - 'defaultSort': array<int, array{
-     *                      field: string,
-     *                      order: 'asc'|'desc'
-     *                      }>
-     *                      - 'translationDomain': string
-     *                      - 'searchable', 'sortable', 'exportable', 'autoColumns': bool
-     *
-     * @return self returns the current instance for method chaining
-     *
-     * @throws \InvalidArgumentException if validation checks fail for 'defaultSort'
-     */
-    public function addOption(string $name, mixed $value): self
-    {
-        switch ($name) {
-            case 'actionColumn': // an array with 'template' and 'label'
-                if (!is_array($value) || !isset($value['template'], $value['label']) || !is_string($value['template']) || !is_string($value['label'])) {
-                    throw new \InvalidArgumentException('The "actionColumn" option must be an array with "template" and "label" as strings.');
-                }
-                break;
-            case 'selectorColumn': // an array with 'template' and 'label'
-                if (!is_array($value) || !isset($value['label']) || !is_string($value['label'])) {
-                    throw new \InvalidArgumentException('The "selectorColumn" option must be an array with "label" as a string.');
-                }
-                // @todo Enable this test when selectorColumn template will be implemented
-                /*if (isset($value['template']) && !is_string($value['template'])) {
-                    throw new \InvalidArgumentException('The "template" in "selectorColumn" must be a string.');
-                }*/
-                break;
-            case 'options': // an  array<string,string|int|float|bool|null>
-                if (!is_array($value)) {
-                    throw new \InvalidArgumentException('The "options" option must be an array.');
-                }
-                break;
-            case 'defaultPageSize':
-                if (!is_int($value)) {
-                    $value = (int) Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
-                }
-                break;
-            case 'defaultSort':
-                if (!is_array($value) || empty($value)) {
-                    if (!empty($this->columns)) {
-                        $value = [['field' => $this->columns[0]['name'], 'order' => 'asc']];
-                    } else {
-                        $value = [['field' => null, 'order' => 'asc']];
-                    }
-                }
-
-                // Vérifie que chaque élément de $value a la structure attendue
-                foreach ($value as $item) {
-                    if (!is_array($item)) {
-                        throw new \InvalidArgumentException('Each item in the multiSort array must be an array.');
-                    }
-
-                    if (!isset($item['field'], $item['order'])) {
-                        throw new \InvalidArgumentException('Each item must contain a "field" and a "order" key.');
-                    }
-
-                    if (!is_string($item['field'])) {
-                        throw new \InvalidArgumentException('The "field" value must be a string.');
-                    }
-
-                    if (!in_array($item['order'], ['asc', 'desc'], true)) {
-                        throw new \InvalidArgumentException('The "order" value must be either "asc" or "desc".');
-                    }
-                }
-                $value = (array) $value;
-                break;
-            case 'translationDomain':
-                if (!is_string($value) || empty($value)) {
-                    $value = '';
-                }
-                break;
-            case 'searchable':
-            case 'sortable':
-            case 'exportable':
-            case 'autoColumns':
-                $value = (bool) $value;
-                break;
-            default:
-                throw new \InvalidArgumentException(sprintf('The option "%s" is not supported.', $name));
-        }
-
-        /* @phpstan-ignore-next-line */
-        $this->options[$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * @return array<int, array{field: string, order: 'asc'|'desc'}>
+     * @return array<int, array{
+     *      field: string,
+     *      order: string
+     *  }>
      */
     public function getDefaultSort(): array
     {
-        return $this->getOptions()['defaultSort'] ?? [['field' => '', 'order' => 'asc']];
+        if (empty($this->options->defaultSort)) {
+            $this->options->defaultSort = [new SortOptionDTO(field: '', order: 'asc')];
+        }
+
+        return array_map(static function ($sort) {
+            return $sort->toArray();
+        }, $this->options->defaultSort);
     }
 
     public function getTranslationDomain(): string
     {
-        return $this->getOptions()['translationDomain'] ?? '';
+        return $this->options->translationDomain ?? '';
     }
 
     public function getDefaultPageSize(): int
     {
-        return (int) ($this->getOptions()['defaultPageSize'] ?? Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE);
+        return $this->options->defaultPageSize ?? Configuration::DEFAULT_DATATABLE_ITEMS_PER_PAGE;
     }
 
     public function isExportable(): bool
     {
-        return (bool) ($this->getOptions()['exportable'] ?? true);
+        return $this->options->exportable;
+    }
+
+    public function isCsvExportable(): bool
+    {
+        return $this->isExportable() && $this->options->exportCsv;
+    }
+
+    public function isPdfExportable(): bool
+    {
+        return $this->isExportable() && $this->options->exportPdf;
+    }
+
+    public function isExcelExportable(): bool
+    {
+        return $this->isExportable() && $this->options->exportExcel;
     }
 
     public function isSortable(): bool
     {
-        return (bool) ($this->getOptions()['sortable'] ?? true);
+        return $this->options->sortable;
     }
 
     public function isSearchable(): bool
     {
-        return (bool) ($this->getOptions()['searchable'] ?? true);
+        return $this->options->searchable;
+    }
+
+    public function hasSelectorColumn(): bool
+    {
+        return null !== $this->options->selectorColumn;
+    }
+
+    public function hasActionColumn(): bool
+    {
+        return null !== $this->options->actionColumn && !empty($this->options->actionColumn->template);
     }
 
     /**
@@ -773,22 +294,22 @@ abstract class AbstractDatatable
             $searchParts = [];
             foreach ($columns as $column) {
                 $searchExpression = '';
-                if ($column['searchable'] ?? true) {
+                if ($column->searchable ?? true) {
                     // Only search on "searchable" columns
 
-                    switch ($column['datatype'] ?? '') {
+                    switch ($column->datatype ?? '') {
                         case 'integer':
-                            $searchExpression .= sprintf('%s.%s = :search%s', $column['sqlAlias'] ?? $this->getMainAlias(), $column['name'], $searchParamCount);
+                            $searchExpression .= sprintf('%s.%s = :search%s', $column->sqlAlias ?? $this->getMainAlias(), $column->name, $searchParamCount);
                             $queryBuilder
                                 ->setParameter('search'.$searchParamCount, (int) $search);
                             break;
                         case 'double':
-                            $searchExpression .= sprintf('%s.%s = :search%s', $column['sqlAlias'] ?? $this->getMainAlias(), $column['name'], $searchParamCount);
+                            $searchExpression .= sprintf('%s.%s = :search%s', $column->sqlAlias ?? $this->getMainAlias(), $column->name, $searchParamCount);
                             $queryBuilder
                                 ->setParameter('search'.$searchParamCount, (float) $search);
                             break;
                         case 'string':
-                            $searchExpression .= sprintf('%s.%s LIKE :search%s', $column['sqlAlias'] ?? $this->getMainAlias(), $column['name'], $searchParamCount);
+                            $searchExpression .= sprintf('%s.%s LIKE :search%s', $column->sqlAlias ?? $this->getMainAlias(), $column->name, $searchParamCount);
                             $queryBuilder
                                 ->setParameter('search'.$searchParamCount, "%$search%");
                             break;
@@ -837,7 +358,7 @@ abstract class AbstractDatatable
         // Compose columns selected query. Each column is named with its alias to allow dynamic filtering / sorting...
         foreach ($this->columns as $column) {
             $this->queryBuilder
-                ?->addSelect(sprintf('%s.%s AS %s', $column['sqlAlias'] ?? $this->getMainAlias(), $column['name'], $column['nameAs'] ?? $column['name']));
+                ?->addSelect(sprintf('%s.%s AS %s', $column->sqlAlias ?? $this->getMainAlias(), $column->name, $column->nameAs ?? $column->name));
         }
 
         if (null === $this->queryBuilder) {
@@ -886,39 +407,35 @@ abstract class AbstractDatatable
     }
 
     /**
-     * @param array<string, array{
-     *       rank: int,
-     *       datatype: string,
-     *       isEnum: bool,
-     *       isTranslatableEnum: bool,
-     *  }> $cachedTypes
+     * @param ColumnCachedTypeDTO[] $cachedTypes
      */
     public function setCachedTypes(array $cachedTypes): void
     {
+        $templatePrefix = '@ZhorteinSymfonyToolbox/datatables/column_types/';
         foreach ($cachedTypes as $columnTypeDefinition) {
-            if (is_int($columnTypeDefinition['rank'])) {
-                $this->columns[$columnTypeDefinition['rank']]['datatype'] = (string) $columnTypeDefinition['datatype'];
-                $this->columns[$columnTypeDefinition['rank']]['isEnum'] = (bool) $columnTypeDefinition['isEnum'];
-                $this->columns[$columnTypeDefinition['rank']]['isTranslatableEnum'] = $columnTypeDefinition['isEnum'] && $columnTypeDefinition['isTranslatableEnum'];
+            if (is_int($columnTypeDefinition->rank)) {
+                $this->columns[$columnTypeDefinition->rank]->datatype = $columnTypeDefinition->datatype;
+                $this->columns[$columnTypeDefinition->rank]->isEnum = $columnTypeDefinition->isEnum;
+                $this->columns[$columnTypeDefinition->rank]->isTranslatableEnum = $columnTypeDefinition->isEnum && $columnTypeDefinition->isTranslatableEnum;
 
-                if (empty($this->columns[$columnTypeDefinition['rank']]['template'])) {
-                    $this->columns[$columnTypeDefinition['rank']]['template'] = match ((string) $columnTypeDefinition['datatype']) {
-                        'enum' => '@ZhorteinSymfonyToolbox/datatables/column_types/_enum.html.twig',
-                        'enum_translatable' => '@ZhorteinSymfonyToolbox/datatables/column_types/_enum-translatable.html.twig',
-                        'array' => '@ZhorteinSymfonyToolbox/datatables/column_types/_array.html.twig',
-                        'boolean' => '@ZhorteinSymfonyToolbox/datatables/column_types/_boolean.html.twig',
-                        \DateTimeInterface::class, \DateTime::class, \DateTimeImmutable::class => '@ZhorteinSymfonyToolbox/datatables/column_types/_datetime.html.twig',
-                        \DateInterval::class => '@ZhorteinSymfonyToolbox/datatables/column_types/_dateinterval.html.twig',
-                        \DatePeriod::class => '@ZhorteinSymfonyToolbox/datatables/column_types/_dateperiod.html.twig',
-                        \DateTimeZone::class => '@ZhorteinSymfonyToolbox/datatables/column_types/_timezone.html.twig',
-                        'double' => '@ZhorteinSymfonyToolbox/datatables/column_types/_double.html.twig',
-                        'integer' => '@ZhorteinSymfonyToolbox/datatables/column_types/_integer.html.twig',
-                        'object' => '@ZhorteinSymfonyToolbox/datatables/column_types/_object.html.twig',
-                        'resource' => '@ZhorteinSymfonyToolbox/datatables/column_types/_resource.html.twig',
-                        'resource (closed)' => '@ZhorteinSymfonyToolbox/datatables/column_types/_resource-closed.html.twig',
-                        'unknown type' => '@ZhorteinSymfonyToolbox/datatables/column_types/_unknown.html.twig',
-                        'NULL' => '@ZhorteinSymfonyToolbox/datatables/column_types/_null.html.twig',
-                        default => '@ZhorteinSymfonyToolbox/datatables/column_types/_string.html.twig',
+                if (empty($this->columns[$columnTypeDefinition->rank]->template)) {
+                    $this->columns[$columnTypeDefinition->rank]->template = $templatePrefix.match ($columnTypeDefinition->datatype) {
+                        'enum' => '_enum.html.twig',
+                        'enum_translatable' => '_enum-translatable.html.twig',
+                        'array' => '_array.html.twig',
+                        'boolean' => '_boolean.html.twig',
+                        \DateTimeInterface::class, \DateTime::class, \DateTimeImmutable::class => '_datetime.html.twig',
+                        \DateInterval::class => '_dateinterval.html.twig',
+                        \DatePeriod::class => '_dateperiod.html.twig',
+                        \DateTimeZone::class => '_timezone.html.twig',
+                        'double' => '_double.html.twig',
+                        'integer' => '_integer.html.twig',
+                        'object' => '_object.html.twig',
+                        'resource' => '_resource.html.twig',
+                        'resource (closed)' => '_resource-closed.html.twig',
+                        'unknown type' => '_unknown.html.twig',
+                        'NULL' => '_null.html.twig',
+                        default => '_string.html.twig',
                     };
                 }
             }
@@ -927,13 +444,16 @@ abstract class AbstractDatatable
 
     public function isIconUxMode(): bool
     {
-        return $this->getGlobalOptions()['ux_icons'] ?? true;
+        return $this->globalOptions->uxIcons ?? true;
     }
 
     public function getIcon(string $iconName): string
     {
-        $default = $this->isIconUxMode() ? 'carbon:unknown' : '';
+        return $this->globalOptions->uxIconsOptions->getIcon($iconName, $this->isIconUxMode());
+    }
 
-        return $this->getGlobalOptions()['ux_icons_options'][$iconName] ?? $default;
+    public function getDatatableName(): string
+    {
+        return $this->options->name;
     }
 }

@@ -1,0 +1,32 @@
+{% set searchBarClass = searchClasses.searchBarClass %}
+{% set searchContainerClass = searchClasses.searchContainer %}
+{% if not datatable.isSearchable() %}
+    {% set searchContainerClass = searchClasses.searchContainer ~ ' ' ~ hiddenClass %}
+{% endif %}
+{% set labelClass = searchClasses.label %}
+{% set labelText = 'datatable.search'|trans({}, transDomain) %}
+{% set inputClass = searchClasses.input %}
+{% set iconContainerClass = searchClasses.iconContainer %}
+{% set iconClass = searchClasses.icon %}
+
+<div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="{{ searchBarClass }}">
+    <div class="{{ searchContainerClass }}">
+        {% if labelClass is not empty %}
+            <label for="search-button" class="{{ labelClass }}">{{ labelText }}</label>
+        {% endif %}
+        <div class="{{ searchClasses.inputWrapper }}">
+            {% if iconContainerClass is not empty %}
+                <div class="{{ iconContainerClass }}" id="search-button">
+                    {{ ux_icon(datatable.getIcon('icon_search'), {class: iconClass, viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
+                </div>
+            {% endif %}
+            <input
+                    data-action="input->zhortein--symfony-toolbox-bundle--datatable#search"
+                    type="text"
+                    class="{{ inputClass }}"
+                    placeholder="{{ labelText }}"
+                    aria-describedby="search-button"
+            >
+        </div>
+    </div>
+</div>

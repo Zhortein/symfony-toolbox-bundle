@@ -9,7 +9,6 @@ use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Filesystem\Filesystem;
-use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 
 class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtensionInterface
 {
@@ -21,40 +20,10 @@ class ZhorteinSymfonyToolboxExtension extends Extension implements PrependExtens
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
         $actionEnums = is_array($config['action_enums']) ? $config['action_enums'] : [];
+        $datatables = is_array($config['datatables']) ? $config['datatables'] : [];
 
         $container->setParameter('zhortein_symfony_toolbox.action_enums', $actionEnums);
-
-        /**
-         * @var array{
-         *     datatables: array{
-         *             css_mode: string,
-         *             items_per_page: int,
-         *             paginator: string,
-         *             ux_icons: bool,
-         *             ux_icons_options: array{
-         *             icon_first: string,
-         *             icon_previous: string,
-         *             icon_next: string,
-         *             icon_last: string,
-         *             icon_search: string,
-         *             icon_true: string,
-         *             icon_false: string,
-         *             icon_sort_neutral: string,
-         *             icon_sort_asc: string,
-         *             icon_sort_desc: string,
-         *             icon_filter: string,
-         *       }
-         *  }
-         * } $config
-         */
-        $datatableConfig = $config['datatables'] ?? [];
-        $container->setParameter('zhortein_symfony_toolbox.datatables', $datatableConfig);
-
-        if ($container->hasDefinition(DatatableManager::class)) {
-            $container->getDefinition(DatatableManager::class)
-                ->setArgument(2, $config['datatables'])
-            ;
-        }
+        $container->setParameter('zhortein_symfony_toolbox.datatables', $datatables);
 
         $this->handleBundleRoutes($container);
     }

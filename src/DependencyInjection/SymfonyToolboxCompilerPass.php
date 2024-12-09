@@ -9,6 +9,9 @@ use Symfony\Component\DependencyInjection\Reference;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsDatatable;
 use Zhortein\SymfonyToolboxBundle\Attribute\AsHolidayProvider;
 use Zhortein\SymfonyToolboxBundle\Doctrine\DBAL\Types\EnumActionType;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\ColumnDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\DatatableOptionsDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\GlobalOptionsDTO;
 use Zhortein\SymfonyToolboxBundle\Service\Cache\CacheManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\HolidayProviderManager;
@@ -26,17 +29,58 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
     private array $datatables = [];
 
     /**
-     * @var array<string, mixed>
+     * @var array<string, ColumnDTO[]>
      */
-    private array $datatableOptions = [];
+    private array $datatablesColumns = [];
+
+    /**
+     * @var DatatableOptionsDTO[]
+     */
+    private array $datatablesOptions = [];
+
+    private GlobalOptionsDTO $datatableGlobalOptions;
 
     public function process(ContainerBuilder $container): void
     {
         $haveHolidayProviders = false;
+
+        /**
+         * @var array{
+         *        css_mode: string,
+         *        items_per_page: int,
+         *        paginator: string,
+         *        export: array{
+         *             enabled_by_default: bool,
+         *             export_csv: bool,
+         *             export_pdf: bool,
+         *             export_excel: bool,
+         *        },
+         *        ux_icons: bool,
+         *        ux_icons_options: array{
+         *             icon_first: string,
+         *             icon_previous: string,
+         *             icon_next: string,
+         *             icon_last: string,
+         *             icon_search: string,
+         *             icon_true: string,
+         *             icon_false: string,
+         *             icon_sort_neutral: string,
+         *             icon_sort_asc: string,
+         *             icon_sort_desc: string,
+         *             icon_filter: string,
+         *             icon_export_csv: string,
+         *             icon_export_pdf: string,
+         *             icon_export_excel: string,
+         *        }
+         *    } $globalOptions
+         */
+        $globalOptions = $container->getParameter('zhortein_symfony_toolbox.datatables');
+        $this->datatableGlobalOptions = GlobalOptionsDTO::fromArray($globalOptions);
+
         foreach ($container->getDefinitions() as $definition) {
             $class = $definition->getClass();
 
-            if (!$class || !class_exists($class)) {
+            if (!$class || !class_exists($class) || str_contains($class, 'class@anonymous')) {
                 continue;
             }
 
@@ -64,12 +108,100 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
      */
     private function detectDatatables(\ReflectionClass $class): bool
     {
-        $attribute = $class->getAttributes(AsDatatable::class);
-        if ($attribute) {
-            $instance = $attribute[0]->newInstance();
+        /** @var AsDatatable|null $instance */
+        $instance = $class->getAttributes(AsDatatable::class)[0] ?? null;
+        if ($instance) {
             $serviceId = $class->getName();
+
+            /**
+             * @var array{
+             *      columns: array<int, array{
+             *          name: string,
+             *          label: string,
+             *          searchable?: bool,
+             *          sortable?: bool,
+             *          nameAs?: string,
+             *          alias?: string,
+             *          sqlAlias?: string,
+             *          datatype?: string,
+             *          template?: string,
+             *          header?: array{
+             *              translate?: bool,
+             *              keep_default_classes?: bool,
+             *              class?: string,
+             *              data?: array<string, string|int|float|bool|null>
+             *          },
+             *          dataset?: array{
+             *              translate?: bool,
+             *              keep_default_classes?: bool,
+             *              class?: string,
+             *              data?: array<string, string|int|float|bool|null>
+             *          },
+             *          footer?: array{
+             *              translate?: bool,
+             *              keep_default_classes?: bool,
+             *              class?: string,
+             *              data?: array<string, string|int|float|bool|null>
+             *          },
+             *          autoColumns?: bool,
+             *          isEnum?: bool,
+             *          isTranslatableEnum?: bool
+             *      }>,
+             *      name: string,
+             *      defaultPageSize?: int,
+             *      defaultSort?: array<int, array{
+             *           field: string,
+             *           order: string
+             *      }>,
+             *      searchable?: bool,
+             *      sortable?: bool,
+             *      exportable?: bool,
+             *      exportCsv?: bool,
+             *      exportPdf?: bool,
+             *      exportExcel?: bool,
+             *      autoColumns?: bool,
+             *      translationDomain?: string,
+             *      actionColumn?: array{
+             *          label?: string,
+             *          template?: string
+             *      },
+             *      selectorColumn?: array{
+             *          label?: string,
+             *          template?: string
+             *      },
+             *      options?: array{
+             *       thead?: array{
+             *         translate?: bool,
+             *         keep_default_classes?: bool,
+             *         class?: string,
+             *         data?: array<string, string|int|float|bool|null>,
+             *     },
+             *       tbody?: array{
+             *         translate?: bool,
+             *         keep_default_classes?: bool,
+             *         class?: string,
+             *         data?: array<string, string|int|float|bool|null>,
+             *     },
+             *       tfoot?: array{
+             *         translate?: bool,
+             *         keep_default_classes?: bool,
+             *         class?: string,
+             *         data?: array<string, string|int|float|bool|null>,
+             *     },
+             *   }
+             *  } $attrOptions
+             */
+            $attrOptions = $instance->toArray();
+            if (!array_key_exists('name', $attrOptions) || !array_key_exists('columns', $attrOptions) || !is_array($attrOptions['columns'])) {
+                throw new \InvalidArgumentException('Datatable name and columns must be defined for '.$instance->name);
+            }
             $this->datatables[$instance->name] = new Reference($serviceId);
-            $this->datatableOptions[$instance->name] = $instance->toArray();
+            $this->datatablesColumns[$instance->name] = [];
+
+            foreach ($attrOptions['columns'] as $column) {
+                $this->datatablesColumns[$instance->name][] = ColumnDTO::fromArray($column);
+            }
+            $this->datatablesOptions[$instance->name] = DatatableOptionsDTO::fromArray($attrOptions, $this->datatableGlobalOptions);
 
             return true;
         }
@@ -82,8 +214,10 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         if ($container->hasDefinition(DatatableManager::class)) {
             $container->getDefinition(DatatableManager::class)
                 ->setArgument(0, $this->datatables)
-                ->setArgument(1, $this->datatableOptions)
-                ->setArgument(3, new Reference(CacheManager::class))
+                ->setArgument(1, $this->datatablesColumns)
+                ->setArgument(2, $this->datatablesOptions)
+                ->setArgument(3, $this->datatableGlobalOptions)
+                ->setArgument(4, new Reference(CacheManager::class))
             ;
         }
     }
@@ -95,14 +229,13 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
      */
     private function detectHolidayProvider(\ReflectionClass $class): bool
     {
-        $attribute = $class->getAttributes(AsHolidayProvider::class);
-        if (!$attribute) {
+        /** @var AsHolidayProvider|null $instance */
+        $instance = $class->getAttributes(AsHolidayProvider::class)[0] ?? null;
+        if (!$instance) {
             return false;
         }
 
-        $instance = $attribute[0]->newInstance();
         $countryCodes = $instance->countryCodes;
-
         $serviceId = $class->getName();
         foreach ($countryCodes as $countryCode) {
             $this->holidayProviders[strtoupper($countryCode)] = new Reference($serviceId);

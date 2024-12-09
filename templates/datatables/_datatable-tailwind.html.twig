@@ -1,175 +1,29 @@
-<div
-        data-controller="zhortein--symfony-toolbox-bundle--datatable"
-        data-zhortein--symfony-toolbox-bundle--datatable-id-value="{{ datatableId }}"
-        data-zhortein--symfony-toolbox-bundle--datatable-mode-value="{{ datatable.cssMode }}"
-        data-zhortein--symfony-toolbox-bundle--datatable-pagesize-value="{{ datatable.defaultPageSize }}"
-        data-zhortein--symfony-toolbox-bundle--datatable-url-value="{{ path('zhortein_datatable_fetch_data', {'datatableId': datatableId}) }}"
-        data-zhortein--symfony-toolbox-bundle--datatable-download-value="{{ path('zhortein_datatable_export', {'datatableId': datatableId}) }}"
-        {{ attributes }}
-        class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
-    <div data-zhortein--symfony-toolbox-bundle--datatable-target="error" class="datatable-error hidden"></div>
-    <div data-zhortein--symfony-toolbox-bundle--datatable-target="actions" class="datatable-actions{% if not datatable.options.exportable %} hidden{% endif %}">
-        <span class="isolate inline-flex rounded-md shadow-sm">
-          <button
-                  type="button"
-                  class="relative inline-flex items-center rounded-l-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
-                  data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportCsv"
-                  data-zhortein--symfony-toolbox-bundle--datatable-target="export"
-          >{{ 'datatable.export.csv'|trans({}, transDomain) }}</button>
-          <button
-                  type="button"
-                  class="relative -ml-px inline-flex items-center bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
-                  data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportExcel"
-                  data-zhortein--symfony-toolbox-bundle--datatable-target="export"
-          >{{ 'datatable.export.excel'|trans({}, transDomain) }}</button>
-          <button
-                  type="button"
-                  class="relative -ml-px inline-flex items-center rounded-r-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10"
-                  data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportPdf"
-                  data-zhortein--symfony-toolbox-bundle--datatable-target="export"
-          >{{ 'datatable.export.pdf'|trans({}, transDomain) }}</button>
-        </span>
-    </div>
-    <div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="datatable-search{% if not datatable.options.searchable %} hidden{% endif %}">
-        <div>
-            <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
-            <div class="relative mt-2 rounded-md shadow-sm">
-                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3" id="search-button">
-                    {{ ux_icon(datatable.getIcon('icon_search'), {class: 'size-5', viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
-                </div>
-                <input data-action="input->zhortein--symfony-toolbox-bundle--datatable#search" type="text" class="block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6" placeholder="{{ 'datatable.search'|trans({}, transDomain) }}" aria-describedby="search-button">
-            </div>
-        </div>
-    </div>
-    <div data-zhortein--symfony-toolbox-bundle--datatable-target="spinner" class="datatable-spinner hidden">{{ 'datatable.loading'|trans({}, transDomain) }}</div>
-    <table class="datatable min-w-full divide-y divide-gray-300">
-        <thead data-zhortein--symfony-toolbox-bundle--datatable-target="header"
-                class="{% if datatable.options.options.thead.keep_default_classes %}{% endif %}{{ datatable.options.options.thead.class }}"
-                {% for headerKey,headerValue in datatable.options.options.thead %}
-                    {% if headerKey == 'data' %}
-                        {% for dataKey,dataValue in datatable.options.options.thead.data %}
-                            data-{{ dataKey }}="{{ dataValue }}"
-                        {% endfor %}
-                    {% endif %}
+{% extends '@ZhorteinSymfonyToolbox/datatables/_datatable-base.html.twig' %}
 
-                    {% if headerKey not in ['class','data','keep_default_classes','translate'] %}
-                        {{ headerKey }}="{{ headerValue }}"
-                    {% endif %}
-                {% endfor %}
-        >
-        <tr>
-            {% if datatable.options.selectorColumn is defined and datatable.options.selectorColumn is not empty %}
-                <th>
-                    {% if datatable.options.selectorColumn.label is defined %}
-                        {% set selectorLabel =  datatable.options.selectorColumn.label %}
-                    {% endif %}
-                    {% if datatable.translationDomain is not empty %}
-                        {% set selectorLabel = selectorLabel|trans({}, datatable.translationDomain) %}
-                    {% endif %}
-                    {{ selectorLabel }}
-                </th>
-            {% endif %}
-            {% for column in datatable.columns %}
-                {% if column.header.keep_default_classes %}
-                    {% if loop.index == 1 %}
-                        {% set headerCssClasses = 'py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0' %}
-                    {% else %}
-                        {% set headerCssClasses = 'px-3 py-3.5 text-left text-sm font-semibold text-gray-900' %}
-                    {% endif %}
-                {% endif %}
-                {% set headerCssClasses = headerCssClasses ~ ' ' ~ column.header.class %}
-                <th
-                        scope="col"
-                        class="{{ headerCssClasses }}"
-                        {% if datatable.options.sortable and column.sortable %}
-                        data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort"
-                        data-field="{{ column.nameAs }}"
-                        {% endif %}
-                        {% for headerKey,headerValue in column.header %}
-                            {% if headerKey == 'data' %}
-                                {% for dataKey,dataValue in column.header.data %}
-                                    {% if dataKey != 'field' and dataKey != 'action' %}
-                                        data-{{ dataKey }}="{{ dataValue }}"
-                                    {% endif %}
-                                {% endfor %}
-                            {% endif %}
+{% set tableClass = 'datatable min-w-full divide-y divide-gray-300' %}
+{% set tableTheadClass = '' %}
+{% set headerFirstCssClasses = 'py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-0' %}
+{% set headerOthersCssClasses = 'px-3 py-3.5 text-left text-sm font-semibold text-gray-900' %}
+{% set headerCssClasses = '' %}
+{% set tableTbodyClass = '' %}
+{% set tableTfootClass = '' %}
+{% set hiddenClass = 'hidden' %}
+{% set datatableErrorClass = 'datatable-error' %}
+{% set actionBarClass = 'datatable-actions' %}
+{% set actionContainerClass = 'button-group isolate inline-flex' %}
+{% set actionClasses = {
+    firstButton: 'relative inline-flex items-center rounded-l-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10',
+    button: 'relative -ml-px inline-flex items-center bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10',
+    lastButton: 'relative -ml-px inline-flex items-center rounded-r-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-10'
+} %}
+{% set paginationClass = 'datatable-pagination isolate inline-flex -space-x-px rounded-md shadow-sm' %}
 
-                            {% if headerKey not in ['class','data','keep_default_classes','translate'] %}
-                                {{ headerKey }}="{{ headerValue }}"
-                            {% endif %}
-                        {% endfor %}
-                >
-                    <span class="datatable-sort-icon" data-priority="0"></span>
-                    {% if datatable.translationDomain is not empty and column.header.translate %}{{ column.label|trans({}, datatable.translationDomain) }}{% else %}{{ column.label }}{% endif %}
-                </th>
-            {% endfor %}
-            {% if datatable.options.actionColumn is defined and datatable.options.actionColumn is not empty %}
-                <th>
-                    {% if datatable.options.actionColumn.label is defined %}
-                        {% set actionLabel = datatable.options.actionColumn.label %}
-                    {% endif %}
-                    {% if datatable.translationDomain is not empty %}
-                        {% set actionLabel = actionLabel|trans({}, datatable.translationDomain) %}
-                    {% endif %}
-                    {{ actionLabel }}
-                </th>
-            {% endif %}
-        </tr>
-        </thead>
-        <tbody
-                class="{% if datatable.options.options.tbody.keep_default_classes %}divide-y divide-gray-200 {% endif %}{{ datatable.options.options.tbody.class }}"
-                data-zhortein--symfony-toolbox-bundle--datatable-target="table"
-                {% for key,value in datatable.options.options.tbody %}
-                    {% if key == 'data' %}
-                        {% for dataKey,dataValue in datatable.options.options.tbody.data %}
-                            data-{{ dataKey }}="{{ dataValue }}"
-                        {% endfor %}
-                    {% endif %}
-
-                    {% if key not in ['class','data','keep_default_classes','translate'] %}
-                        {{ key }}="{{ value }}"
-                    {% endif %}
-                {% endfor %}
-        >
-        <!-- Initial rows will be populated dynamically -->
-        </tbody>
-        {% if datatable.displayFooter %}
-            <tfoot
-                    class="{% if datatable.options.options.tfoot.keep_default_classes %}{% endif %}{{ datatable.options.options.tfoot.class }}"
-                    data-zhortein--symfony-toolbox-bundle--datatable-target="footer"
-                    {% for key,value in datatable.options.options.tfoot %}
-                        {% if key == 'data' %}
-                            {% for dataKey,dataValue in datatable.options.options.tfoot.data %}
-                                data-{{ dataKey }}="{{ dataValue }}"
-                            {% endfor %}
-                        {% endif %}
-
-                        {% if key not in ['class','data','keep_default_classes','translate'] %}
-                            {{ key }}="{{ value }}"
-                        {% endif %}
-                    {% endfor %}
-            >
-            {# @todo Datatable footer : To be implemented #}
-            </tfoot>
-        {% endif %}
-    </table>
-    <nav
-            class="{% if datatable.options.options.pagination.keep_default_classes %}datatable-pagination isolate inline-flex -space-x-px rounded-md shadow-sm {% endif %}{{ datatable.options.options.pagination.class }}"
-            aria-label="{{ 'datatable.pagination'|trans({}, transDomain) }}"
-            data-zhortein--symfony-toolbox-bundle--datatable-target="pagination"
-
-            {% for key,value in datatable.options.options.pagination %}
-                {% if key == 'data' %}
-                    {% for dataKey,dataValue in datatable.options.options.pagination.data %}
-                        data-{{ dataKey }}="{{ dataValue }}"
-                    {% endfor %}
-                {% endif %}
-
-                {% if key not in ['class','data','keep_default_classes','translate'] %}
-                    {{ key }}="{{ value }}"
-                {% endif %}
-            {% endfor %}
-    >
-        <!-- Pagination dynamically handled -->
-    </nav>
-</div>
+{% set searchClasses = {
+    searchBarClass: 'datatable-search',
+    searchContainer: '',
+    label: 'block text-sm/6 font-medium text-gray-900',
+    inputWrapper: 'relative mt-2 rounded-md shadow-sm',
+    iconContainer: 'pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3',
+    icon: 'sizze-5',
+    input: 'block w-full rounded-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6'
+} %}

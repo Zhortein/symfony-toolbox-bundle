@@ -16,7 +16,7 @@ abstract class ExportService
     ) {
     }
 
-    abstract public function export(AbstractDatatable $datatable, Request $request, string $datatableName): Response;
+    abstract public function export(AbstractDatatable $datatable, Request $request): Response;
 
     protected function getFilename(string $datatableName, string $extension): string
     {
@@ -31,7 +31,7 @@ abstract class ExportService
         if (!empty($datatable->getTranslationDomain())) {
             $headers = [];
             foreach ($datatable->getColumns() as $column) {
-                $headers[] = $this->translator->trans($column['label'], [], $datatable->getTranslationDomain());
+                $headers[] = $this->translator->trans($column->label, [], $datatable->getTranslationDomain());
             }
 
             return $headers;
@@ -49,7 +49,7 @@ abstract class ExportService
     {
         $data = [];
         foreach ($datatable->getColumns() as $column) {
-            $data[] = $row[$column['nameAs'] ?? $column['name']] ?? '';
+            $data[] = $row[$column->nameAs ?? $column->name] ?? '';
         }
 
         return $data;

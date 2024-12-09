@@ -10,7 +10,7 @@ use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 
 class ExportExcelService extends ExportService
 {
-    public function export(AbstractDatatable $datatable, Request $request, string $datatableName): Response
+    public function export(AbstractDatatable $datatable, Request $request): Response
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
@@ -45,7 +45,7 @@ class ExportExcelService extends ExportService
             200,
             [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                'Content-Disposition' => 'attachment; filename="'.$this->getFilename($datatableName, 'xlsx').'"',
+                'Content-Disposition' => 'attachment; filename="'.$this->getFilename($datatable->getDatatableName(), 'xlsx').'"',
             ]
         );
     }
