@@ -102,11 +102,15 @@ class DatatableService
         // Get default sorting
         $defaultSort = $datatable->getDefaultSort();
 
-        // Get multiSort from the QueryString
+        // Get multiSort and filters (search builder) from the QueryString
         $multiSort = [];
+        $filters = [];
         foreach ($request->query->all() as $key => $value) {
             if ('multiSort' === $key) {
                 $multiSort = $value;
+            }
+            if ('filters' === $key) {
+                $filters = $value;
             }
         }
 
@@ -145,6 +149,7 @@ class DatatableService
             'limit' => max(1, (int) $request->query->get('limit', (string) $defaultPageSize)),
             'multiSort' => $validatedMultiSort,
             'search' => $request->query->get('search'),
+            'filters' => $filters,
         ];
     }
 
@@ -281,7 +286,7 @@ class DatatableService
         if ($params['search'] && $datatable->isSearchable()) {
             $datatable->applySearch($queryBuilder, $params['search']);
         }
-        if ($params['filters'] && $datatable->isSearchable()) {
+        if (!empty($params['filters']) && $datatable->isSearchable()) {
             $datatable->applyFilters($queryBuilder, $params['filters']);
         }
         $datatable->applyStaticFilters($queryBuilder);

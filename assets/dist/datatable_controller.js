@@ -24,7 +24,7 @@ export default class extends Controller {
             multiSort: []
         };
 
-        await this.loadFilterInfo();
+        this.loadFilterInfo();
         this.updateTable();
     }
 
