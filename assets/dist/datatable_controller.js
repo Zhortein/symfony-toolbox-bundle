@@ -59,7 +59,7 @@ export default class extends Controller {
         // Ajout des filtres
         const filterData = this.filters.map(filter => ({
             column: filter.column,
-            type: filter.filterType,
+            type: filter.type,
             value1: this.getInputValue(`filters[${filter.id}][value1]`),
             value2: this.getInputValue(`filters[${filter.id}][value2]`),
             values: this.getInputValues(`filters[${filter.id}][values][]`)
