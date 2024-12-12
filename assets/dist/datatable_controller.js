@@ -64,7 +64,14 @@ export default class extends Controller {
             value2: this.getInputValue(`filters[${filter.id}][value2]`),
             values: this.getInputValues(`filters[${filter.id}][values][]`)
         }));
-        url.searchParams.set('filters', JSON.stringify(filterData));
+
+        filterData.forEach((filter, index) => {
+            url.searchParams.set(`filters[${index}][column]`, filter.column);
+            url.searchParams.set(`filters[${index}][type]`, filter.type);
+            url.searchParams.set(`filters[${index}][value1]`, filter.value1 || '');
+            url.searchParams.set(`filters[${index}][value2]`, filter.value2 || '');
+            url.searchParams.set(`filters[${index}][values]`, filter.values || []);
+        });
 
         try {
             const response = await fetch(url);
@@ -266,27 +273,31 @@ export default class extends Controller {
 
     renderFilters() {
         const filtersHtml = this.filters.map(filter => this.renderFilter(filter)).join('');
-        this.filterContainerTarget.innerHTML = filtersHtml;
+        this.filtersTarget.innerHTML = filtersHtml;
     }
 
     renderFilter(filter) {
         // On va devoir rendre ces options dynamiques, à adapter
-        const columnOptions = this.getColumnOptions();
-        const filterTypeOptions = this.getFilterTypeOptions(filter.column);
+        const columnOptions = this.getColumnOptions(filter);
+        const filterTypeOptions = this.getFilterTypeOptions(filter);
         const inputFields = this.getInputFields(filter);
 
         return `
         <div class="filter" data-filter-id="${filter.id}">
             <select name="filters[${filter.id}][column]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeColumn">
+                <option>---</option>
                 ${columnOptions}
             </select>
 
             <select name="filters[${filter.id}][type]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeFilterType">
+                <option>---</option>
                 ${filterTypeOptions}
             </select>
 
-            ${inputFields}
-
+            <div data-filter-inputs>
+                ${inputFields}
+            </div>
+            
             <button 
                 data-filter-id="${filter.id}" 
                 data-action="click->zhortein--symfony-toolbox-bundle--datatable#deleteFilter"
@@ -295,8 +306,8 @@ export default class extends Controller {
     `;
     }
 
-    getColumnOptions() {
-        return this.columns.map(col => `<option value="${col.name}">${col.label}</option>`).join('');
+    getColumnOptions(filter) {
+        return this.columns.map(col => `<option value="${col.name}" ${filter.column === col.name ? 'selected' : ''}>${col.label}</option>`).join('');
     }
 
     getEnumOptions(columnName) {
@@ -308,33 +319,33 @@ export default class extends Controller {
         ).join('');
     }
 
-    getFilterTypeOptions(columnName) {
-        const column = this.columns.find(col => col.name === columnName);
+    getFilterTypeOptions(filter) {
+        const column = this.columns.find(col => col.name === filter.column);
         if (!column) return '';
 
-        return column.filters.map(filter => {
-            return `<option value="${filter.id}">${filter.label}</option>`;
+        return column.filters.map(f => {
+            return `<option value="${f.id}" ${filter.type === f.id ? 'selected' : ''}>${f.label}</option>`;
         }).join('');
     }
 
     getInputFields(filter) {
-        const filterType = filter.filterType;
+        const filterType = filter.type;
         if (!filterType) return '';
 
         switch (filterType) {
             case 'before':
             case 'after':
-                return `<input type="date" name="filters[${filter.id}][value1]" value="${filter.value1 || ''}" />`;
+                return `<input required type="date" name="filters[${filter.id}][value1]" value="${filter.value1 || ''}" />`;
             case 'between':
             case 'not_between':
                 return `
-                <input type="text" name="filters[${filter.id}][value1]" value="${filter.value1 || ''}" />
-                <input type="text" name="filters[${filter.id}][value2]" value="${filter.value2 || ''}" />
+                <input required type="text" name="filters[${filter.id}][value1]" value="${filter.value1 || ''}" />
+                <input required type="text" name="filters[${filter.id}][value2]" value="${filter.value2 || ''}" />
             `;
 
             case 'in':
             case 'not_in':
-                return `<select multiple name="filters[${filter.id}][values][]">${this.getEnumOptions(filter.column)}</select>`;
+                return `<select required multiple name="filters[${filter.id}][values][]">${this.getEnumOptions(filter.column)}</select>`;
 
             case 'is_true':
             case 'is_false':
@@ -343,7 +354,7 @@ export default class extends Controller {
                 return ``; // Aucun champ nécessaire pour ces filtres
 
             default:
-                return `<input type="text" name="filters[${filter.id}][value1]" value="${filter.value1 || ''}" />`;
+                return `<input required type="text" name="filters[${filter.id}][value1]" value="${filter.value1 || ''}" />`;
         }
     }
 
@@ -353,7 +364,81 @@ export default class extends Controller {
     }
 
     hideErrorPanel() {
-        this.errorTarget.innerHTML = message;
+        this.errorTarget.innerHTML = '';
         this.errorTarget.classList.add(this.getHiddenClass());
+    }
+
+    changeColumn(event) {
+        const filterId = this.getFilterIdFromElement(event.target);
+        const selectedColumnName = event.target.value;
+
+        // Trouver la colonne correspondante
+        const column = this.columns.find(col => col.name === selectedColumnName);
+        if (!column) {
+            console.warn(`Colonne "${selectedColumnName}" non trouvée dans la liste des colonnes disponibles.`);
+            return;
+        }
+
+        // Mettre à jour l'état du filtre pour la colonne sélectionnée
+        const filterData = this.filters.find(f => f.id === parseInt(filterId));
+        if (filterData) {
+            filterData.column = selectedColumnName;
+            filterData.type = ''; // On réinitialise le type de filtre
+            filterData.value1 = '';
+            filterData.value2 = '';
+            filterData.values = [];
+        }
+
+        // Mettre à jour les options de type de filtre
+        const filterTypeSelect = event.target.closest('.filter').querySelector(`select[name="filters[${filterId}][type]"]`);
+        if (filterTypeSelect) {
+            filterTypeSelect.innerHTML = `
+            <option value="">---</option>
+            ${column.filters.map(filter => `<option value="${filter.id}">${filter.label}</option>`).join('')}
+        `;
+        }
+
+        // Re-render les champs de saisie pour le filtre
+        this.renderFilters();
+    }
+
+    changeFilterType(event) {
+        const filterId = this.getFilterIdFromElement(event.target);
+        const selectedFilterType = event.target.value;
+
+        // Mettre à jour l'état du filtre pour le type sélectionné
+        const filterData = this.filters.find(f => f.id === parseInt(filterId));
+        if (filterData) {
+            filterData.type = selectedFilterType;
+            filterData.value1 = '';
+            filterData.value2 = '';
+            filterData.values = [];
+        }
+
+        // Re-render uniquement cette partie
+        this.renderFilterFields(filterId);
+    }
+
+    renderFilterFields(filterId) {
+        const filterData = this.filters.find(f => f.id === parseInt(filterId));
+        if (!filterData) return;
+
+        const filterContainer = document.querySelector(`.filter[data-filter-id="${filterId}"]`);
+        if (!filterContainer) return;
+
+        const fieldsContainer = filterContainer.querySelector('[data-filter-inputs]');
+        if (!fieldsContainer) return;
+
+        fieldsContainer.innerHTML = this.getInputFields(filterData);
+    }
+
+    getFilterIdFromElement(element) {
+        const filterContainer = element.closest('.filter');
+        return filterContainer ? filterContainer.dataset.filterId : null;
+    }
+
+    applyFilters(event) {
+        event.preventDefault();
+        this.updateTable();
     }
 }

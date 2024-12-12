@@ -344,23 +344,31 @@ abstract class AbstractDatatable
 
             switch ($type) {
                 case 'equal':
-                    $qb->andWhere("$column = :$paramName1")
-                        ->setParameter($paramName1, $value1);
+                    if (!empty($value1)) {
+                        $qb->andWhere("$column = :$paramName1")
+                            ->setParameter($paramName1, $value1);
+                    }
                     break;
 
                 case 'not_equal':
-                    $qb->andWhere("$column != :$paramName1")
-                        ->setParameter($paramName1, $value1);
+                    if (!empty($value1)) {
+                        $qb->andWhere("$column != :$paramName1")
+                            ->setParameter($paramName1, $value1);
+                    }
                     break;
 
                 case 'contains':
-                    $qb->andWhere("$column LIKE :$paramName1")
-                        ->setParameter($paramName1, '%'.$value1.'%');
+                    if (!empty($value1)) {
+                        $qb->andWhere("$column LIKE :$paramName1")
+                            ->setParameter($paramName1, '%'.$value1.'%');
+                    }
                     break;
 
                 case 'not_contains':
-                    $qb->andWhere("$column NOT LIKE :$paramName1")
-                        ->setParameter($paramName1, '%'.$value1.'%');
+                    if (!empty($value1)) {
+                        $qb->andWhere("$column NOT LIKE :$paramName1")
+                            ->setParameter($paramName1, '%'.$value1.'%');
+                    }
                     break;
 
                 case 'starts_with':
@@ -397,15 +405,15 @@ abstract class AbstractDatatable
 
                 case 'in':
                     if (!empty($values)) {
-                        $qb->andWhere("$column IN (:$paramName1)")
-                            ->setParameter($paramName1, explode(',', $values));
+                        $qb->andWhere("$column IN (:$paramNameValues)")
+                            ->setParameter($paramNameValues, explode(',', $values));
                     }
                     break;
 
                 case 'not_in':
                     if (!empty($values)) {
-                        $qb->andWhere("$column NOT IN (:$paramName1)")
-                            ->setParameter($paramName1, explode(',', $values));
+                        $qb->andWhere("$column NOT IN (:$paramNameValues)")
+                            ->setParameter($paramNameValues, explode(',', $values));
                     }
                     break;
 
@@ -429,24 +437,32 @@ abstract class AbstractDatatable
 
                 case 'before':
                 case 'less_than':
-                    $qb->andWhere("$column < :$paramName1")
-                        ->setParameter($paramName1, $value1);
+                    if (!empty($value1)) {
+                        $qb->andWhere("$column < :$paramName1")
+                            ->setParameter($paramName1, $value1);
+                    }
                     break;
 
                 case 'less_or_equal_than':
-                    $qb->andWhere("$column <= :$paramName1")
-                        ->setParameter($paramName1, $value1);
+                    if (!empty($value1)) {
+                        $qb->andWhere("$column <= :$paramName1")
+                            ->setParameter($paramName1, $value1);
+                    }
                     break;
 
                 case 'after':
                 case 'greater_than':
-                    $qb->andWhere("$column > :$paramName1")
-                        ->setParameter($paramName1, $value1);
+                    if (!empty($value1)) {
+                        $qb->andWhere("$column > :$paramName1")
+                            ->setParameter($paramName1, $value1);
+                    }
                     break;
 
                 case 'greater_or_equal_than':
-                    $qb->andWhere("$column >= :$paramName1")
-                        ->setParameter($paramName1, $value1);
+                    if (!empty($value1)) {
+                        $qb->andWhere("$column >= :$paramName1")
+                            ->setParameter($paramName1, $value1);
+                    }
                     break;
 
                 default:

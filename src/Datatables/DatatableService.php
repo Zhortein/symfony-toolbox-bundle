@@ -109,7 +109,7 @@ class DatatableService
             if ('multiSort' === $key) {
                 $multiSort = $value;
             }
-            if ('filters' === $key) {
+            if ('filters' === $key && '[]' !== $value) {
                 $filters = $value;
             }
         }

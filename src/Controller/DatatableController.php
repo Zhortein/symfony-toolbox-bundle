@@ -70,7 +70,7 @@ class DatatableController extends AbstractController
         foreach ($columns as $column) {
             $dataType = $datatable->getDatatypeForFilters($column->datatype);
             $response[] = [
-                'name' => $column->nameAs,
+                'name' => ($column->sqlAlias ?? $datatable->getMainAlias()).'.'.$column->nameAs,
                 'label' => $column->label,
                 'type' => $dataType,
                 'filters' => $this->getAvailableFilters($dataType),
