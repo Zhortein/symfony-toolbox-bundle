@@ -284,6 +284,11 @@ export default class extends Controller {
 
         return `
         <div class="filter" data-filter-id="${filter.id}">
+            <select name="filters[${filter.id}][operator]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeOperator">
+                <option value="AND" ${filter.operator === 'AND' ? 'selected' : ''}>AND</option>
+                <option value="OR" ${filter.operator === 'OR' ? 'selected' : ''}>OR</option>
+            </select>
+        
             <select name="filters[${filter.id}][column]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeColumn">
                 <option>---</option>
                 ${columnOptions}
@@ -304,6 +309,71 @@ export default class extends Controller {
             >Supprimer</button>
         </div>
     `;
+    }
+
+    renderGroup(group) {
+        const groupId = group.id;
+
+        return `
+    <div class="filter-group" data-group-id="${groupId}">
+        <select name="groups[${groupId}][operator]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeGroupOperator">
+            <option value="AND" ${group.operator === 'AND' ? 'selected' : ''}>AND</option>
+            <option value="OR" ${group.operator === 'OR' ? 'selected' : ''}>OR</option>
+        </select>
+
+        <div class="group-children">
+            ${group.children.map(child => child.type === 'group'
+            ? this.renderGroup(child)
+            : this.renderFilter(child)
+        ).join('')}
+        </div>
+
+        <button 
+            data-group-id="${groupId}" 
+            data-action="click->zhortein--symfony-toolbox-bundle--datatable#addFilterToGroup"
+        >Ajouter un filtre</button>
+
+        <button 
+            data-group-id="${groupId}" 
+            data-action="click->zhortein--symfony-toolbox-bundle--datatable#addSubGroup"
+        >Ajouter un sous-groupe</button>
+    </div>`;
+    }
+
+    addFilterToGroup(event) {
+        const groupId = event.target.dataset.groupId;
+        const group = this.filters.find(g => g.id === parseInt(groupId));
+        if (!group) return;
+
+        const newFilter = {
+            id: Date.now(),
+            column: '',
+            type: '',
+            value1: '',
+            value2: '',
+            values: [],
+            operator: 'AND',
+            type: 'filter'
+        };
+
+        group.children.push(newFilter);
+        this.renderFilters();
+    }
+
+    addSubGroup(event) {
+        const groupId = event.target.dataset.groupId;
+        const group = this.filters.find(g => g.id === parseInt(groupId));
+        if (!group) return;
+
+        const newGroup = {
+            id: Date.now(),
+            type: 'group',
+            operator: 'AND',
+            children: []
+        };
+
+        group.children.push(newGroup);
+        this.renderFilters();
     }
 
     getColumnOptions(filter) {
