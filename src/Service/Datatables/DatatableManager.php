@@ -56,7 +56,8 @@ class DatatableManager
      *       },
      *       autoColumns: bool,
      *       isEnum: bool,
-     *       isTranslatableEnum: bool
+     *       isTranslatableEnum: bool,
+     *       enumClass: string,
      *   }>>         $rawDatatableColumns
      * @param array<string, array{
      *       name: string,
@@ -247,25 +248,15 @@ class DatatableManager
         if (!empty($result[0]) && is_array($result[0])) {
             foreach ($result[0] as $key => $value) {
                 // Détection du type PHP
-                $detectedType = gettype($value);
-                $isEnum = false;
-                $isTranslatableEnum = false;
-                if ('object' === $detectedType && is_object($value)) {
-                    $detectedType = get_class($value);
-                    $isEnum = $value instanceof \BackedEnum;
-                    $isTranslatableEnum = method_exists($value, 'label') && method_exists(
-                        $value,
-                        'getTranslationDomain'
-                    );
-                }
+                $detectedType = $this->detectType($value);
 
                 foreach ($datatable->getColumns() as $rank => $column) {
                     if (($column->nameAs ?? '') === $key) {
                         $types[$key] = new ColumnCachedTypeDTO(
                             rank: $rank,
-                            datatype: $detectedType,  // Type détecté
-                            isEnum: $isEnum,
-                            isTranslatableEnum: $isTranslatableEnum,
+                            datatype: $detectedType['type'],
+                            isEnum: $detectedType['isEnum'],
+                            isTranslatableEnum: $detectedType['isTranslatableEnum'],
                         );
                         break;
                     }
@@ -274,5 +265,68 @@ class DatatableManager
         }
 
         return $types;
+    }
+
+    /**
+     * @return array{
+     *     type: string,
+     *     isEnum: bool,
+     *     isTranslatableEnum: bool
+     * }
+     */
+    private function detectType(mixed $value): array
+    {
+        $detectedType = gettype($value);
+        $isEnum = false;
+        $enumClass = '';
+        $isTranslatableEnum = false;
+
+        if (is_object($value)) {
+            $detectedType = get_class($value);
+
+            if ($value instanceof \BackedEnum) {
+                $detectedType = 'enum';
+                $isEnum = true;
+                $enumClass = $detectedType;
+
+                if (method_exists($value, 'label') && method_exists($value, 'getTranslationDomain')) {
+                    $isTranslatableEnum = true;
+                    $detectedType = 'enum_translatable';
+                }
+            }
+
+            if ($value instanceof \DateTimeInterface) {
+                $detectedType = 'date';
+            }
+        }
+
+        // Map des types Doctrine → types utilisateurs
+        $doctrineToUserTypeMap = [
+            'integer' => 'int',
+            'smallint' => 'int',
+            'bigint' => 'int',
+            'float' => 'float',
+            'decimal' => 'float',
+            'boolean' => 'bool',
+            'datetime' => 'datetime',
+            'datetimetz' => 'datetime',
+            'date' => 'date',
+            'time' => 'time',
+            'json' => 'json',
+            'array' => 'array',
+            'string' => 'string',
+            'text' => 'string',
+        ];
+
+        if (isset($doctrineToUserTypeMap[$detectedType])) {
+            $detectedType = $doctrineToUserTypeMap[$detectedType];
+        }
+
+        return [
+            'type' => $detectedType,
+            'isEnum' => $isEnum,
+            'isTranslatableEnum' => $isTranslatableEnum,
+            'enumClass' => $isEnum ? $enumClass : null,
+        ];
     }
 }

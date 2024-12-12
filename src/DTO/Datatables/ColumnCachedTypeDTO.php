@@ -9,6 +9,7 @@ class ColumnCachedTypeDTO
         public string $datatype = '',
         public bool $isEnum = false,
         public bool $isTranslatableEnum = false,
+        public ?string $enumClassName = null,
     ) {
     }
 }

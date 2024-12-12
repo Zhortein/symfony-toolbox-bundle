@@ -330,6 +330,131 @@ abstract class AbstractDatatable
         }
     }
 
+    public function applyFilters(QueryBuilder $qb, array $filters): void
+    {
+        foreach ($filters as $index => $filter) {
+            $paramName1 = 'filter_value1_'.$index;
+            $paramName2 = 'filter_value2_'.$index;
+            $paramNameValues = 'filter_values_'.$index; // Pour le IN / NOT IN
+            $column = $filter['column'];
+            $type = $filter['type'];
+            $value1 = $filter['value1'];
+            $value2 = $filter['value2'] ?? null;
+            $values = $filter['values'] ?? [];
+
+            switch ($type) {
+                case 'equal':
+                    $qb->andWhere("$column = :$paramName1")
+                        ->setParameter($paramName1, $value1);
+                    break;
+
+                case 'not_equal':
+                    $qb->andWhere("$column != :$paramName1")
+                        ->setParameter($paramName1, $value1);
+                    break;
+
+                case 'contains':
+                    $qb->andWhere("$column LIKE :$paramName1")
+                        ->setParameter($paramName1, '%'.$value1.'%');
+                    break;
+
+                case 'not_contains':
+                    $qb->andWhere("$column NOT LIKE :$paramName1")
+                        ->setParameter($paramName1, '%'.$value1.'%');
+                    break;
+
+                case 'starts_with':
+                    $qb->andWhere("$column LIKE :$paramName1")
+                        ->setParameter($paramName1, $value1.'%');
+                    break;
+
+                case 'not_starts_with':
+                    $qb->andWhere("$column NOT LIKE :$paramName1")
+                        ->setParameter($paramName1, $value1.'%');
+                    break;
+
+                case 'ends_with':
+                    $qb->andWhere("$column LIKE :$paramName1")
+                        ->setParameter($paramName1, '%'.$value1);
+                    break;
+
+                case 'not_ends_with':
+                    $qb->andWhere("$column NOT LIKE :$paramName1")
+                        ->setParameter($paramName1, '%'.$value1);
+                    break;
+
+                case 'between':
+                    $qb->andWhere("$column BETWEEN :$paramName1 AND :$paramName2")
+                        ->setParameter($paramName1, $value1)
+                        ->setParameter($paramName2, $value2);
+                    break;
+
+                case 'not_between':
+                    $qb->andWhere("$column NOT BETWEEN :$paramName1 AND :$paramName2")
+                        ->setParameter($paramName1, $value1)
+                        ->setParameter($paramName2, $value2);
+                    break;
+
+                case 'in':
+                    if (!empty($values)) {
+                        $qb->andWhere("$column IN (:$paramName1)")
+                            ->setParameter($paramName1, explode(',', $values));
+                    }
+                    break;
+
+                case 'not_in':
+                    if (!empty($values)) {
+                        $qb->andWhere("$column NOT IN (:$paramName1)")
+                            ->setParameter($paramName1, explode(',', $values));
+                    }
+                    break;
+
+                case 'is_null':
+                    $qb->andWhere("$column IS NULL");
+                    break;
+
+                case 'is_not_null':
+                    $qb->andWhere("$column IS NOT NULL");
+                    break;
+
+                case 'is_true':
+                    $qb->andWhere("$column = :$paramName1")
+                        ->setParameter($paramName1, true);
+                    break;
+
+                case 'is_false':
+                    $qb->andWhere("$column = :$paramName1")
+                        ->setParameter($paramName1, false);
+                    break;
+
+                case 'before':
+                case 'less_than':
+                    $qb->andWhere("$column < :$paramName1")
+                        ->setParameter($paramName1, $value1);
+                    break;
+
+                case 'less_or_equal_than':
+                    $qb->andWhere("$column <= :$paramName1")
+                        ->setParameter($paramName1, $value1);
+                    break;
+
+                case 'after':
+                case 'greater_than':
+                    $qb->andWhere("$column > :$paramName1")
+                        ->setParameter($paramName1, $value1);
+                    break;
+
+                case 'greater_or_equal_than':
+                    $qb->andWhere("$column >= :$paramName1")
+                        ->setParameter($paramName1, $value1);
+                    break;
+
+                default:
+                    break;
+            }
+        }
+    }
+
     /**
      * Redefine this method to set static filters on the QueryBuilder.
      * All searches, sorts, ... on the Datatable will use those static filters.
@@ -411,34 +536,63 @@ abstract class AbstractDatatable
      */
     public function setCachedTypes(array $cachedTypes): void
     {
-        $templatePrefix = '@ZhorteinSymfonyToolbox/datatables/column_types/';
         foreach ($cachedTypes as $columnTypeDefinition) {
-            if (is_int($columnTypeDefinition->rank)) {
-                $this->columns[$columnTypeDefinition->rank]->datatype = $columnTypeDefinition->datatype;
-                $this->columns[$columnTypeDefinition->rank]->isEnum = $columnTypeDefinition->isEnum;
-                $this->columns[$columnTypeDefinition->rank]->isTranslatableEnum = $columnTypeDefinition->isEnum && $columnTypeDefinition->isTranslatableEnum;
+            $rank = $columnTypeDefinition->rank;
+            if (is_int($rank)) {
+                $this->columns[$rank]->datatype = $columnTypeDefinition->datatype;
+                $this->columns[$rank]->isEnum = $columnTypeDefinition->isEnum;
+                $this->columns[$rank]->isTranslatableEnum = $columnTypeDefinition->isEnum && $columnTypeDefinition->isTranslatableEnum;
+                $this->columns[$rank]->enumClass = $columnTypeDefinition->isEnum ? $columnTypeDefinition->enumClassName : '';
 
-                if (empty($this->columns[$columnTypeDefinition->rank]->template)) {
-                    $this->columns[$columnTypeDefinition->rank]->template = $templatePrefix.match ($columnTypeDefinition->datatype) {
-                        'enum' => '_enum.html.twig',
-                        'enum_translatable' => '_enum-translatable.html.twig',
-                        'array' => '_array.html.twig',
-                        'boolean' => '_boolean.html.twig',
-                        \DateTimeInterface::class, \DateTime::class, \DateTimeImmutable::class => '_datetime.html.twig',
-                        \DateInterval::class => '_dateinterval.html.twig',
-                        \DatePeriod::class => '_dateperiod.html.twig',
-                        \DateTimeZone::class => '_timezone.html.twig',
-                        'double' => '_double.html.twig',
-                        'integer' => '_integer.html.twig',
-                        'object' => '_object.html.twig',
-                        'resource' => '_resource.html.twig',
-                        'resource (closed)' => '_resource-closed.html.twig',
-                        'unknown type' => '_unknown.html.twig',
-                        'NULL' => '_null.html.twig',
-                        default => '_string.html.twig',
-                    };
-                }
+                $this->updateColumnTemplate($rank, $columnTypeDefinition->datatype);
             }
+        }
+    }
+
+    private function getDefaultTemplateForDatatype(string $dataType): ?string
+    {
+        return match ($dataType) {
+            'enum' => '_enum.html.twig',
+            'enum_translatable' => '_enum-translatable.html.twig',
+            'array' => '_array.html.twig',
+            'json' => '_json.html.twig',
+            'bool', 'boolean' => '_boolean.html.twig',
+            \DateTimeInterface::class, \DateTime::class, \DateTimeImmutable::class, 'datetime', 'datetimetz' => '_datetime.html.twig',
+            \DateInterval::class => '_dateinterval.html.twig',
+            \DatePeriod::class => '_dateperiod.html.twig',
+            \DateTimeZone::class => '_timezone.html.twig',
+            'date' => '_date.html.twig',
+            'time' => '_time.html.twig',
+            'double', 'float' => '_double.html.twig',
+            'int', 'integer' => '_integer.html.twig',
+            'object' => '_object.html.twig',
+            'resource' => '_resource.html.twig',
+            'resource (closed)' => '_resource-closed.html.twig',
+            'unknown type' => '_unknown.html.twig',
+            'NULL' => '_null.html.twig',
+            default => null,
+        };
+    }
+
+    public function getDatatypeForFilters(string $dataType): string
+    {
+        return match ($dataType) {
+            'enum', 'enum_translatable' => 'enum',
+            'array', 'json', \DateInterval::class, \DatePeriod::class, 'resource', 'resource (closed)', 'unknown type', 'NULL', 'object' => '',
+            'bool', 'boolean' => 'boolean',
+            \DateTimeInterface::class, \DateTime::class, \DateTimeImmutable::class, 'datetime', 'datetimetz', 'date' => 'date',
+            'double', 'float', 'int', 'integer' => 'number',
+            default => 'string',
+        };
+    }
+
+    private function updateColumnTemplate(int $rank, string $type): void
+    {
+        $templatePrefix = '@ZhorteinSymfonyToolbox/datatables/column_types/';
+        $template = $this->getDefaultTemplateForDatatype($type) ?? '_string.html.twig';
+
+        if (empty($this->columns[$rank]->template)) {
+            $this->columns[$rank]->template = $templatePrefix.$template;
         }
     }
 

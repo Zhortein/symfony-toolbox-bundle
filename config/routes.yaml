@@ -3,6 +3,7 @@ zhortein_datatable_fetch_data:
   controller: Zhortein\SymfonyToolboxBundle\Controller\DatatableController::fetchData
   requirements:
     datatableId: .+
+  methods: [GET, POST, OPTIONS]
   options:
     expose: true
 zhortein_datatable_export:
@@ -10,6 +11,14 @@ zhortein_datatable_export:
   controller: Zhortein\SymfonyToolboxBundle\Controller\DatatableController::export
   requirements:
     datatableId: .+
-  methods: [GET]
+  methods: [GET, POST, OPTIONS]
+  options:
+    expose: true
+zhortein_datatable_filters:
+  path: /zhortein/symfony-toolbox/datatable/{datatableId}/filters-info
+  controller: Zhortein\SymfonyToolboxBundle\Controller\DatatableController::getFiltersInfo
+  requirements:
+    datatableId: .+
+  methods: [GET, POST, OPTIONS]
   options:
     expose: true

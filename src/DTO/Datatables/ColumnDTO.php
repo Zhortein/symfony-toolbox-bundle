@@ -25,6 +25,7 @@ class ColumnDTO
         public bool $autoColumns = false,
         public bool $isEnum = false,
         public bool $isTranslatableEnum = false,
+        public string $enumClass = '',
     ) {
     }
 
@@ -80,7 +81,8 @@ class ColumnDTO
      *     },
      *     autoColumns?: bool,
      *     isEnum?: bool,
-     *     isTranslatableEnum?: bool
+     *     isTranslatableEnum?: bool,
+     *     enumClass: string,
      * } $data
      */
     public static function fromArray(array $data, string $mainAlias = AbstractDatatable::DEFAULT_MAIN_ALIAS): self
@@ -107,6 +109,7 @@ class ColumnDTO
             autoColumns: $data['autoColumns'] ?? false,
             isEnum: $data['isEnum'] ?? false,
             isTranslatableEnum: $data['isTranslatableEnum'] ?? false,
+            enumClass: $data['enumClass'] ?? '',
         );
         $column->mainAlias = $mainAlias;
         $column->completeFields();
@@ -145,7 +148,8 @@ class ColumnDTO
      *      },
      *      autoColumns: bool,
      *      isEnum: bool,
-     *      isTranslatableEnum: bool
+     *      isTranslatableEnum: bool,
+     *      enumClass: string,
      *  }
      */
     public function toArray(): array
@@ -166,6 +170,7 @@ class ColumnDTO
             'autoColumns' => $this->autoColumns,
             'isEnum' => $this->isEnum,
             'isTranslatableEnum' => $this->isTranslatableEnum,
+            'enumClass' => $this->enumClass,
         ];
     }
 }

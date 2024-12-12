@@ -6,6 +6,7 @@
         data-zhortein--symfony-toolbox-bundle--datatable-pagesize-value="{{ datatable.defaultPageSize }}"
         data-zhortein--symfony-toolbox-bundle--datatable-url-value="{{ path('zhortein_datatable_fetch_data', {'datatableId': datatableId}) }}"
         data-zhortein--symfony-toolbox-bundle--datatable-download-value="{{ path('zhortein_datatable_export', {'datatableId': datatableId}) }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-filters-value="{{ path('zhortein_datatable_filters', {'datatableId': datatableId}) }}"
         {{ attributes }}
         class="{{ containerClass }}"
 >
@@ -18,6 +19,9 @@
 
     {# Barre de recherche #}
     {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-search.html.twig' %}
+
+    {# Barre de recherche avancée #}
+    {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-search-builder.html.twig' %}
 
     {# Spinner #}
     {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-spinner.html.twig' %}

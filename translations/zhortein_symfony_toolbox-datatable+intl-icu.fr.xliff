@@ -46,6 +46,14 @@
                 <source>PDF</source>
                 <target>PDF</target>
             </trans-unit>
+            <trans-unit id="11" resname="datatable.search.builder.filter.add">
+                <source>Add filter</source>
+                <target>Ajouter un filtre</target>
+            </trans-unit>
+            <trans-unit id="12" resname="datatable.search.builder.filter.reset">
+                <source>Reset filters</source>
+                <target>Supprimer les filtres</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
