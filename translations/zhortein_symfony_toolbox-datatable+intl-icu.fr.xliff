@@ -54,6 +54,10 @@
                 <source>Reset filters</source>
                 <target>Supprimer les filtres</target>
             </trans-unit>
+            <trans-unit id="13" resname="datatable.search.builder.filter.apply">
+                <source>Apply filters</source>
+                <target>Appliquer les filtres</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>
