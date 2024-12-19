@@ -18,4 +18,12 @@
     >
         {{ 'datatable.search.builder.filter.reset'|trans({}, transDomain) }}
     </button>
+
+    <button
+            type="button"
+            class="{{ searchBuilder.applyFilterBtnClass }}"
+            data-action="zhortein--symfony-toolbox-bundle--datatable#applyFilters"
+    >
+        {{ 'datatable.search.builder.filter.apply'|trans({}, transDomain) }}
+    </button>
 </div>
