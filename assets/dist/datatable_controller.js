@@ -272,7 +272,12 @@ export default class extends Controller {
     }
 
     renderFilters() {
-        const filtersHtml = this.filters.map(filter => this.renderFilter(filter)).join('');
+        const filtersHtml = this.filters.map(filter =>
+            filter.type === 'group'
+                ? this.renderGroup(filter)
+                : this.renderFilter(filter)
+        ).join('');
+
         this.filtersTarget.innerHTML = filtersHtml;
     }
 
@@ -283,43 +288,28 @@ export default class extends Controller {
 
         return `
     <div class="filter" data-filter-id="${filter.id}">
-        <select name="filters[${filter.id}][operator]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeOperator">
+        <select name="filters[${filter.id}][operator]">
             <option value="AND" ${filter.operator === 'AND' ? 'selected' : ''}>AND</option>
             <option value="OR" ${filter.operator === 'OR' ? 'selected' : ''}>OR</option>
         </select>
-    
-        <select name="filters[${filter.id}][column]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeColumn">
-            <option>---</option>
-            ${columnOptions}
-        </select>
 
-        <select name="filters[${filter.id}][type]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeFilterType">
-            <option>---</option>
-            ${filterTypeOptions}
-        </select>
-
-        <div data-filter-inputs>
-            ${inputFields}
-        </div>
+        <select name="filters[${filter.id}][column]">${columnOptions}</select>
+        <select name="filters[${filter.id}][type]">${filterTypeOptions}</select>
         
-        <button 
-            data-filter-id="${filter.id}" 
-            data-action="click->zhortein--symfony-toolbox-bundle--datatable#deleteFilter"
-        >Supprimer</button>
-    </div>
-    `;
+        <div data-filter-inputs>${inputFields}</div>
+        
+        <button data-id="${filter.id}" data-action="click->datatable#deleteFilterOrGroup">Supprimer</button>
+    </div>`;
     }
 
-    renderGroup(group) {
-        const groupId = group.id;
-
+    renderGrouprenderGroup(group) {
         return `
-    <div class="filter-group" data-group-id="${groupId}">
-        <select name="groups[${groupId}][operator]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeGroupOperator">
+    <div class="filter-group" data-group-id="${group.id}">
+        <select name="groups[${group.id}][operator]" data-action="change->datatable#changeGroupOperator">
             <option value="AND" ${group.operator === 'AND' ? 'selected' : ''}>AND</option>
             <option value="OR" ${group.operator === 'OR' ? 'selected' : ''}>OR</option>
         </select>
-
+        
         <div class="group-children">
             ${group.children.map(child => child.type === 'group'
             ? this.renderGroup(child)
@@ -327,52 +317,10 @@ export default class extends Controller {
         ).join('')}
         </div>
 
-        <button 
-            data-group-id="${groupId}" 
-            data-action="click->zhortein--symfony-toolbox-bundle--datatable#addFilterToGroup"
-        >Ajouter un filtre</button>
-
-        <button 
-            data-group-id="${groupId}" 
-            data-action="click->zhortein--symfony-toolbox-bundle--datatable#addSubGroup"
-        >Ajouter un sous-groupe</button>
+        <button data-group-id="${group.id}" data-action="click->datatable#addFilterToGroup">+ Filtre</button>
+        <button data-group-id="${group.id}" data-action="click->datatable#addSubGroup">+ Sous-groupe</button>
+        <button data-id="${group.id}" data-action="click->datatable#deleteFilterOrGroup">Supprimer</button>
     </div>`;
-    }
-
-    addFilterToGroup(event) {
-        const groupId = event.target.dataset.groupId;
-        const group = this.filters.find(g => g.id === parseInt(groupId));
-        if (!group) return;
-
-        const newFilter = {
-            id: Date.now(),
-            column: '',
-            type: '',
-            value1: '',
-            value2: '',
-            values: [],
-            operator: 'AND',
-            type: 'filter'
-        };
-
-        group.children.push(newFilter);
-        this.renderFilters();
-    }
-
-    addSubGroup(event) {
-        const groupId = event.target.dataset.groupId;
-        const group = this.filters.find(g => g.id === parseInt(groupId));
-        if (!group) return;
-
-        const newGroup = {
-            id: Date.now(),
-            type: 'group',
-            operator: 'AND',
-            children: []
-        };
-
-        group.children.push(newGroup);
-        this.renderFilters();
     }
 
     getColumnOptions(filter) {
@@ -513,4 +461,69 @@ export default class extends Controller {
         event.preventDefault();
         this.updateTable();
     }
+
+    addGroup(event) {
+        event.preventDefault();
+
+        const newGroup = {
+            id: Date.now(),
+            type: 'group',
+            operator: 'AND',
+            children: []
+        };
+
+        this.filters.push(newGroup);
+        this.renderFilters();
+    }
+
+    addSubGroup(event) {
+        const groupId = event.target.dataset.groupId;
+        const parentGroup = this.findGroupById(this.filters, parseInt(groupId));
+        if (!parentGroup) return;
+
+        const newGroup = {
+            id: Date.now(),
+            type: 'group',
+            operator: 'AND',
+            children: []
+        };
+
+        parentGroup.children.push(newGroup);
+        this.renderFilters();
+    }
+
+    addFilterToGroup(event) {
+        const groupId = event.target.dataset.groupId;
+        const parentGroup = this.findGroupById(this.filters, parseInt(groupId));
+        if (!parentGroup) return;
+
+        const newFilter = {
+            id: Date.now(),
+            type: 'filter',
+            column: '',
+            filterType: '',
+            value1: '',
+            operator: 'AND'
+        };
+
+        parentGroup.children.push(newFilter);
+        this.renderFilters();
+    }
+
+    deleteFilterOrGroup(event) {
+        const id = parseInt(event.target.dataset.id);
+        this.filters = this.removeItemById(this.filters, id);
+        this.renderFilters();
+    }
+
+    removeItemById(groups, id) {
+        return groups.filter(item => {
+            if (item.id === id) return false;
+            if (item.type === 'group' && item.children.length > 0) {
+                item.children = this.removeItemById(item.children, id);
+            }
+            return true;
+        });
+    }
+
 }
