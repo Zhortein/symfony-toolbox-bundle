@@ -272,61 +272,42 @@ export default class extends Controller {
     }
 
     renderFilters() {
-        const filtersHtml = this.filters.map(filter =>
-            filter.type === 'group'
-                ? this.renderGroup(filter)
-                : this.renderFilter(filter)
-        ).join('');
-
+        const filtersHtml = this.filters.map(filter => this.renderFilter(filter)).join('');
         this.filtersTarget.innerHTML = filtersHtml;
     }
 
     renderFilter(filter) {
+        // On va devoir rendre ces options dynamiques, à adapter
         const columnOptions = this.getColumnOptions(filter);
         const filterTypeOptions = this.getFilterTypeOptions(filter);
         const inputFields = this.getInputFields(filter);
 
         return `
-    <div class="filter" data-filter-id="${filter.id}">
-        <select name="filters[${filter.id}][operator]">
-            <option value="AND" ${filter.operator === 'AND' ? 'selected' : ''}>AND</option>
-            <option value="OR" ${filter.operator === 'OR' ? 'selected' : ''}>OR</option>
-        </select>
+        <div class="filter" data-filter-id="${filter.id}">
+            <select name="filters[${filter.id}][column]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeColumn">
+                <option>---</option>
+                ${columnOptions}
+            </select>
 
-        <select name="filters[${filter.id}][column]">${columnOptions}</select>
-        <select name="filters[${filter.id}][type]">${filterTypeOptions}</select>
-        
-        <div data-filter-inputs>${inputFields}</div>
-        
-        <button data-id="${filter.id}" data-action="click->datatable#deleteFilterOrGroup">Supprimer</button>
-    </div>`;
-    }
+            <select name="filters[${filter.id}][type]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeFilterType">
+                <option>---</option>
+                ${filterTypeOptions}
+            </select>
 
-    renderGrouprenderGroup(group) {
-        return `
-    <div class="filter-group" data-group-id="${group.id}">
-        <select name="groups[${group.id}][operator]" data-action="change->datatable#changeGroupOperator">
-            <option value="AND" ${group.operator === 'AND' ? 'selected' : ''}>AND</option>
-            <option value="OR" ${group.operator === 'OR' ? 'selected' : ''}>OR</option>
-        </select>
-        
-        <div class="group-children">
-            ${group.children.map(child => child.type === 'group'
-            ? this.renderGroup(child)
-            : this.renderFilter(child)
-        ).join('')}
+            <div data-filter-inputs>
+                ${inputFields}
+            </div>
+            
+            <button 
+                data-filter-id="${filter.id}" 
+                data-action="click->zhortein--symfony-toolbox-bundle--datatable#deleteFilter"
+            >Supprimer</button>
         </div>
-
-        <button data-group-id="${group.id}" data-action="click->datatable#addFilterToGroup">+ Filtre</button>
-        <button data-group-id="${group.id}" data-action="click->datatable#addSubGroup">+ Sous-groupe</button>
-        <button data-id="${group.id}" data-action="click->datatable#deleteFilterOrGroup">Supprimer</button>
-    </div>`;
+    `;
     }
 
     getColumnOptions(filter) {
-        return this.columns.map(col =>
-            `<option value="${col.name}" ${filter.column === col.name ? 'selected' : ''}>${col.label}</option>`
-        ).join('');
+        return this.columns.map(col => `<option value="${col.name}" ${filter.column === col.name ? 'selected' : ''}>${col.label}</option>`).join('');
     }
 
     getEnumOptions(columnName) {
@@ -342,9 +323,9 @@ export default class extends Controller {
         const column = this.columns.find(col => col.name === filter.column);
         if (!column) return '';
 
-        return column.filters.map(f =>
-            `<option value="${f.id}" ${filter.type === f.id ? 'selected' : ''}>${f.label}</option>`
-        ).join('');
+        return column.filters.map(f => {
+            return `<option value="${f.id}" ${filter.type === f.id ? 'selected' : ''}>${f.label}</option>`;
+        }).join('');
     }
 
     getInputFields(filter) {
@@ -409,17 +390,16 @@ export default class extends Controller {
         }
 
         // Mettre à jour les options de type de filtre
-        const filterContainer = document.querySelector(`.filter[data-filter-id="${filterId}"]`);
-        const filterTypeSelect = filterContainer.querySelector(`select[name="filters[${filterId}][type]"]`);
+        const filterTypeSelect = event.target.closest('.filter').querySelector(`select[name="filters[${filterId}][type]"]`);
         if (filterTypeSelect) {
             filterTypeSelect.innerHTML = `
-        <option value="">---</option>
-        ${column.filters.map(filter => `<option value="${filter.id}">${filter.label}</option>`).join('')}
-    `;
+            <option value="">---</option>
+            ${column.filters.map(filter => `<option value="${filter.id}">${filter.label}</option>`).join('')}
+        `;
         }
 
         // Re-render les champs de saisie pour le filtre
-        this.renderFilterFields(filterId);
+        this.renderFilters();
     }
 
     changeFilterType(event) {
@@ -435,7 +415,7 @@ export default class extends Controller {
             filterData.values = [];
         }
 
-        // Re-render uniquement les champs de saisie pour ce filtre
+        // Re-render uniquement cette partie
         this.renderFilterFields(filterId);
     }
 
@@ -461,69 +441,4 @@ export default class extends Controller {
         event.preventDefault();
         this.updateTable();
     }
-
-    addGroup(event) {
-        event.preventDefault();
-
-        const newGroup = {
-            id: Date.now(),
-            type: 'group',
-            operator: 'AND',
-            children: []
-        };
-
-        this.filters.push(newGroup);
-        this.renderFilters();
-    }
-
-    addSubGroup(event) {
-        const groupId = event.target.dataset.groupId;
-        const parentGroup = this.findGroupById(this.filters, parseInt(groupId));
-        if (!parentGroup) return;
-
-        const newGroup = {
-            id: Date.now(),
-            type: 'group',
-            operator: 'AND',
-            children: []
-        };
-
-        parentGroup.children.push(newGroup);
-        this.renderFilters();
-    }
-
-    addFilterToGroup(event) {
-        const groupId = event.target.dataset.groupId;
-        const parentGroup = this.findGroupById(this.filters, parseInt(groupId));
-        if (!parentGroup) return;
-
-        const newFilter = {
-            id: Date.now(),
-            type: 'filter',
-            column: '',
-            filterType: '',
-            value1: '',
-            operator: 'AND'
-        };
-
-        parentGroup.children.push(newFilter);
-        this.renderFilters();
-    }
-
-    deleteFilterOrGroup(event) {
-        const id = parseInt(event.target.dataset.id);
-        this.filters = this.removeItemById(this.filters, id);
-        this.renderFilters();
-    }
-
-    removeItemById(groups, id) {
-        return groups.filter(item => {
-            if (item.id === id) return false;
-            if (item.type === 'group' && item.children.length > 0) {
-                item.children = this.removeItemById(item.children, id);
-            }
-            return true;
-        });
-    }
-
 }
