@@ -277,37 +277,36 @@ export default class extends Controller {
     }
 
     renderFilter(filter) {
-        // On va devoir rendre ces options dynamiques, à adapter
         const columnOptions = this.getColumnOptions(filter);
         const filterTypeOptions = this.getFilterTypeOptions(filter);
         const inputFields = this.getInputFields(filter);
 
         return `
-        <div class="filter" data-filter-id="${filter.id}">
-            <select name="filters[${filter.id}][operator]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeOperator">
-                <option value="AND" ${filter.operator === 'AND' ? 'selected' : ''}>AND</option>
-                <option value="OR" ${filter.operator === 'OR' ? 'selected' : ''}>OR</option>
-            </select>
-        
-            <select name="filters[${filter.id}][column]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeColumn">
-                <option>---</option>
-                ${columnOptions}
-            </select>
+    <div class="filter" data-filter-id="${filter.id}">
+        <select name="filters[${filter.id}][operator]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeOperator">
+            <option value="AND" ${filter.operator === 'AND' ? 'selected' : ''}>AND</option>
+            <option value="OR" ${filter.operator === 'OR' ? 'selected' : ''}>OR</option>
+        </select>
+    
+        <select name="filters[${filter.id}][column]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeColumn">
+            <option>---</option>
+            ${columnOptions}
+        </select>
 
-            <select name="filters[${filter.id}][type]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeFilterType">
-                <option>---</option>
-                ${filterTypeOptions}
-            </select>
+        <select name="filters[${filter.id}][type]" data-action="change->zhortein--symfony-toolbox-bundle--datatable#changeFilterType">
+            <option>---</option>
+            ${filterTypeOptions}
+        </select>
 
-            <div data-filter-inputs>
-                ${inputFields}
-            </div>
-            
-            <button 
-                data-filter-id="${filter.id}" 
-                data-action="click->zhortein--symfony-toolbox-bundle--datatable#deleteFilter"
-            >Supprimer</button>
+        <div data-filter-inputs>
+            ${inputFields}
         </div>
+        
+        <button 
+            data-filter-id="${filter.id}" 
+            data-action="click->zhortein--symfony-toolbox-bundle--datatable#deleteFilter"
+        >Supprimer</button>
+    </div>
     `;
     }
 
@@ -377,7 +376,9 @@ export default class extends Controller {
     }
 
     getColumnOptions(filter) {
-        return this.columns.map(col => `<option value="${col.name}" ${filter.column === col.name ? 'selected' : ''}>${col.label}</option>`).join('');
+        return this.columns.map(col =>
+            `<option value="${col.name}" ${filter.column === col.name ? 'selected' : ''}>${col.label}</option>`
+        ).join('');
     }
 
     getEnumOptions(columnName) {
@@ -393,9 +394,9 @@ export default class extends Controller {
         const column = this.columns.find(col => col.name === filter.column);
         if (!column) return '';
 
-        return column.filters.map(f => {
-            return `<option value="${f.id}" ${filter.type === f.id ? 'selected' : ''}>${f.label}</option>`;
-        }).join('');
+        return column.filters.map(f =>
+            `<option value="${f.id}" ${filter.type === f.id ? 'selected' : ''}>${f.label}</option>`
+        ).join('');
     }
 
     getInputFields(filter) {
@@ -460,16 +461,17 @@ export default class extends Controller {
         }
 
         // Mettre à jour les options de type de filtre
-        const filterTypeSelect = event.target.closest('.filter').querySelector(`select[name="filters[${filterId}][type]"]`);
+        const filterContainer = document.querySelector(`.filter[data-filter-id="${filterId}"]`);
+        const filterTypeSelect = filterContainer.querySelector(`select[name="filters[${filterId}][type]"]`);
         if (filterTypeSelect) {
             filterTypeSelect.innerHTML = `
-            <option value="">---</option>
-            ${column.filters.map(filter => `<option value="${filter.id}">${filter.label}</option>`).join('')}
-        `;
+        <option value="">---</option>
+        ${column.filters.map(filter => `<option value="${filter.id}">${filter.label}</option>`).join('')}
+    `;
         }
 
         // Re-render les champs de saisie pour le filtre
-        this.renderFilters();
+        this.renderFilterFields(filterId);
     }
 
     changeFilterType(event) {
@@ -485,7 +487,7 @@ export default class extends Controller {
             filterData.values = [];
         }
 
-        // Re-render uniquement cette partie
+        // Re-render uniquement les champs de saisie pour ce filtre
         this.renderFilterFields(filterId);
     }
 
