@@ -12,9 +12,13 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
+use Zhortein\SymfonyToolboxBundle\Enum\EnumTranslatableInterface;
 
 class DatatableController extends AbstractController
 {
+    /**
+     * @var array<string, array<int, array{key: string|int, label: string}>|null>
+     */
     private static array $enumCache = [];
 
     public function __construct(
@@ -70,11 +74,11 @@ class DatatableController extends AbstractController
         foreach ($columns as $column) {
             $dataType = $datatable->getDatatypeForFilters($column->datatype);
             $response[] = [
-                'name' => $datatable->getFullyQualifiedColumnFromNameAs($column->nameAs),
+                'name' => $datatable->getFullyQualifiedColumnFromNameAs((string) $column->nameAs),
                 'label' => $column->label,
                 'type' => $dataType,
                 'filters' => $this->getAvailableFilters($dataType),
-                'values' => $column->isEnum ? $this->getEnumValues($column->enumClass) : null,
+                'values' => $column->isEnum && null !== $column->enumClass ? $this->getEnumValues($column->enumClass) : null,
             ];
         }
 
@@ -85,6 +89,9 @@ class DatatableController extends AbstractController
         ]);
     }
 
+    /**
+     * @return array<int, array{id: string, label: string}>
+     */
     private function getAvailableFilters(string $type): array
     {
         $transDomain = 'zhortein_symfony_toolbox-datatable-filters';
@@ -137,31 +144,32 @@ class DatatableController extends AbstractController
     }
 
     /**
-     * @return array{
-     *     key: string|int,
-     *     label: string
-     * }|null
+     * @param class-string<\BackedEnum> $enumClass
+     *
+     * @return array<int, array{key: string|int, label: string}>|null
      */
-    private function getEnumValues($enumClass): ?array
+    private function getEnumValues(string $enumClass): ?array
     {
         if (!isset(self::$enumCache[$enumClass])) {
             if (!enum_exists($enumClass)) {
                 self::$enumCache[$enumClass] = null;
             } else {
-                self::$enumCache[$enumClass] = array_map(static fn ($value) => [
-                    'key' => $value->value,
-                    'label' => $this->getLabelForEnumValue($value),
-                ], $enumClass::cases());
+                self::$enumCache[$enumClass] = array_map(function (\BackedEnum $value): array {
+                    return [
+                        'key' => $value->value,
+                        'label' => $this->getLabelForEnumValue($value),
+                    ];
+                }, $enumClass::cases());
             }
         }
 
         return self::$enumCache[$enumClass];
     }
 
-    private function getLabelForEnumValue(object $enumValue): string
+    private function getLabelForEnumValue(\BackedEnum $enumValue): string
     {
-        if (method_exists($enumValue, 'label')) {
-            return $enumValue->label($this->translator);
+        if ($enumValue instanceof EnumTranslatableInterface) {
+            return (string) $enumValue->label($this->translator);
         }
 
         return (string) $enumValue->value;

@@ -9,6 +9,9 @@ class ColumnDTO
 {
     protected string $mainAlias = AbstractDatatable::DEFAULT_MAIN_ALIAS;
 
+    /**
+     * @param class-string<\BackedEnum>|null $enumClass
+     */
     public function __construct(
         public string $name,
         public string $label,
@@ -25,7 +28,7 @@ class ColumnDTO
         public bool $autoColumns = false,
         public bool $isEnum = false,
         public bool $isTranslatableEnum = false,
-        public string $enumClass = '',
+        public ?string $enumClass = null,
     ) {
     }
 
@@ -82,7 +85,7 @@ class ColumnDTO
      *     autoColumns?: bool,
      *     isEnum?: bool,
      *     isTranslatableEnum?: bool,
-     *     enumClass: string,
+     *     enumClass: class-string<\BackedEnum>|null,
      * } $data
      */
     public static function fromArray(array $data, string $mainAlias = AbstractDatatable::DEFAULT_MAIN_ALIAS): self
@@ -109,7 +112,7 @@ class ColumnDTO
             autoColumns: $data['autoColumns'] ?? false,
             isEnum: $data['isEnum'] ?? false,
             isTranslatableEnum: $data['isTranslatableEnum'] ?? false,
-            enumClass: $data['enumClass'] ?? '',
+            enumClass: $data['enumClass'],
         );
         $column->mainAlias = $mainAlias;
         $column->completeFields();
@@ -149,7 +152,7 @@ class ColumnDTO
      *      autoColumns: bool,
      *      isEnum: bool,
      *      isTranslatableEnum: bool,
-     *      enumClass: string,
+     *      enumClass: class-string<\BackedEnum>|null,
      *  }
      */
     public function toArray(): array

@@ -90,11 +90,19 @@ class DatatableService
      *     page: int<1, max>,
      *     limit: int<1, max>,
      *     search: string|null,
-     *     multiSort: array<int, array{field: string, order: string}>
+     *     multiSort: array<int, array{field: string, order: string}>,
+     *     filters: array<int, array{
+     *         column: string,
+     *         type: string,
+     *         value1: string,
+     *         value2?: string,
+     *         values?: array<int, array{key: string|int, label: string}>
+     *     }>
      * } Associative array containing extracted parameters:
      *               - 'page' (int): The current page number, default is 1.
      *               - 'limit' (int): The number of items per page, default is determined by datatable options or global configuration.
      *               - 'multiSort' (array): An array defining multi-sort order; falls back to default sort if not provided.
+     *               - 'filters' (array): An array defining filters; falls back to empty array if not provided.
      *               - 'search' (string|null): The search query string provided in the request.
      */
     private function extractParameters(Request $request, AbstractDatatable $datatable): array
@@ -110,6 +118,15 @@ class DatatableService
                 $multiSort = $value;
             }
             if ('filters' === $key && '[]' !== $value) {
+                /**
+                 * @var array<int, array{
+                 *          column: string,
+                 *          type: string,
+                 *          value1: string,
+                 *          value2?: string,
+                 *          values?: array<int, array{key: string|int, label: string}>
+                 *      }> $filters
+                 */
                 $filters = $value;
             }
         }

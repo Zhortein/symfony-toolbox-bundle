@@ -330,6 +330,15 @@ abstract class AbstractDatatable
         }
     }
 
+    /**
+     * @param array<int, array{
+     *     column: string,
+     *     type: string,
+     *     value1: string,
+     *     value2?: string,
+     *     values?: array<int, array{key: string|int, label: string}>
+     * }> $filters
+     */
     public function applyFilters(QueryBuilder $qb, array $filters): void
     {
         foreach ($filters as $index => $filter) {
@@ -406,14 +415,14 @@ abstract class AbstractDatatable
                 case 'in':
                     if (!empty($values)) {
                         $qb->andWhere("$column IN (:$paramNameValues)")
-                            ->setParameter($paramNameValues, explode(',', $values));
+                            ->setParameter($paramNameValues, $values);
                     }
                     break;
 
                 case 'not_in':
                     if (!empty($values)) {
                         $qb->andWhere("$column NOT IN (:$paramNameValues)")
-                            ->setParameter($paramNameValues, explode(',', $values));
+                            ->setParameter($paramNameValues, $values);
                     }
                     break;
 
@@ -558,7 +567,7 @@ abstract class AbstractDatatable
                 $this->columns[$rank]->datatype = $columnTypeDefinition->datatype;
                 $this->columns[$rank]->isEnum = $columnTypeDefinition->isEnum;
                 $this->columns[$rank]->isTranslatableEnum = $columnTypeDefinition->isEnum && $columnTypeDefinition->isTranslatableEnum;
-                $this->columns[$rank]->enumClass = $columnTypeDefinition->isEnum ? $columnTypeDefinition->enumClassName : '';
+                $this->columns[$rank]->enumClass = $columnTypeDefinition->isEnum ? $columnTypeDefinition->enumClassName : null;
 
                 $this->updateColumnTemplate($rank, $columnTypeDefinition->datatype);
             }

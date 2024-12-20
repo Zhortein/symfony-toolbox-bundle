@@ -57,7 +57,7 @@ class DatatableManager
      *       autoColumns: bool,
      *       isEnum: bool,
      *       isTranslatableEnum: bool,
-     *       enumClass: string,
+     *       enumClass: class-string<\BackedEnum>|null,
      *   }>>         $rawDatatableColumns
      * @param array<string, array{
      *       name: string,
