@@ -26,17 +26,23 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
     private array $datatables = [];
 
     /**
+     * @var array<string, array<int, mixed>>
+     */
+    private array $datatablesColumns = [];
+
+    /**
      * @var array<string, mixed>
      */
-    private array $datatableOptions = [];
+    private array $datatablesOptions = [];
 
     public function process(ContainerBuilder $container): void
     {
         $haveHolidayProviders = false;
+
         foreach ($container->getDefinitions() as $definition) {
             $class = $definition->getClass();
 
-            if (!$class || !class_exists($class)) {
+            if (!$class || !class_exists($class) || str_contains($class, 'class@anonymous')) {
                 continue;
             }
 
@@ -68,8 +74,18 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         if ($attribute) {
             $instance = $attribute[0]->newInstance();
             $serviceId = $class->getName();
+
+            $attrOptions = $instance->toArray();
+            if (!array_key_exists('name', $attrOptions) || !array_key_exists('columns', $attrOptions) || !is_array($attrOptions['columns'])) {
+                throw new \InvalidArgumentException('Datatable name and columns must be defined for '.$instance->name);
+            }
             $this->datatables[$instance->name] = new Reference($serviceId);
-            $this->datatableOptions[$instance->name] = $instance->toArray();
+            $this->datatablesColumns[$instance->name] = [];
+
+            foreach ($attrOptions['columns'] as $column) {
+                $this->datatablesColumns[$instance->name][] = $column;
+            }
+            $this->datatablesOptions[$instance->name] = $attrOptions;
 
             return true;
         }
@@ -80,10 +96,13 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
     private function registerDatatables(ContainerBuilder $container): void
     {
         if ($container->hasDefinition(DatatableManager::class)) {
+            $globalOptions = $container->getParameter('zhortein_symfony_toolbox.datatables');
             $container->getDefinition(DatatableManager::class)
                 ->setArgument(0, $this->datatables)
-                ->setArgument(1, $this->datatableOptions)
-                ->setArgument(3, new Reference(CacheManager::class))
+                ->setArgument(1, $this->datatablesColumns)
+                ->setArgument(2, $this->datatablesOptions)
+                ->setArgument(3, $globalOptions)
+                ->setArgument(4, new Reference(CacheManager::class))
             ;
         }
     }
@@ -102,7 +121,6 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
 
         $instance = $attribute[0]->newInstance();
         $countryCodes = $instance->countryCodes;
-
         $serviceId = $class->getName();
         foreach ($countryCodes as $countryCode) {
             $this->holidayProviders[strtoupper($countryCode)] = new Reference($serviceId);

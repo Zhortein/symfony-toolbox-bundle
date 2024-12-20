@@ -30,6 +30,34 @@
                 <source>Search</source>
                 <target>Search</target>
             </trans-unit>
+            <trans-unit id="7" resname="datatable.export">
+                <source>Export</source>
+                <target>Export</target>
+            </trans-unit>
+            <trans-unit id="8" resname="datatable.export.csv">
+                <source>CSV</source>
+                <target>CSV</target>
+            </trans-unit>
+            <trans-unit id="9" resname="datatable.export.excel">
+                <source>Excel</source>
+                <target>Excel</target>
+            </trans-unit>
+            <trans-unit id="10" resname="datatable.export.pdf">
+                <source>PDF</source>
+                <target>PDF</target>
+            </trans-unit>
+            <trans-unit id="11" resname="datatable.search.builder.filter.add">
+                <source>Add filter</source>
+                <target>Add filter</target>
+            </trans-unit>
+            <trans-unit id="12" resname="datatable.search.builder.filter.reset">
+                <source>Reset filters</source>
+                <target>Reset filters</target>
+            </trans-unit>
+            <trans-unit id="13" resname="datatable.search.builder.filter.apply">
+                <source>Apply filters</source>
+                <target>Apply filters</target>
+            </trans-unit>
         </body>
     </file>
 </xliff>

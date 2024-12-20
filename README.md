@@ -68,6 +68,11 @@ zhortein_symfony_toolbox:
     css_mode: 'bootstrap'
     items_per_page: 10
     paginator: 'custom'
+    export:
+      enabled_by_default: true
+      export_csv: true
+      export_pdf: false
+      export_excel: true
     ux_icons: true
     ux_icons_options:
       icon_first: 'bi:chevron-double-left'
@@ -81,6 +86,9 @@ zhortein_symfony_toolbox:
       icon_sort_asc: 'bi:sort-alpha-down'
       icon_sort_desc: 'bi:sort-alpha-up'
       icon_filter: 'mi:filter'
+      icon_export_csv: 'bi:filetype-csv'
+      icon_export_pdf: 'bi:filetype-pdf'
+      icon_export_excel: 'bi:filetype-xlsx'
 ```
 
 ```yaml
@@ -201,6 +209,11 @@ zhortein_symfony_toolbox:
     css_mode: 'bootstrap'
     items_per_page: 10
     paginator: 'custom'
+    export:
+      enabled_by_default: true
+      export_csv: true
+      export_pdf: false
+      export_excel: true
     ux_icons: true
     ux_icons_options:
       icon_first: 'bi:chevron-double-left'
@@ -214,6 +227,9 @@ zhortein_symfony_toolbox:
       icon_sort_asc: 'bi:sort-alpha-down'
       icon_sort_desc: 'bi:sort-alpha-up'
       icon_filter: 'mi:filter'
+      icon_export_csv: 'bi:filetype-csv'
+      icon_export_pdf: 'bi:filetype-pdf'
+      icon_export_excel: 'bi:filetype-xlsx'
 ```
 
 ```yaml

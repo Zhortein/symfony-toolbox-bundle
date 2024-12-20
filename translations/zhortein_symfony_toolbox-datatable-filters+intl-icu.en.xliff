@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+    <file source-language="en" target-language="en" datatype="plaintext" original="file_content">
+        <body>
+            <trans-unit id="0" resname="datatable.filter.equal">
+                <source>is equal</source>
+                <target>is equal</target>
+            </trans-unit>
+            <trans-unit id="1" resname="datatable.filter.not_equal">
+                <source>is not equal</source>
+                <target>is not equal</target>
+            </trans-unit>
+            <trans-unit id="2" resname="datatable.filter.contains">
+                <source>contains</source>
+                <target>contains</target>
+            </trans-unit>
+            <trans-unit id="3" resname="datatable.filter.not_contains">
+                <source>not contains</source>
+                <target>not contains</target>
+            </trans-unit>
+            <trans-unit id="4" resname="datatable.filter.starts_with">
+                <source>starts with</source>
+                <target>starts with</target>
+            </trans-unit>
+            <trans-unit id="5" resname="datatable.filter.not_starts_with">
+                <source>not starts with</source>
+                <target>not starts with</target>
+            </trans-unit>
+            <trans-unit id="6" resname="datatable.filter.ends_with">
+                <source>ends with</source>
+                <target>ends with</target>
+            </trans-unit>
+            <trans-unit id="7" resname="datatable.filter.not_ends_with">
+                <source>not ends with</source>
+                <target>not ends with</target>
+            </trans-unit>
+            <trans-unit id="8" resname="datatable.filter.is_null">
+                <source>is null</source>
+                <target>is null</target>
+            </trans-unit>
+            <trans-unit id="9" resname="datatable.filter.is_not_null">
+                <source>is not null</source>
+                <target>is not null</target>
+            </trans-unit>
+            <trans-unit id="10" resname="datatable.filter.before">
+                <source>before</source>
+                <target>before</target>
+            </trans-unit>
+            <trans-unit id="11" resname="datatable.filter.after">
+                <source>after</source>
+                <target>after</target>
+            </trans-unit>
+            <trans-unit id="12" resname="datatable.filter.between">
+                <source>between</source>
+                <target>between</target>
+            </trans-unit>
+            <trans-unit id="13" resname="datatable.filter.not_between">
+                <source>not between</source>
+                <target>not between</target>
+            </trans-unit>
+            <trans-unit id="14" resname="datatable.filter.greater_than">
+                <source>greater than</source>
+                <target>greater than</target>
+            </trans-unit>
+            <trans-unit id="15" resname="datatable.filter.greater_or_equal_than">
+                <source>greater or equal than</source>
+                <target>greater or equal than</target>
+            </trans-unit>
+            <trans-unit id="16" resname="datatable.filter.less_than">
+                <source>less than</source>
+                <target>less than</target>
+            </trans-unit>
+            <trans-unit id="17" resname="datatable.filter.less_or_equal_than">
+                <source>less or equal than</source>
+                <target>less or equal than</target>
+            </trans-unit>
+            <trans-unit id="18" resname="datatable.filter.is_true">
+                <source>is true</source>
+                <target>is true</target>
+            </trans-unit>
+            <trans-unit id="19" resname="datatable.filter.is_false">
+                <source>is false</source>
+                <target>is false</target>
+            </trans-unit>
+            <trans-unit id="20" resname="datatable.filter.in">
+                <source>in</source>
+                <target>in</target>
+            </trans-unit>
+            <trans-unit id="21" resname="datatable.filter.not_in">
+                <source>not in</source>
+                <target>not in</target>
+            </trans-unit>
+        </body>
+    </file>
+</xliff>

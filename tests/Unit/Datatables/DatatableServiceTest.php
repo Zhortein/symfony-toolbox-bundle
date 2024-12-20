@@ -4,11 +4,14 @@ namespace Zhortein\SymfonyToolboxBundle\Tests\Unit\Datatables;
 
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
+use Sensiolabs\GotenbergBundle\GotenbergPdfInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Environment;
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\ColumnDTO;
 use Zhortein\SymfonyToolboxBundle\Service\Cache\CacheManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory;
@@ -24,6 +27,8 @@ class DatatableServiceTest extends TestCase
         $cacheManager = $this->createMock(CacheManager::class);
         $twigMock = $this->createMock(Environment::class);
         $paginatorFactoryMock = $this->createMock(PaginatorFactory::class);
+        $translatorMock = $this->createMock(TranslatorInterface::class);
+        $gotenbergMock = $this->createMock(GotenbergPdfInterface::class);
 
         $this->datatable = new class($em) extends AbstractDatatable {
             public function configure(): AbstractDatatable
@@ -39,7 +44,14 @@ class DatatableServiceTest extends TestCase
 
         $datatableManager = new DatatableManager(
             ['dt1' => $this->datatable],
+            [
+                'dt1' => [
+                    ['name' => 'id', 'label' => 'ID', 'nameAs' => 'id'],
+                    ['name' => 'name', 'label' => 'Name', 'nameAs' => 'name'],
+                ],
+            ],
             ['dt1' => [
+                'name' => 'testDatatable',
                 'defaultPageSize' => 20,
             ],
             ],
@@ -47,7 +59,7 @@ class DatatableServiceTest extends TestCase
             $cacheManager
         );
 
-        $this->datatableService = new DatatableService($datatableManager, $twigMock, $paginatorFactoryMock);
+        $this->datatableService = new DatatableService($datatableManager, $twigMock, $paginatorFactoryMock, $gotenbergMock, $translatorMock);
     }
 
     public function testExtractParameters(): void
@@ -63,8 +75,8 @@ class DatatableServiceTest extends TestCase
         ]);
 
         $this->datatable->setColumns([
-            ['name' => 'name', 'label' => 'Name'],
-            ['name' => 'id', 'label' => 'Identifier'],
+            ColumnDTO::fromArray(['name' => 'name', 'label' => 'Name']),
+            ColumnDTO::fromArray(['name' => 'id', 'label' => 'Identifier']),
         ]);
 
         $params = $this->datatableService->getParameters($this->datatable, $request);
@@ -85,12 +97,10 @@ class DatatableServiceTest extends TestCase
         ]);
 
         $this->datatable->setColumns([
-            ['name' => 'id', 'label' => 'Identifier'],
+            ColumnDTO::fromArray(['name' => 'id', 'label' => 'Identifier']),
         ]);
 
         // Mock des méthodes nécessaires pour simuler un fonctionnement complet
-        $this->datatable->addOption('searchable', true);
-        $this->datatable->addOption('sortable', true);
 
         $result = $this->datatableService->render($this->datatable, $request);
         $result = json_decode($result->getContent(), true);

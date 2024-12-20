@@ -4,81 +4,156 @@ namespace Zhortein\SymfonyToolboxBundle\Service\Datatables;
 
 use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\ColumnCachedTypeDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\ColumnDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\DatatableOptionsDTO;
+use Zhortein\SymfonyToolboxBundle\DTO\Datatables\GlobalOptionsDTO;
 use Zhortein\SymfonyToolboxBundle\Service\Cache\CacheManager;
 
-readonly class DatatableManager
+class DatatableManager
 {
     /**
-     * @param array<string, AbstractDatatable> $datatables
-     * @param array<string, array{
-     *      defaultPageSize?: int,
-     *      defaultSort?: array<int, array{
-     *          field: string,
-     *          order: 'asc'|'desc'
-     *      }>,
-     *      searchable?: bool,
-     *      sortable?: bool,
-     *      autoColumns?: bool,
-     *      options?: array{
-     *          thead?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          },
-     *          tbody?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          },
-     *          tfoot?: array{
-     *              keep_default_classes?: bool,
-     *              class?: string,
-     *              data?: array<string, mixed>
-     *          }
-     *      },
-     *      actionColumn?: array{template: string, label: string},
-     *      selectorColumn?: array{label: string, template?: string},
-     *      translationDomain?: string
-     *  }> $datatableOptions
-     * @param array{
-     *      css_mode: string,
-     *      items_per_page: int,
-     *      paginator: string,
-     *      ux_icons: bool,
-     *      ux_icons_options: array{
-     *           icon_first: string,
-     *           icon_previous: string,
-     *           icon_next: string,
-     *           icon_last: string,
-     *           icon_search: string,
-     *           icon_true: string,
-     *           icon_false: string,
-     *           icon_sort_neutral: string,
-     *           icon_sort_asc: string,
-     *           icon_sort_desc: string,
-     *           icon_filter: string,
-     *      }
-     *  }   $globalOptions
+     * @var array<string, ColumnDTO[]>
      */
-    public function __construct(
-        private array $datatables,
-        private array $datatableOptions,
-        private array $globalOptions,
-        private CacheManager $cache,
-    ) {
-    }
+    private array $datatableColumns = [];
 
     /**
-     * Retrieves a global option by its key.
-     *
-     * @param string $key     the key for the global option to retrieve
-     * @param mixed  $default the default value to return if the key does not exist
-     *
-     * @return mixed the value of the global option associated with the key, or the default value if the key does not exist
+     * @var array<string, DatatableOptionsDTO>
      */
-    public function getGlobalOption(string $key, mixed $default = null): mixed
+    private array $datatableOptions = [];
+
+    private GlobalOptionsDTO $globalOptions;
+
+    /**
+     * @param array<string, AbstractDatatable> $datatables
+     * @param array<string, array<int, array{
+     *       name: string,
+     *       label: string,
+     *       searchable: bool,
+     *       sortable: bool,
+     *       nameAs?: string,
+     *       alias?: string,
+     *       sqlAlias?: string,
+     *       datatype: string,
+     *       template: string,
+     *       header: array{
+     *           translate?: bool,
+     *           keep_default_classes?: bool,
+     *           class?: string,
+     *           data?: array<string, string|int|float|bool|null>
+     *       },
+     *       dataset: array{
+     *           translate?: bool,
+     *           keep_default_classes?: bool,
+     *           class?: string,
+     *           data?: array<string, string|int|float|bool|null>
+     *       },
+     *       footer: array{
+     *           translate?: bool,
+     *           keep_default_classes?: bool,
+     *           class?: string,
+     *           data?: array<string, string|int|float|bool|null>
+     *       },
+     *       autoColumns: bool,
+     *       isEnum: bool,
+     *       isTranslatableEnum: bool,
+     *       enumClass: class-string<\BackedEnum>|null,
+     *   }>>         $rawDatatableColumns
+     * @param array<string, array{
+     *       name: string,
+     *       defaultPageSize: int,
+     *       defaultSort: array<int, array{
+     *            field: string,
+     *            order: string
+     *       }>,
+     *       searchable: bool,
+     *       sortable: bool,
+     *       exportable: bool,
+     *       exportCsv: bool,
+     *       exportPdf: bool,
+     *       exportExcel: bool,
+     *       autoColumns: bool,
+     *       translationDomain: string,
+     *       actionColumn?: array{
+     *           label?: string,
+     *           template?: string
+     *       },
+     *       selectorColumn?: array{
+     *           label?: string,
+     *           template?: string
+     *       },
+     *       options: array{
+     *        thead?: array{
+     *          translate?: bool,
+     *          keep_default_classes?: bool,
+     *          class?: string,
+     *          data?: array<string, string|int|float|bool|null>,
+     *      },
+     *        tbody?: array{
+     *          translate?: bool,
+     *          keep_default_classes?: bool,
+     *          class?: string,
+     *          data?: array<string, string|int|float|bool|null>,
+     *      },
+     *        tfoot?: array{
+     *          translate?: bool,
+     *          keep_default_classes?: bool,
+     *          class?: string,
+     *          data?: array<string, string|int|float|bool|null>,
+     *      },
+     *    }
+     *   }> $rawDatatableOptions
+     * @param array{
+     *         css_mode: string,
+     *         items_per_page: int,
+     *         paginator: string,
+     *         export: array{
+     *              enabled_by_default: bool,
+     *              export_csv: bool,
+     *              export_pdf: bool,
+     *              export_excel: bool,
+     *         },
+     *         ux_icons: bool,
+     *         ux_icons_options: array{
+     *              icon_first: string,
+     *              icon_previous: string,
+     *              icon_next: string,
+     *              icon_last: string,
+     *              icon_search: string,
+     *              icon_true: string,
+     *              icon_false: string,
+     *              icon_sort_neutral: string,
+     *              icon_sort_asc: string,
+     *              icon_sort_desc: string,
+     *              icon_filter: string,
+     *              icon_export_csv: string,
+     *              icon_export_pdf: string,
+     *              icon_export_excel: string,
+     *         }
+     *     } $rawGlobalOptions
+     */
+    public function __construct(
+        private readonly array $datatables,
+        private readonly array $rawDatatableColumns,
+        private readonly array $rawDatatableOptions,
+        private readonly array $rawGlobalOptions,
+        private readonly CacheManager $cache,
+    ) {
+        $this->globalOptions = GlobalOptionsDTO::fromArray($this->rawGlobalOptions);
+        foreach ($this->rawDatatableColumns as $name => $rawDatatableColumn) {
+            $this->datatableColumns[$name] = [];
+            foreach ($rawDatatableColumn as $column) {
+                $this->datatableColumns[$name][] = ColumnDTO::fromArray($column);
+            }
+        }
+        foreach ($this->rawDatatableOptions as $name => $rawDatatableOption) {
+            $this->datatableOptions[$name] = DatatableOptionsDTO::fromArray($rawDatatableOption, $this->globalOptions);
+        }
+    }
+
+    public function getGlobalOptions(): GlobalOptionsDTO
     {
-        return array_key_exists($key, $this->globalOptions) ? $this->globalOptions[$key] : $default;
+        return $this->globalOptions;
     }
 
     /**
@@ -91,22 +166,15 @@ readonly class DatatableManager
      */
     public function getCssMode(): string
     {
-        $cssMode = $this->getGlobalOption('css_mode', Configuration::DEFAULT_DATATABLE_CSS_MODE);
-        if (!is_string($cssMode)) {
-            return Configuration::DEFAULT_DATATABLE_CSS_MODE;
-        }
-
-        return $cssMode;
+        return $this->globalOptions->cssMode ?? Configuration::DEFAULT_DATATABLE_CSS_MODE;
     }
 
     /**
      * Retrieves the options for a specific datatable by its name.
      *
      * @param string $name the name of the datatable
-     *
-     * @return array<string, mixed>|null the options of the datatable, or null if not found
      */
-    public function getDatatableOptions(string $name): ?array
+    public function getDatatableOptions(string $name): ?DatatableOptionsDTO
     {
         return $this->datatableOptions[$name] ?? null;
     }
@@ -127,75 +195,20 @@ readonly class DatatableManager
             $checksum = $datatable->calculateChecksum($name);
             $datatable->setGlobalOptions($this->globalOptions);
             $datatable->setCssMode($this->getCssMode());
-            $options = $this->getDatatableOptions($name);
-            if (!empty($options)) {
-                foreach ($options as $key => $value) {
-                    if ('columns' === $key && is_array($value)) {
-                        /**
-                         * @var array{
-                         *          name: string,
-                         *          label: string,
-                         *          searchable?: bool,
-                         *          sortable?: bool,
-                         *          nameAs?: string,
-                         *          alias?: string,
-                         *          sqlAlias?: string,
-                         *          datatype?: string,
-                         *          template?: string,
-                         *          header?: array{
-                         *              translate?: bool,
-                         *              keep_default_classes?: bool,
-                         *              class?: string,
-                         *              data?: array<string, mixed>
-                         *          },
-                         *          dataset?: array{
-                         *              translate?: bool,
-                         *              keep_default_classes?: bool,
-                         *              class?: string,
-                         *              data?: array<string, mixed>
-                         *          },
-                         *          footer?: array{
-                         *              translate?: bool,
-                         *              auto?: string,
-                         *              keep_default_classes?: bool,
-                         *              class?: string,
-                         *              data?: array<string, mixed>
-                         *          }
-                         *      } $column
-                         */
-                        foreach ($value as $column) {
-                            $datatable->addColumn(
-                                $column['name'],
-                                $column['label'],
-                                $column['searchable'] ?? true,
-                                $column['sortable'] ?? true,
-                                $column['alias'] ?? null,
-                                $column['header'] ?? ['keep_default_classes' => true, 'class' => ''],
-                                $column['dataset'] ?? ['keep_default_classes' => true, 'class' => ''],
-                                $column['footer'] ?? ['keep_default_classes' => true, 'class' => '', 'auto' => ''],
-                                $column['nameAs'] ?? '',
-                                $column['datatype'] ?? '',
-                                $column['template'] ?? ''
-                            );
-                        }
-                    }
-
-                    if (in_array($key, ['actionColumn', 'selectorColumn', 'defaultPageSize', 'defaultSort', 'searchable', 'sortable', 'options', 'autoColumns', 'translationDomain'])) {
-                        $datatable->addOption($key, $value);
-                    }
-                }
+            if (isset($this->datatableColumns[$name])) {
+                $datatable->setColumns($this->datatableColumns[$name]);
+            } else {
+                throw new \RuntimeException(sprintf('Unable to find datatable columns for datatable "%s".', $name));
             }
-
+            if (isset($this->datatableOptions[$name])) {
+                $datatable->setOptions($this->datatableOptions[$name]);
+            } else {
+                $datatable->setOptions(new DatatableOptionsDTO());
+            }
             $datatable->validateColumns();
-            $datatable->validateTableOptions();
 
             // Get cached column_types
-            /** @var array<string, array{
-             * rank: int,
-             * datatype: string,
-             * isEnum: bool,
-             * isTranslatableEnum: bool,
-             * }> $cachedTypes */
+            /** @var ColumnCachedTypeDTO[] $cachedTypes */
             $cachedTypes = $this->cache->get($checksum, function () use ($datatable) {
                 return $this->buildDatatableTypesForCache($datatable);
             });
@@ -221,12 +234,7 @@ readonly class DatatableManager
      *
      * @param AbstractDatatable $datatable The datatable instance to analyze for type caching
      *
-     * @return array<string, array{
-     *      rank: int,
-     *      datatype: string,
-     *      isEnum: bool,
-     *      isTranslatableEnum: bool,
-     * }> An associative array where keys are column names and values are arrays containing 'rank', 'datatype', 'isEnum', and 'isTranslatableEnum'
+     * @return ColumnCachedTypeDTO[]
      */
     private function buildDatatableTypesForCache(AbstractDatatable $datatable): array
     {
@@ -240,26 +248,16 @@ readonly class DatatableManager
         if (!empty($result[0]) && is_array($result[0])) {
             foreach ($result[0] as $key => $value) {
                 // Détection du type PHP
-                $detectedType = gettype($value);
-                $isEnum = false;
-                $isTranslatableEnum = false;
-                if ('object' === $detectedType && is_object($value)) {
-                    $detectedType = get_class($value);
-                    $isEnum = $value instanceof \BackedEnum;
-                    $isTranslatableEnum = method_exists($value, 'label') && method_exists(
-                        $value,
-                        'getTranslationDomain'
-                    );
-                }
+                $detectedType = $this->detectType($value);
 
                 foreach ($datatable->getColumns() as $rank => $column) {
-                    if (($column['nameAs'] ?? '') === $key) {
-                        $types[$key] = [
-                            'rank' => $rank,
-                            'datatype' => $detectedType,  // Type détecté
-                            'isEnum' => $isEnum,
-                            'isTranslatableEnum' => $isTranslatableEnum,
-                        ];
+                    if (($column->nameAs ?? '') === $key) {
+                        $types[$key] = new ColumnCachedTypeDTO(
+                            rank: $rank,
+                            datatype: $detectedType['type'],
+                            isEnum: $detectedType['isEnum'],
+                            isTranslatableEnum: $detectedType['isTranslatableEnum'],
+                        );
                         break;
                     }
                 }
@@ -267,5 +265,68 @@ readonly class DatatableManager
         }
 
         return $types;
+    }
+
+    /**
+     * @return array{
+     *     type: string,
+     *     isEnum: bool,
+     *     isTranslatableEnum: bool
+     * }
+     */
+    private function detectType(mixed $value): array
+    {
+        $detectedType = gettype($value);
+        $isEnum = false;
+        $enumClass = '';
+        $isTranslatableEnum = false;
+
+        if (is_object($value)) {
+            $detectedType = get_class($value);
+
+            if ($value instanceof \BackedEnum) {
+                $detectedType = 'enum';
+                $isEnum = true;
+                $enumClass = $detectedType;
+
+                if (method_exists($value, 'label') && method_exists($value, 'getTranslationDomain')) {
+                    $isTranslatableEnum = true;
+                    $detectedType = 'enum_translatable';
+                }
+            }
+
+            if ($value instanceof \DateTimeInterface) {
+                $detectedType = 'date';
+            }
+        }
+
+        // Map des types Doctrine → types utilisateurs
+        $doctrineToUserTypeMap = [
+            'integer' => 'int',
+            'smallint' => 'int',
+            'bigint' => 'int',
+            'float' => 'float',
+            'decimal' => 'float',
+            'boolean' => 'bool',
+            'datetime' => 'datetime',
+            'datetimetz' => 'datetime',
+            'date' => 'date',
+            'time' => 'time',
+            'json' => 'json',
+            'array' => 'array',
+            'string' => 'string',
+            'text' => 'string',
+        ];
+
+        if (isset($doctrineToUserTypeMap[$detectedType])) {
+            $detectedType = $doctrineToUserTypeMap[$detectedType];
+        }
+
+        return [
+            'type' => $detectedType,
+            'isEnum' => $isEnum,
+            'isTranslatableEnum' => $isTranslatableEnum,
+            'enumClass' => $isEnum ? $enumClass : null,
+        ];
     }
 }

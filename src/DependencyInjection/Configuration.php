@@ -20,6 +20,12 @@ class Configuration implements ConfigurationInterface
      *      css_mode: string,
      *      items_per_page: int,
      *      paginator: string,
+     *      export: array{
+     *            enabled_by_default: bool,
+     *            export_csv: bool,
+     *            export_pdf: bool,
+     *            export_excel: bool,
+     *      },
      *      ux_icons: bool,
      *      ux_icons_options: array{
      *           icon_first: string,
@@ -33,6 +39,9 @@ class Configuration implements ConfigurationInterface
      *           icon_sort_asc: string,
      *           icon_sort_desc: string,
      *           icon_filter: string,
+     *           icon_export_csv: string,
+     *           icon_export_pdf: string,
+     *           icon_export_excel: string,
      *      }
      *  }
      */
@@ -40,6 +49,12 @@ class Configuration implements ConfigurationInterface
         'css_mode' => self::DEFAULT_DATATABLE_CSS_MODE,
         'items_per_page' => self::DEFAULT_DATATABLE_ITEMS_PER_PAGE,
         'paginator' => self::DEFAULT_DATATABLE_PAGINATOR,
+        'export' => [
+            'enabled_by_default' => true,
+            'export_csv' => true,
+            'export_pdf' => false,
+            'export_excel' => true,
+        ],
         'ux_icons' => true,
         'ux_icons_options' => [
             'icon_first' => 'bi:chevron-double-left',
@@ -53,6 +68,9 @@ class Configuration implements ConfigurationInterface
             'icon_sort_asc' => 'bi:sort-alpha-down',
             'icon_sort_desc' => 'bi:sort-alpha-up',
             'icon_filter' => 'mi:filter',
+            'icon_export_csv' => 'bi:filetype-csv',
+            'icon_export_pdf' => 'bi:filetype-pdf',
+            'icon_export_excel' => 'bi:filetype-xlsx',
         ],
     ];
 
@@ -84,6 +102,15 @@ class Configuration implements ConfigurationInterface
                                 ->thenInvalid('Invalid pagination mode: %s. Use "knp", or "custom".')
                             ->end()
                         ->end()
+                        ->arrayNode('export')
+                            ->addDefaultsIfNotSet()
+                            ->children()
+                                ->booleanNode('enabled_by_default')->defaultValue(true)->end()
+                                ->booleanNode('export_csv')->defaultValue(true)->end()
+                                ->booleanNode('export_pdf')->defaultValue(false)->end()
+                                ->booleanNode('export_excel')->defaultValue(true)->end()
+                            ->end()
+                        ->end()
                         ->booleanNode('ux_icons')->defaultValue(true)->end()
                         ->arrayNode('ux_icons_options')
                             ->addDefaultsIfNotSet()
@@ -99,6 +126,9 @@ class Configuration implements ConfigurationInterface
                                 ->scalarNode('icon_sort_asc')->defaultValue('bi:sort-alpha-down')->end()
                                 ->scalarNode('icon_sort_desc')->defaultValue('bi:sort-alpha-up')->end()
                                 ->scalarNode('icon_filter')->defaultValue('mi:filter')->end()
+                                ->scalarNode('icon_export_csv')->defaultValue('bi:filetype-csv')->end()
+                                ->scalarNode('icon_export_pdf')->defaultValue('bi:filetype-pdf')->end()
+                                ->scalarNode('icon_export_excel')->defaultValue('bi:filetype-xslx')->end()
                             ->end()
                         ->end()
                     ->end()

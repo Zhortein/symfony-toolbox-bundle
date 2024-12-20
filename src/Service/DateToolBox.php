@@ -2,6 +2,7 @@
 
 namespace Zhortein\SymfonyToolboxBundle\Service;
 
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Psr\Log\LoggerInterface;
 use Zhortein\SymfonyToolboxBundle\Enum\Day;
 
@@ -71,20 +72,19 @@ class DateToolBox
      */
     public static function getDateFromExcel(float|int|string|null $excelDate): ?\DateTime
     {
-        if (class_exists('PhpOffice\PhpSpreadsheet\Shared\Date')) {
+        if (class_exists(Date::class)) {
             if (is_string($excelDate)) {
                 $excelDate = (float) trim(str_replace(',', '.', $excelDate));
             }
 
             if (!empty($excelDate)) {
                 try {
-                    /** @var \DateTime|null $date */
-                    $date = \PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($excelDate, self::getTimeZone());
-                } catch (\Exception $e) {
+                    $date = Date::excelToDateTimeObject($excelDate, self::getTimeZone());
+                } catch (\Exception) {
                     try {
                         $formattedDate = str_replace('/', '-', (string) $excelDate);
                         $date = new \DateTime($formattedDate, self::getTimeZone());
-                    } catch (\Exception $e) {
+                    } catch (\Exception) {
                         $date = null;
                     }
                 }

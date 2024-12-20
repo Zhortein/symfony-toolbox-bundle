@@ -1,0 +1,48 @@
+{% import '@ZhorteinSymfonyToolbox/datatables/macros.html.twig' as toolbox %}
+<div
+        data-controller="zhortein--symfony-toolbox-bundle--datatable"
+        data-zhortein--symfony-toolbox-bundle--datatable-id-value="{{ datatableId }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-mode-value="{{ datatable.cssMode }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-pagesize-value="{{ datatable.defaultPageSize }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-url-value="{{ path('zhortein_datatable_fetch_data', {'datatableId': datatableId}) }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-download-value="{{ path('zhortein_datatable_export', {'datatableId': datatableId}) }}"
+        data-zhortein--symfony-toolbox-bundle--datatable-filters-value="{{ path('zhortein_datatable_filters', {'datatableId': datatableId}) }}"
+        {{ attributes }}
+        class="{{ containerClass }}"
+>
+    {# Barre des erreurs #}
+    {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-errors.html.twig' %}
+
+    {# Barre des actions (exports) #}
+    {# Charger la template partielle d'actions #}
+    {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-actions.html.twig' %}
+
+    {# Barre de recherche #}
+    {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-search.html.twig' %}
+
+    {# Barre de recherche avancée #}
+    {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-search-builder.html.twig' %}
+
+    {# Spinner #}
+    {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-spinner.html.twig' %}
+
+    {# Tableau principal #}
+    <table class="{{ tableClass }}">
+        <thead data-zhortein--symfony-toolbox-bundle--datatable-target="header" {{ toolbox.render_attributes(datatable.options.options.thead, tableTheadClass) }}>
+        {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-thead.html.twig' %}
+        </thead>
+        <tbody data-zhortein--symfony-toolbox-bundle--datatable-target="table" {{ toolbox.render_attributes(datatable.options.options.tbody, tableTbodyClass) }}>
+        {# Les lignes seront chargées dynamiquement #}
+        </tbody>
+        {% if datatable.displayFooter %}
+            <tfoot data-zhortein--symfony-toolbox-bundle--datatable-target="footer" {{ toolbox.render_attributes(datatable.options.options.tfoot, tableTfootClass) }}>
+            {% include '@ZhorteinSymfonyToolbox/datatables/parts/_datatable-tfoot.html.twig' %}
+            </tfoot>
+        {% endif %}
+    </table>
+
+    {# Pagination #}
+    <nav data-zhortein--symfony-toolbox-bundle--datatable-target="pagination"
+         aria-label="{{ 'datatable.pagination'|trans({}, transDomain) }}"
+         {{ toolbox.render_attributes(datatable.options.options.pagination, paginationClass) }}></nav>
+</div>
