@@ -1,0 +1,41 @@
+{% set searchBarClass = searchClasses.searchBarClass %}
+{% set searchContainerClass = searchClasses.searchContainer %}
+{% if not datatable.isSearchable() %}
+    {% set searchContainerClass = searchClasses.searchContainer ~ ' ' ~ hiddenClass %}
+{% endif %}
+{% set labelClass = searchClasses.label %}
+{% set labelText = 'datatable.search'|trans({}, transDomain) %}
+{% set inputClass = searchClasses.input %}
+{% set iconContainerType = searchClasses.iconContainerType %}
+{% set iconContainerClass = searchClasses.iconContainer %}
+{% set iconClass = searchClasses.icon %}
+
+<div data-zhortein--symfony-toolbox-bundle--datatable-target="search" class="{{ searchBarClass }}">
+    <div class="{{ searchContainerClass }}">
+        {% if labelClass is not empty %}
+            <label for="search-button" class="{{ labelClass }}">{{ labelText }}</label>
+        {% endif %}
+        {% if searchClasses.inputWrapper is not empty %}<div class="{{ searchClasses.inputWrapper }}">{% endif %}
+            {% if iconContainerClass is not empty %}
+                {% if iconContainerType == 'div' %}
+                    <div class="{{ iconContainerClass }}" id="search-button">
+                {% else %}
+                    <label class="{{ iconContainerClass }}" id="search-button">
+                {% endif %}
+                    {{ ux_icon(datatable.getIcon('icon_search'), {height: '16px', width: '16px', class: iconClass, viewbox: '0 0 20 20', 'aria-hidden': true, 'data-slot': 'icon'}) }}
+                {% if iconContainerType != 'div' %}
+                    </label>
+                {% else %}
+                    </div>
+                {% endif %}
+            {% endif %}
+            <input
+                    data-action="input->zhortein--symfony-toolbox-bundle--datatable#search"
+                    type="text"
+                    class="{{ inputClass }}"
+                    placeholder="{{ labelText }}"
+                    aria-describedby="search-button"
+            >
+        {% if searchClasses.inputWrapper is not empty %}</div>{% endif %}
+    </div>
+</div>

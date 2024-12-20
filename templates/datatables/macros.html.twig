@@ -1,0 +1,35 @@
+{% macro render_attributes(attributes, defaultClasses) %}
+    {% set ignored_keys = ['class', 'data', 'keepDefaultClasses', 'translate'] %}
+    {% set ignored_data_keys = ['field', 'action'] %}
+
+    {# Gérer la classe à l'intérieur de la macro #}
+    {% set classes = '' %}
+    {% if attributes.keepDefaultClasses %}
+        {% set classes = defaultClasses ~ ' ' %}
+    {% endif %}
+    {% set classes = classes ~ attributes.class %}
+
+    {% if classes is not empty %}
+        class="{{ classes|trim }}"
+    {% endif %}
+
+    {# Gérer les autres attributs classiques #}
+    {% for key, value in attributes %}
+        {% if key not in ignored_keys %}{{ key }}="{{ value }}"{% endif %}
+    {% endfor %}
+
+    {# Gérer les data-* attributes #}
+    {% if attributes.data is defined %}
+        {% for dataKey, dataValue in attributes.data %}
+            {% if key not in ignored_data_keys %}data-{{ dataKey }}="{{ dataValue }}"{% endif %}
+        {% endfor %}
+    {% endif %}
+{% endmacro %}
+
+{% macro get_label(column, translationDomain) %}
+    {% if translationDomain is not empty and column.translate is defined and column.translate %}
+        {{ column.label|trans({}, translationDomain) }}
+    {% else %}
+        {{ column.label }}
+    {% endif %}
+{% endmacro %}

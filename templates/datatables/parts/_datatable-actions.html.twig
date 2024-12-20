@@ -1,0 +1,39 @@
+<div data-zhortein--symfony-toolbox-bundle--datatable-target="actions" class="{{ actionBarClass }}{% if not datatable.isExportable() %} hiddenClass{% endif %}">
+    <div class="{{ actionContainerClass }}" role="group" aria-label="{{ 'datatable.export'|trans({}, transDomain) }}">
+        {% if datatable.isCsvExportable() %}
+            <button
+                    type="button"
+                    class="{{ actionClasses.firstButton }}"
+                    data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportCsv"
+                    data-zhortein--symfony-toolbox-bundle--datatable-target="export"
+                    title="{{ 'datatable.export.csv'|trans({}, transDomain) }}"
+            >
+                {{ 'datatable.export.csv'|trans({}, transDomain) }}
+            </button>
+        {% endif %}
+
+        {% if datatable.isExcelExportable() %}
+            <button
+                    type="button"
+                    class="{{ actionClasses.button }}"
+                    data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportExcel"
+                    data-zhortein--symfony-toolbox-bundle--datatable-target="export"
+                    title="{{ 'datatable.export.excel'|trans({}, transDomain) }}"
+            >
+                {{ 'datatable.export.excel'|trans({}, transDomain) }}
+            </button>
+        {% endif %}
+
+        {% if datatable.isPdfExportable() %}
+            <button
+                    type="button"
+                    class="{{ actionClasses.lastButton }}"
+                    data-action="click->zhortein--symfony-toolbox-bundle--datatable#exportPdf"
+                    data-zhortein--symfony-toolbox-bundle--datatable-target="export"
+                    title="{{ 'datatable.export.pdf'|trans({}, transDomain) }}"
+            >
+                {{ 'datatable.export.pdf'|trans({}, transDomain) }}
+            </button>
+        {% endif %}
+    </div>
+</div>

@@ -16,6 +16,7 @@ class AsDatatable
      *          label: string,
      *          searchable?: bool,
      *          sortable?: bool,
+     *          exportable?: bool,
      *          nameAs?: string,
      *          alias?: string,
      *          sqlAlias?: string,
@@ -40,11 +41,12 @@ class AsDatatable
      *              class?: string,
      *              data?: array<string, mixed>
      *          }
-     *      }> $columns Configuration for each column, including properties like 'name', 'label', 'searchable', 'sortable', and others
+     *      }> $columns Configuration for each column, including properties like 'name', 'label', 'searchable', 'sortable', 'exportable', and others
      * @param int                                                    $defaultPageSize   default number of items per page; uses a predefined constant by default
      * @param array<int, array<string, string>>                      $defaultSort       default sort configuration, consisting of field and order
      * @param bool                                                   $searchable        boolean flag indicating if the table supports search functionality
      * @param bool                                                   $sortable          boolean flag indicating if the table supports sorting functionality
+     * @param bool                                                   $exportable        boolean flag indicating if the table supports exports functionality
      * @param bool                                                   $autoColumns       whether columns should be automatically constructed from the request
      * @param array<string, array{label?: string, template: string}> $actionColumn      configuration for an "action" column, if any; contains 'label' and 'template'
      * @param array<string, array{label?: string, template: string}> $selectorColumn    configuration for a "selector" column, if any; contains 'label' and 'template'
@@ -60,6 +62,7 @@ class AsDatatable
         public array $defaultSort = [], // ex: [['field' => 'id', 'order' => 'asc'], ]
         public bool $searchable = true, // User can perform searches
         public bool $sortable = true, // User can change sorting
+        public bool $exportable = true, // User can export data
         public bool $autoColumns = false, // Construct columns from request then merge column settings (settings erase auto cols detection)
         public array $actionColumn = [], // Add an "action" column ['label' => 'Actions', 'template' => '']
         public array $selectorColumn = [], // Add a "selector" column ['label' => '', 'template' => '']
@@ -85,6 +88,7 @@ class AsDatatable
             'defaultSort' => $this->defaultSort,
             'searchable' => $this->searchable,
             'sortable' => $this->sortable,
+            'exportable' => $this->exportable,
             'autoColumns' => $this->autoColumns,
             'actionColumn' => $this->actionColumn,
             'selectorColumn' => $this->selectorColumn,

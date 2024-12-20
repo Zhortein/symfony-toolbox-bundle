@@ -1,0 +1,33 @@
+{% import '@ZhorteinSymfonyToolbox/datatables/macros.html.twig' as toolbox %}
+<tr>
+    {% if datatable.hasSelectorColumn %}
+        <th>{{ toolbox.get_label(datatable.options.selectorColumn, transDomain) }}</th>
+    {% endif %}
+
+    {% for column in datatable.columns %}
+        {% if not column.header.keepDefaultClasses %}
+                {% set headerFirstCssClasses = '' %}
+                {% set headerOthersCssClasses = '' %}
+        {% endif %}
+        {% if loop.index == 1 %}
+            {% set headerCssClasses = headerFirstCssClasses ~ ' ' ~ column.header.class %}
+        {% else %}
+            {% set headerCssClasses = headerOthersCssClasses ~ ' ' ~ column.header.class %}
+        {% endif %}
+        <th
+                scope="col"
+                {{ toolbox.render_attributes(column.header, headerCssClasses|trim) }}
+                {% if datatable.isSortable() and column.sortable %}
+                    data-action="click->zhortein--symfony-toolbox-bundle--datatable#sort"
+                    data-field="{{ column.nameAs }}"
+                {% endif %}
+        >
+            <span class="datatable-sort-icon" data-priority="0"></span>
+            {{ toolbox.get_label(column, transDomain) }}
+        </th>
+    {% endfor %}
+
+    {% if datatable.hasActionColumn %}
+        <th>{{ toolbox.get_label(datatable.options.actionColumn, transDomain) }}</th>
+    {% endif %}
+</tr>
