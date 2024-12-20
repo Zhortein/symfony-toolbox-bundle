@@ -90,9 +90,9 @@ class DatatableManagerTest extends TestCase
                 ],
             ],
             ['dt1' => [
-                    'name' => 'testDatatable',
-                    'defaultPageSize' => 15,
-                ],
+                'name' => 'testDatatable',
+                'defaultPageSize' => 15,
+            ],
             ],
             Configuration::DEFAULT_CONFIGURATION,
             $this->cacheManager
