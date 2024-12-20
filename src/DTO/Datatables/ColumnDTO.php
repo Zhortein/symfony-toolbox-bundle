@@ -96,6 +96,9 @@ class ColumnDTO
         if (!isset($data['label']) || !is_string($data['label'])) {
             throw new \InvalidArgumentException('The "label" key is required and must be a string in ColumnDTO.');
         }
+        if (!isset($data['enumClass']) || !is_string($data['enumClass'])) {
+            $data['enumClass'] = null;
+        }
         $column = new self(
             name: $data['name'],
             label: $data['label'],
@@ -112,7 +115,7 @@ class ColumnDTO
             autoColumns: $data['autoColumns'] ?? false,
             isEnum: $data['isEnum'] ?? false,
             isTranslatableEnum: $data['isTranslatableEnum'] ?? false,
-            enumClass: $data['enumClass'],
+            enumClass: $data['enumClass'] ?? null,
         );
         $column->mainAlias = $mainAlias;
         $column->completeFields();

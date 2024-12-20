@@ -83,13 +83,18 @@ class DatatableManagerTest extends TestCase
 
         $this->datatableManager = new DatatableManager(
             ['dt1' => $this->datatable],
-            $this->datatable->getColumns(),
-            ['dt1' => DatatableOptionsDTO::fromArray([
-                'name' => 'testDatatable',
-                'defaultPageSize' => 15,
-            ], GlobalOptionsDTO::fromArray(Configuration::DEFAULT_CONFIGURATION)),
+            [
+                'dt1' => [
+                    ['name' => 'id', 'label' => 'ID', 'nameAs' => 'id'],
+                    ['name' => 'name', 'label' => 'Name', 'nameAs' => 'name'],
+                ],
             ],
-            GlobalOptionsDTO::fromArray(Configuration::DEFAULT_CONFIGURATION),
+            ['dt1' => [
+                    'name' => 'testDatatable',
+                    'defaultPageSize' => 15,
+                ],
+            ],
+            Configuration::DEFAULT_CONFIGURATION,
             $this->cacheManager
         );
 

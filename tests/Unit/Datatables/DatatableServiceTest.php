@@ -12,8 +12,6 @@ use Zhortein\SymfonyToolboxBundle\Datatables\AbstractDatatable;
 use Zhortein\SymfonyToolboxBundle\Datatables\DatatableService;
 use Zhortein\SymfonyToolboxBundle\DependencyInjection\Configuration;
 use Zhortein\SymfonyToolboxBundle\DTO\Datatables\ColumnDTO;
-use Zhortein\SymfonyToolboxBundle\DTO\Datatables\DatatableOptionsDTO;
-use Zhortein\SymfonyToolboxBundle\DTO\Datatables\GlobalOptionsDTO;
 use Zhortein\SymfonyToolboxBundle\Service\Cache\CacheManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\DatatableManager;
 use Zhortein\SymfonyToolboxBundle\Service\Datatables\PaginatorFactory;
@@ -46,13 +44,18 @@ class DatatableServiceTest extends TestCase
 
         $datatableManager = new DatatableManager(
             ['dt1' => $this->datatable],
-            $this->datatable->getColumns(),
-            ['dt1' => DatatableOptionsDTO::fromArray([
+            [
+                'dt1' => [
+                    ['name' => 'id', 'label' => 'ID', 'nameAs' => 'id'],
+                    ['name' => 'name', 'label' => 'Name', 'nameAs' => 'name'],
+                ],
+            ],
+            ['dt1' => [
                 'name' => 'testDatatable',
                 'defaultPageSize' => 20,
-            ], GlobalOptionsDTO::fromArray(Configuration::DEFAULT_CONFIGURATION)),
             ],
-            GlobalOptionsDTO::fromArray(Configuration::DEFAULT_CONFIGURATION),
+            ],
+            Configuration::DEFAULT_CONFIGURATION,
             $cacheManager
         );
 
