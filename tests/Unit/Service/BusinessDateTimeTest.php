@@ -169,7 +169,7 @@ class BusinessDateTimeTest extends TestCase
 
     public function testAddHoliday(): void
     {
-        $date = new \DateTime('2024-12-26');
+        $date = new \DateTime('2025-12-26');
         $this->businessDateTime->addHoliday($date);
         $this->assertTrue($this->businessDateTime->isHoliday($date, 'FR'));
     }
