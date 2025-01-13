@@ -42,7 +42,7 @@ class SymfonyToolboxCompilerPass implements CompilerPassInterface
         foreach ($container->getDefinitions() as $definition) {
             $class = $definition->getClass();
 
-            if (!$class || !class_exists($class) || str_contains($class, 'class@anonymous')) {
+            if (!$class || str_contains($class, 'class@anonymous') || !str_starts_with($class, 'Zhortein\\') || !str_starts_with($class, 'App\\') || !class_exists($class)) {
                 continue;
             }
 
