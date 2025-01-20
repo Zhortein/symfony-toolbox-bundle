@@ -7,12 +7,9 @@ use Twig\Extension\RuntimeExtensionInterface;
 
 readonly class DataFormatRuntime implements RuntimeExtensionInterface
 {
-
     public function __construct(
         private TranslatorInterface $translator,
-    )
-    {
-
+    ) {
     }
 
     public function formatDurationIso(?string $duration, bool $shortFormat = true): string
