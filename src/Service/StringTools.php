@@ -184,6 +184,7 @@ class StringTools
      * Supporte Unicode, accents, multi-mots ("Jean-Marc", "José Maria", ...).
      *
      * @param string|null $firstName Prénom brut ou null
+     *
      * @return string|null Prénom normalisé ou null si entrée vide
      */
     public static function formatFirstName(?string $firstName): ?string
@@ -201,14 +202,15 @@ class StringTools
         if (function_exists('mb_convert_case')) {
             return preg_replace_callback(
                 '/([^\s-]+)/u',
-                fn($m) => mb_convert_case($m[1], MB_CASE_TITLE, 'UTF-8'),
+                fn ($m) => mb_convert_case($m[1], MB_CASE_TITLE, 'UTF-8'),
                 $firstName
             );
         }
+
         // 3. ASCII fallback (majuscules pour la 1ère lettre, minuscule le reste)
         return preg_replace_callback(
             '/([^\s-]+)/',
-            fn($m) => ucfirst(strtolower($m[1])),
+            fn ($m) => ucfirst(strtolower($m[1])),
             $firstName
         );
     }
@@ -217,6 +219,7 @@ class StringTools
      * Formatte un nom de famille : trim, majuscules, support Unicode/accents.
      *
      * @param string|null $lastName Nom de famille brut ou null
+     *
      * @return string|null Nom normalisé en MAJUSCULES ou null si entrée vide
      */
     public static function formatLastName(?string $lastName): ?string
@@ -232,6 +235,7 @@ class StringTools
         if (function_exists('mb_strtoupper')) {
             return mb_strtoupper($lastName, 'UTF-8');
         }
+
         return strtoupper($lastName);
     }
 
@@ -239,6 +243,7 @@ class StringTools
      * Formatte un nom d'organisation : trim, titre chaque mot.
      *
      * @param string|null $organisation Nom de l'organisation brut ou null
+     *
      * @return string|null Nom formaté ou null si entrée vide
      */
     public static function formatOrganisationName(?string $organisation): ?string
@@ -254,15 +259,15 @@ class StringTools
         if (function_exists('mb_convert_case')) {
             return preg_replace_callback(
                 '/([^\s-]+)/u',
-                fn($m) => mb_convert_case($m[1], MB_CASE_TITLE, 'UTF-8'),
+                fn ($m) => mb_convert_case($m[1], MB_CASE_TITLE, 'UTF-8'),
                 $organisation
             );
         }
+
         return preg_replace_callback(
             '/([^\s-]+)/',
-            fn($m) => ucfirst(strtolower($m[1])),
+            fn ($m) => ucfirst(strtolower($m[1])),
             $organisation
         );
     }
-
 }
