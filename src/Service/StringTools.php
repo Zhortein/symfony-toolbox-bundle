@@ -44,7 +44,7 @@ class StringTools
      *
      * @todo Gestion du format RTF
      */
-    public static function sanitizeString(?string $string): ?string
+    public static function sanitizeString(?string $string): string|false|null
     {
         if (null === $string) {
             return null;
