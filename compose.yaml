@@ -1,0 +1,27 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./:/app
+    environment:
+      - COMPOSER_MEMORY_LIMIT=-1
+      - TERM=xterm-256color
+    depends_on:
+      - db
+    tty: true
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: symfony
+      POSTGRES_USER: symfony
+      POSTGRES_PASSWORD: symfony
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

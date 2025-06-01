@@ -44,7 +44,7 @@ class StringTools
      *
      * @todo Gestion du format RTF
      */
-    public static function sanitizeString(?string $string): ?string
+    public static function sanitizeString(?string $string): string|false|null
     {
         if (null === $string) {
             return null;
@@ -177,5 +177,97 @@ class StringTools
         }
 
         return true;
+    }
+
+    /**
+     * Formatte un prénom : trim, première lettre de chaque mot en majuscule, le reste en minuscule.
+     * Supporte Unicode, accents, multi-mots ("Jean-Marc", "José Maria", ...).
+     *
+     * @param string|null $firstName Prénom brut ou null
+     *
+     * @return string|null Prénom normalisé ou null si entrée vide
+     */
+    public static function formatFirstName(?string $firstName): ?string
+    {
+        if (null === $firstName) {
+            return null;
+        }
+        $firstName = trim($firstName);
+
+        // 1. Symfony String
+        if (class_exists(UnicodeString::class)) {
+            return (string) u($firstName)->title(true);
+        }
+        // 2. mbstring
+        if (function_exists('mb_convert_case')) {
+            return preg_replace_callback(
+                '/([^\s-]+)/u',
+                fn ($m) => mb_convert_case($m[1], MB_CASE_TITLE, 'UTF-8'),
+                $firstName
+            );
+        }
+
+        // 3. ASCII fallback (majuscules pour la 1ère lettre, minuscule le reste)
+        return preg_replace_callback(
+            '/([^\s-]+)/',
+            fn ($m) => ucfirst(strtolower($m[1])),
+            $firstName
+        );
+    }
+
+    /**
+     * Formatte un nom de famille : trim, majuscules, support Unicode/accents.
+     *
+     * @param string|null $lastName Nom de famille brut ou null
+     *
+     * @return string|null Nom normalisé en MAJUSCULES ou null si entrée vide
+     */
+    public static function formatLastName(?string $lastName): ?string
+    {
+        if (null === $lastName) {
+            return null;
+        }
+        $lastName = trim($lastName);
+
+        if (class_exists(UnicodeString::class)) {
+            return (string) u($lastName)->upper();
+        }
+        if (function_exists('mb_strtoupper')) {
+            return mb_strtoupper($lastName, 'UTF-8');
+        }
+
+        return strtoupper($lastName);
+    }
+
+    /**
+     * Formatte un nom d'organisation : trim, titre chaque mot.
+     *
+     * @param string|null $organisation Nom de l'organisation brut ou null
+     *
+     * @return string|null Nom formaté ou null si entrée vide
+     */
+    public static function formatOrganisationName(?string $organisation): ?string
+    {
+        if (null === $organisation) {
+            return null;
+        }
+        $organisation = trim($organisation);
+
+        if (class_exists(UnicodeString::class)) {
+            return (string) u($organisation)->title(true);
+        }
+        if (function_exists('mb_convert_case')) {
+            return preg_replace_callback(
+                '/([^\s-]+)/u',
+                fn ($m) => mb_convert_case($m[1], MB_CASE_TITLE, 'UTF-8'),
+                $organisation
+            );
+        }
+
+        return preg_replace_callback(
+            '/([^\s-]+)/',
+            fn ($m) => ucfirst(strtolower($m[1])),
+            $organisation
+        );
     }
 }
